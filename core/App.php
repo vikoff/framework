@@ -69,7 +69,7 @@ class App{
 				$this->_requestControllerIdentifier = DEFAULT_CONTROLLER;
 			}
 		}
-		$this->_requestController = self::getControllerClassName(this->_requestControllerIdentifier);
+		$this->_requestController = self::getControllerClassName($this->_requestControllerIdentifier);
 	}
 	
 	/**

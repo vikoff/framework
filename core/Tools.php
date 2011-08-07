@@ -1,6 +1,6 @@
 <?
 
-class Common{
+class Tools{
 	
 	/* БЕЗОПАСНЫЕ ТЕКСТ */
 	
@@ -130,7 +130,7 @@ class Common{
 					$input = YDate::timestamp2date($input);
 					break;
 			}
-		}else{die("Invalid parametr for function 'Common::convert_item': ".gettype($input).", ".gettype($convert_rules));}
+		}else{die("Invalid parametr for function 'Tools::convert_item': ".gettype($input).", ".gettype($convert_rules));}
 		return $input;
 	}
 	

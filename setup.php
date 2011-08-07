@@ -8,8 +8,8 @@ $GLOBALS['__vikOffTimerStart__'] = microtime(1);
 
 ########## ПОДКЛЮЧЕНИЕ ЯДРА ##########
 
-require_once(FS_ROOT.'core/Func.core.php');
-require_once(FS_ROOT.'core/App.core.php');
+require_once(FS_ROOT.'core/Func.php');
+require_once(FS_ROOT.'core/App.php');
 
 
 ########## УСТАНОВКА ОБРАБОТЧИКА ОШИБОК ##########
