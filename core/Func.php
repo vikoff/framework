@@ -47,40 +47,36 @@ function __autoload($className){
 		return;
 	}
 	
-	// библиотеки
-	if(strpos($className, 'Com_') === 0){
-		// преобразование Com_Auth_Model в /components/Auth/Model.php
-		$fname = FS_ROOT.'components/'.str_replace(array('Com_', '_'), array('', '/'), $className).'.php';
-		if(file_exists($fname))
-			require($fname);
-		return;
-	}
-	
-	
-	// контроллер
-	if(strpos($className, 'Controller')){
-	
-		$fname = FS_ROOT.'controllers/'.str_replace('Controller', '.controller.php', $className);
-		if(file_exists($fname))
-			require($fname);
-		return;
-	}
-	
-	else{
+	/*
+	МОДУЛИ
+
+	new Page_Model;
+	new Page_Forms_Form1;
+
+	Page/
+		Forms/
+			Form1.php
+			Form2.php
+			Form3.php
+		PageModel.php
+		PageController.php
+	*/
+	if(strpos($name, '_')){
 		
-		// модель
-		$fileName = FS_ROOT.'models/'.$className.'.model.php';
-		if(file_exists($fileName)){
-			require($fileName);
-			return;
+		list($module, $classIdentifier) = explode('_', $name, 2);
+		
+		// класс [SomeClass]Collection всегда лежит в файле [SomeClass].php
+		if(substr($classIdentifier, -10) == 'Collection')
+			$classIdentifier = substr($classIdentifier, 0, -10);
+			
+		$path = FS_ROOT.'modules/'.$module.'/';
+		if(strpos($classIdentifier, '_')){
+			$path .= str_replace('_', DIRECTORY_SEPARATOR, $classIdentifier).'.php';
+		}else{
+			$path .= $module.$classIdentifier.'.php';
 		}
 		
-		// коллекция
-		$fileName = FS_ROOT.'models/'.str_replace('Collection', '', $className).'.model.php';
-		if(file_exists($fileName)){
-			require($fileName);
-			return;
-		}
+		require($path);
 	}
 	
 }
