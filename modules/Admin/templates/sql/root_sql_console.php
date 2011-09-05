@@ -1,0 +1,72 @@
+
+<h3 style="text-align: center;">SQL-консоль</h3>
+
+<? if(getVar($sql_error)): ?>
+	<p class="userMessageError"><?=$sql_error;?></p>
+<? endif; ?>
+
+<form action="" method="post">
+
+	<textarea
+		id="sql-input"
+		name="query"
+		class="ctrlentersend"
+		style="width: 98%; height: 150px; font-size: 14px; font-family: monospace;"><?=$query;?></textarea>
+		
+	<div style="text-align: right; margin-top: 10px;"><input type="submit" name="" value="Выполнить запрос" /></div>
+</form>
+
+<script type="text/javascript">
+	$(function(){
+		$('#sql-input')
+			.focus()
+			.keydown(function(e){
+				if(e.keyCode == 116){ // F5
+					if($(this).val().length && confirm('Выполнить запрос?')){
+						$(this.form).submit();
+					}else{
+						location.href = location.href;
+					}
+					return false;
+				}
+			});
+		$('.thead-floatblock').floatblock({placeholder: 'clone'});
+	});
+</script>
+
+<? if(isset($data) && is_array($data)): ?>
+	<? foreach($data as $index => $result): ?>
+
+		<div class="paragraph">
+		
+			<? if(count(getVar($result, array()))): ?>
+			
+				<div>Запрос #<?= $index; ?></div>
+				
+				<table class="std-grid" style="margin: 0px auto;">
+				<thead class="thead-floatblock">
+					<tr>
+					<? foreach($result[0] as $field => $val)
+						echo '<th>'.$field.'</th>'; ?>
+					</tr>
+				</thead>
+				<tbody>
+				
+				<? foreach($result as $row){
+					echo '<tr>';
+					foreach($row as $val)
+						echo '<td>'.$val.'</td>';
+					echo '</tr>';
+				} ?>
+				</tbody>
+				</table>
+			<? else: ?>
+				
+				Запрос #<?= $index; ?> вернул пустой результат.
+				
+			<? endif; ?>
+			
+		</div>
+
+	<? endforeach; ?>
+<? endif; ?>

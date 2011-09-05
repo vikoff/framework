@@ -29,7 +29,7 @@ define('PERMS_ROOT', 		50);
 
 ########## ПОДКЛЮЧЕНИЕ КОНФИГУРАЦИОННОГО ФАЙЛА ##########
 
-require_once('config.php');
+require_once('config/config.'.RUN_MODE.'.php');
 
 
 ########## QUERY STRING PREFIX ##########
