@@ -19,8 +19,6 @@ define('INDEX_FILE', basename(__FILE__));
 /** режим работы сайта */
 define('RUN_MODE', 'dev');
 
-echo INDEX_FILE; die;
-
 // отправка Content-type заголовка
 header('Content-Type: text/html; charset=utf-8');
 

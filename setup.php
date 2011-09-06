@@ -8,13 +8,14 @@ $GLOBALS['__vikOffTimerStart__'] = microtime(1);
 
 ########## ПОДКЛЮЧЕНИЕ ЯДРА ##########
 
-require_once(FS_ROOT.'core/Func.php');
-require_once(FS_ROOT.'core/App.php');
+require(FS_ROOT.'core/Func.php');
+require(FS_ROOT.'core/App.php');
+require(FS_ROOT.'includes/autoload.php');
 
 
 ########## УСТАНОВКА ОБРАБОТЧИКА ОШИБОК ##########
 
-set_error_handler(array('Error', 'error_handler'));	
+set_error_handler(array('Core_Error_Model', 'error_handler'));	
 
 
 ########## ПРАВА ПОЛЬЗОВАТЕЛЕЙ ##########
@@ -27,16 +28,9 @@ define('PERMS_SUPERADMIN',	40);
 define('PERMS_ROOT', 		50);
 
 
-########## ПОДКЛЮЧЕНИЕ КОНФИГУРАЦИОННОГО ФАЙЛА ##########
+########## ИНИЦИАЛИЗАЦИЯ КОНФИГА ##########
 
-require_once('config/config.'.RUN_MODE.'.php');
-
-
-########## QUERY STRING PREFIX ##########
-
-define('WWW_QS_PREFIX', CFG_USE_SEF ? '' : 'index.php?r=');
-define('WWW_PREFIX', WWW_ROOT.WWW_QS_PREFIX);
-define('WWW_ADMIN_PREFIX', WWW_ROOT.WWW_QS_PREFIX.'admin/');
+Config::init();
 
 
 ########## ИНИЦИАЛИЗАЦИЯ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ##########

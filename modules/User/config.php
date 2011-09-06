@@ -3,7 +3,7 @@
 return array(
 	'isCallable' => true,
 	'required' => true,
-	'mainController' => 'Admin_Controller',
+	'mainController' => 'User_Controller',
 	'dependence' => array(),
 );
 

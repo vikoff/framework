@@ -86,7 +86,7 @@ class App{
 		
 		// проверка контроллера отображения
 		if(is_null($this->_requestController)){
-			Debugger::get()->log('Контроллер не найден');
+			// Debugger::get()->log('Контроллер не найден');
 			$this->error404();
 		}
 		
@@ -105,7 +105,7 @@ class App{
 		
 		// проверка контроллера отображения
 		if(is_null($this->_requestController)){
-			Debugger::get()->log('Контроллер не найден');
+			// Debugger::get()->log('Контроллер не найден');
 			$this->error404();
 		}
 		
@@ -140,7 +140,7 @@ class App{
 		$method = self::getActionMethodName($_method);
 		
 		if(is_null($controller)){
-			Debugger::get()->log('Контроллер не найден по идентификатору "'.$_controller.'"');
+			// Debugger::get()->log('Контроллер не найден по идентификатору "'.$_controller.'"');
 			$this->error404('Неизвестное действие');
 		}
 		
@@ -338,25 +338,27 @@ class App{
 	#### ПРОЧЕЕ ####
 	
 	// ERROR 403
-	public static function error403($msg){
+	public static function error403($msg = ''){
 		
 		if(AJAX_MODE){
 			header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden'); // 'HTTP/1.1 403 Forbidden'
 			echo $msg;
 		}else{
-			CommonViewer::get()->error403($msg);
+			$layoutClass = $this->_adminMode ? 'BackendLayout' : 'FrontendLayout';
+			$layoutClass::get()->error404($msg);
 		}
 		exit();
 	}
 	
 	/** ПОКАЗАТЬ СТРАНИЦУ 404 */
-	public function error404($msg){
+	public function error404($msg = ''){
 		
 		if(AJAX_MODE){
 			header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found'); // 'HTTP/1.1 404 Not Found'
 			echo $msg;
 		}else{
-			CommonViewer::get()->error404($msg);
+			$layoutClass = $this->_adminMode ? 'BackendLayout' : 'FrontendLayout';
+			$layoutClass::get()->error404($msg);
 		}
 		exit();
 	}

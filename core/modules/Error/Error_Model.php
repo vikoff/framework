@@ -1,12 +1,14 @@
 <?
 
-class Error{
+class Core_Error_Model{
 	
 	const HANDLER_MODE = 1;
 	const DISPLAY_MODE = 2;
 	
+	const MODULE = 'Error';
+	
 	// путь к шаблонам (относительно FS_ROOT)
-	const TPL_PATH = 'templates/Error/';
+	const TPL_PATH = 'core/modules/Error/templates/';
 	
 	static private $_cssStylesDisplayed = FALSE;
 	
@@ -25,6 +27,12 @@ class Error{
 	public $mode;
 	public $time;
 	public $url;
+	
+	/**
+	 * полный путь, по которому лежат шаблоны модуля
+	 * назначается в конструкторе
+	 */
+	public $tplPath = null;
 	
 	private static $_config = array(
 		'display' => TRUE,				// отображать ошибки или нет
@@ -88,7 +96,7 @@ class Error{
 		array_shift($backtrace);
 		foreach($backtrace as &$row)
 			unset($row['object']);
-		$instance = new Error($errlevel, $errstr, $errfile, $errline, $errcontext, $backtrace, self::HANDLER_MODE);
+		$instance = new Core_Error_Model($errlevel, $errstr, $errfile, $errline, $errcontext, $backtrace, self::HANDLER_MODE);
 	}
 	
 	// ЗАГРУЗКА ОШИБКИ - МЕТОД САМОСТОЯТЛЬНО ИЗВЛЕКАЕТ ДАННЫЕ ИЗ БД (ТОЧКА ВХОДА В КЛАСС)
@@ -106,7 +114,7 @@ class Error{
 	public static function forceLoad($id, $data){
 		
 		$desc = unserialize(base64_decode($data['description']));
-		$instance = new Error(
+		$instance = new Core_Error_Model(
 			self::getVar($desc['errlevel']),
 			self::getVar($desc['errstr']),
 			self::getVar($desc['errfile']),
@@ -210,6 +218,7 @@ class Error{
 		}else{
 			echo $this->_getHtmlCssJs();
 			include(FS_ROOT.self::TPL_PATH.'view.php');
+			die;
 			return null;
 		}
 	
@@ -259,7 +268,7 @@ class Error{
 			self::$_cssStylesDisplayed = TRUE;
 			$f = FS_ROOT.self::TPL_PATH.'formatting.php';
 			if(!file_exists($f))
-				die('Файл стилей ['.$f.'] не найден Error.core.php #'.__LINE__);
+				die('Файл стилей ['.$f.'] не найден '.__CLASS__.' #'.__LINE__);
 			return preg_replace('/\s+/m', ' ', file_get_contents($f));
 		}
 	}
@@ -272,7 +281,7 @@ class Error{
 	private function log2file(){
 		
 		if(is_null(self::$_config['fileLogPath'])){
-			die('Путь к лог-файлу не указан Error.core.php #'.__LINE__);
+			die('Путь к лог-файлу не указан '.__CLASS__.' #'.__LINE__);
 		}
 			
 		if(!is_dir(self::$_config['fileLogPath']))
@@ -280,7 +289,7 @@ class Error{
 		
 		$txt = $this->_getUserString()."\n".$this->getText()."\n\n";
 		
-		$rs = fopen(self::$_config['fileLogPath'].'error.log', 'a') or die('Не удалось открыть лог-файл Error.core.php #'.__LINE__);
+		$rs = fopen(self::$_config['fileLogPath'].'error.log', 'a') or die('Не удалось открыть лог-файл '.__CLASS__.' #'.__LINE__);
 		fwrite($rs, $txt) or die('Не удалось произвести запись в лог-файл');
 		fclose($rs) or die('Не удалось закрыть лог-файл');
 	}
@@ -353,11 +362,11 @@ class ErrorCollection extends GenericObjectCollection{
 	// ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ
 	public function getPaginated(){
 		
-		$paginator = new Paginator('sql', array('*', 'FROM '.Error::getConfig('dbTableName').' ORDER BY id DESC'), '~50');
+		$paginator = new Paginator('sql', array('*', 'FROM '.Core_Error_Model::getConfig('dbTableName').' ORDER BY id DESC'), '~50');
 		$data = db::get()->getAll($paginator->getSql(), array());
 		
 		foreach($data as &$row)
-			$row = Error::forceLoad($row['id'], $row)->printHTML($return = TRUE);
+			$row = Core_Error_Model::forceLoad($row['id'], $row)->printHTML($return = TRUE);
 		
 		$this->_pagination = $paginator->getButtons();
 		$this->_linkTags = $paginator->getLinkTags();
