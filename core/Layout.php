@@ -8,7 +8,6 @@
  */
 class Layout{
 	
-	protected $_tplPath = 'templates';
 	
 	protected $_layoutName = 'default';
 	protected $_layoutDir = null;
@@ -124,17 +123,19 @@ class Layout{
 	
 	public function setContentHtmlFile($file){
 		
-		$this->_htmlContent = file_get_contents($this->_tplPath.$file);
+		$this->_htmlContent = file_get_contents($file);
 		return $this;
 	}
 	
 	public function setContentPhpFile($file, $variables = array()){
 		
-		extract($variables);
-		
+		foreach($variables as $k => $v)
+			$this->$k = $v;
+			
 		ob_start();
-		include($this->_tplPath.$file);
+		include($file);
 		$this->_htmlContent = ob_get_clean();
+		
 		return $this;
 	}
 	
@@ -197,57 +198,23 @@ class Layout{
 	/** GET CLIENT STATISTICS LOADER HTML */
 	protected function _getClientStatisticsLoader(){
 	
-		$uStat = UserStatistics::get();
+		$uStat = UserStatistics_Model::get();
 		
 		return $uStat->checkClientSideStatistics()
 			? $uStat->getClientSideStatisticsLoader()
 			: '';
 	}
 	
-	/** GET PHP PAGE STATISTICS HTML */
-	protected function _getPhpPageStatistics(){
-		
-		$scriptExecutionTime = round(microtime(1) - $GLOBALS['__vikOffTimerStart__'], 4);
-		
-		$output = ''
-			.'<table class="php-page-statistics">'
-			.'<tr class="section"><th colspan="2" >PHP</th></tr>'
-			.'<tr><th>Показатель</th><th>Значение</th></tr>'
-			.'<tr><td>Версия интерпретатора</td><td>'.phpversion().'</td></tr>'
-			.'<tr><td>Время выполнения скрипта</td><td>'.$scriptExecutionTime.' сек.</td></tr>'
-			.'<tr><td>Подключенных файлов</td><td>'.count(get_included_files()).'</td></tr>'
-			.'<tr><td>Пик использования памяти</td><td>'.Common::formatByteSize(memory_get_peak_usage()).'</td></tr>'
-			
-			.'<tr class="section"><th colspan="2" >SQL</th></tr>'
-			.'<tr><th>Запрос</th><th>Время, сек</th></tr>'
-		;
-		foreach(db::get()->getQueriesWithTime() as $q)
-			$output .= '<tr><td>'.$q['sql'].'</td><td>'.round($q['time'], 5).'</td></tr>';
-		$output .= ''
-			.'<tr class="b"><td>Всего запросов</td><td>'.db::get()->getQueriesNum().'</td></tr>'
-			.'<tr class="b"><td>Общее время выполнения</td><td>'.round(db::get()->getQueriesTime(), 5).' сек.</td></tr>'
-			.'</table>'
-		;
-		
-		$output = '
-			<script type="text/javascript">
-			$(function(){
-				VikDebug.print(\''.preg_replace(array("/\s+/", "/'/"), array(" ", "\\'"), $output).'\', "performance", {activateTab: false, onPrintAction: "none"});
-			});
-			</script>';
-		return $output;
-	}
-	
 	/** RENDER ALL */
 	public function render($boolReturn = FALSE){
 		
 		// сохранение пользовательской статистики
-		UserStatistics::get()->savePrimaryStatistics();
+		UserStatistics_Model::get()->savePrimaryStatistics();
 		
 		if($boolReturn)
 			ob_start();
 			
-		include($this->_layoutDir.$this->_layoutName.'.php');
+		include($this->_layoutDir.'layout.php');
 		
 		if($boolReturn)
 			return ob_get_clean();
@@ -304,12 +271,17 @@ class Layout{
 		}else{
 			$this
 				->setTitle('Страница не найдена')
-				->setContentPhpFile('404.php', array('message' => $message))
+				->setContentPhpFile($this->_layoutDir.'error404.php', array('message' => $message))
 				->render();
 		}
 		exit();
 	}
-
+	
+	public function __get($name){
+		
+		return isset($this->$name) ? $this->$name : '';
+	}
+	
 }
 
 ?>

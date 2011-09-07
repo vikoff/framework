@@ -6,21 +6,18 @@ function __autoload($className){
 	// индекс всех элементов из CORE (кроме App и Func),
 	// а так же всех компонентов.
 	static $filesIndex = array(
-		'Common' 			=> 'core/Common.php',
+		'Tools' 			=> 'core/Tools.php',
 		'db' 				=> 'core/Db.php',
 		'Layout'			=> 'core/Layout.php',
+		'Debugger'			=> 'core/Debugger.php',
 		'DbAdapter_mysql'	=> 'core/DbAdapters/mysql.php',
 		'DbAdapter_sqlite'	=> 'core/DbAdapters/sqlite.php',
-		'CommonViewer' 		=> 'core/CommonViewer.php',
 		'Controller' 		=> 'core/Controller.php',
-		// 'Error' 			=> 'core/Error.php',
 		'GenericObject' 	=> 'core/GenericObject.php',
 		'GenericObjectCollection' => 'core/GenericObject.php',
 		'ImageMaster'		=> 'core/ImageMaster.php',
 		'Messenger' 		=> 'core/Messenger.php',
 		'Paginator' 		=> 'core/Paginator.php',
-		'UserStatistics'	=> 'core/UserStatistics.php',
-		'UserStatisticsCollection' => 'core/UserStatistics.php',
 		'Validator' 		=> 'core/Validator.php',
 		'YDate' 			=> 'core/YDate.php',
 		'CsvParser' 		=> 'core/CsvParser.php',
@@ -31,12 +28,9 @@ function __autoload($className){
 		'FormBuilder'		=> 'core/FormBuilder.php',
 		'Debugger'			=> 'core/Debugger.php',
 		
-		'BackendViewer'		=> 'components/BackendViewer.component.php',
 		'Def'				=> 'components/Def.component.php',
-		'FrontendViewer'	=> 'components/FrontendViewer.component.php',
-		'UserCollection'	=> 'components/User.component.php',
-		'Page' 				=> 'components/Page.component.php',
-		'PageCollection'	=> 'components/Page.component.php',
+		
+		/* NEW */
 		
 		'Config'			=> 'includes/Config.php',
 		'CurUser' 			=> 'includes/CurUser.php',
@@ -54,7 +48,7 @@ function __autoload($className){
 	}
 	
 	/*
-	МОДУЛИ
+	MODULES, LAYOUTS
 
 	new Page_Model;
 	new Page_Forms_Form1;
@@ -80,18 +74,13 @@ function __autoload($className){
 		
 		$path = 'modules/'.$module.'/';
 		
-		// core модуль
-		if($module == 'Core'){
-			list($module, $classIdentifier) = explode('_', $classIdentifier, 2);
-			$path = 'core/modules/'.$module.'/';
-		}
-		
 		if(strpos($classIdentifier, '_')){
 			$path .= str_replace('_', DIRECTORY_SEPARATOR, $classIdentifier).'.php';
 		}else{
 			$path .= $module.'_'.$classIdentifier.'.php';
 		}
 		
+		// echo $path.'<hr>';
 		require(FS_ROOT.$path);
 	}
 	

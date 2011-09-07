@@ -1,8 +1,8 @@
 <?
 
-class BackendViewer extends CommonViewer{
+class BackendLayout extends Layout{
 	
-	protected $_skin = 'backend';
+	protected $_layoutName = 'backend';
 	
 	private $_topMenu = array(
 		'content' => array('perms' => PERMS_ADMIN, 'title' => 'Контент'           ),
@@ -51,7 +51,7 @@ class BackendViewer extends CommonViewer{
 	public static function get(){
 
 		if(is_null(self::$_instance))
-			self::$_instance = new BackendViewer();
+			self::$_instance = new BackendLayout();
 		
 		return self::$_instance;
 	}
@@ -139,7 +139,7 @@ class BackendViewer extends CommonViewer{
 		
 		$isLogged = CurUser::get()->isLogged();
 		$errorMessage = Messenger::get()->ns('login')->getAll();
-		include($this->_tplPath.'Admin/login.php');
+		include($this->_layoutDir.'login.php');
 	}
 	
 }

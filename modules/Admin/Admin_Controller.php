@@ -1,8 +1,6 @@
 <?
 
-// Admin_Controller
-
-class AdminController extends Controller{
+class Admin_Controller extends Controller{
 	
 	const DEFAULT_VIEW = 1;
 	const TPL_PATH = 'Admin/';
@@ -28,7 +26,7 @@ class AdminController extends Controller{
 	public function init(){
 	
 		$this->_adminMode = TRUE;
-		BackendViewer::get()->setTitle('Административная панель');
+		BackendLayout::get()->setTitle('Административная панель');
 	}
 	
 	// МОДИФИКАЦИЯ ИМЕНИ МЕТОДА
@@ -44,7 +42,7 @@ class AdminController extends Controller{
 	// DISPLAY CONTENT
 	public function display_content($params = array()){
 		
-		$viewer = BackendViewer::get();
+		$viewer = BackendLayout::get();
 		$viewer
 			->setTopMenuActiveItem('content')
 			->setLeftMenuType('content');
@@ -62,7 +60,7 @@ class AdminController extends Controller{
 		$displayMethodIdentifier = array_shift($params);
 		
 		if(!$controllerClass){
-			BackendViewer::get()->error404('Контроллер не найден');
+			BackendLayout::get()->error404('Контроллер не найден');
 			exit();
 		}
 		
@@ -77,7 +75,7 @@ class AdminController extends Controller{
 	// DISPLAY USERS
 	public function display_users($params = array()){
 			
-		$viewer = BackendViewer::get();
+		$viewer = BackendLayout::get();
 		$viewer
 			->setTopMenuActiveItem('users')
 			->setLeftMenuType('users');
@@ -107,7 +105,7 @@ class AdminController extends Controller{
 		
 		$section = getVar($params[0]);
 		
-		$viewer = BackendViewer::get();
+		$viewer = BackendLayout::get();
 		$viewer
 			->setTopMenuActiveItem('root')
 			->setLeftMenuType('root')
@@ -142,7 +140,7 @@ class AdminController extends Controller{
 				$displayMethodIdentifier = array_shift($params);
 				
 				if(!$controllerClass){
-					BackendViewer::get()->error404('Контроллер не найден');
+					BackendLayout::get()->error404('Контроллер не найден');
 					exit();
 				}
 				
@@ -170,7 +168,7 @@ class AdminController extends Controller{
 			$variables['data'] = $this->_execSql($query);
 			$variables['sql_error'] = db::get()->hasError() ? db::get()->getError() : '';
 		}
-		BackendViewer::get()
+		BackendLayout::get()
 			->setContentPhpFile(self::TPL_PATH.'root_sql_console.php', $variables);
 	}
 	
@@ -185,7 +183,7 @@ class AdminController extends Controller{
 			'encoding' => $db->getEncoding(),
 		);
 
-		BackendViewer::get()
+		BackendLayout::get()
 			->setContentPhpFile(self::TPL_PATH.'root_sql_dump.php', $variables);
 	}
 	
@@ -197,7 +195,7 @@ class AdminController extends Controller{
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
 		);
-		BackendViewer::get()
+		BackendLayout::get()
 			->setContentPhpFile(self::TPL_PATH.'root_error_log.php', $variables);
 	}
 	
@@ -314,7 +312,7 @@ class AdminController extends Controller{
 	// ОБРАБОТЧИК 403
 	public function error403handler($method, $line = 0){
 		
-		BackendViewer::get()->showLoginPage();
+		BackendLayout::get()->showLoginPage();
 	}
 
 }

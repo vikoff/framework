@@ -1,6 +1,6 @@
 <?
 
-class Tools{
+class Tools {
 	
 	/* БЕЗОПАСНЫЕ ТЕКСТ */
 	

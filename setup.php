@@ -15,7 +15,7 @@ require(FS_ROOT.'includes/autoload.php');
 
 ########## УСТАНОВКА ОБРАБОТЧИКА ОШИБОК ##########
 
-set_error_handler(array('Core_Error_Model', 'error_handler'));	
+set_error_handler(array('Error_Model', 'error_handler'));	
 
 
 ########## ПРАВА ПОЛЬЗОВАТЕЛЕЙ ##########

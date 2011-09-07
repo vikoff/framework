@@ -1,14 +1,14 @@
 <?
 
-class Core_Error_Model{
+class Error_Model{
 	
 	const HANDLER_MODE = 1;
 	const DISPLAY_MODE = 2;
 	
 	const MODULE = 'Error';
 	
-	// путь к шаблонам (относительно FS_ROOT)
-	const TPL_PATH = 'core/modules/Error/templates/';
+	/** путь к шаблонам (относительно FS_ROOT) */
+	const TPL_PATH = 'modules/Error/templates/';
 	
 	static private $_cssStylesDisplayed = FALSE;
 	
@@ -96,7 +96,7 @@ class Core_Error_Model{
 		array_shift($backtrace);
 		foreach($backtrace as &$row)
 			unset($row['object']);
-		$instance = new Core_Error_Model($errlevel, $errstr, $errfile, $errline, $errcontext, $backtrace, self::HANDLER_MODE);
+		$instance = new Error_Model($errlevel, $errstr, $errfile, $errline, $errcontext, $backtrace, self::HANDLER_MODE);
 	}
 	
 	// ЗАГРУЗКА ОШИБКИ - МЕТОД САМОСТОЯТЛЬНО ИЗВЛЕКАЕТ ДАННЫЕ ИЗ БД (ТОЧКА ВХОДА В КЛАСС)
@@ -114,7 +114,7 @@ class Core_Error_Model{
 	public static function forceLoad($id, $data){
 		
 		$desc = unserialize(base64_decode($data['description']));
-		$instance = new Core_Error_Model(
+		$instance = new Error_Model(
 			self::getVar($desc['errlevel']),
 			self::getVar($desc['errstr']),
 			self::getVar($desc['errfile']),
@@ -362,11 +362,11 @@ class ErrorCollection extends GenericObjectCollection{
 	// ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ
 	public function getPaginated(){
 		
-		$paginator = new Paginator('sql', array('*', 'FROM '.Core_Error_Model::getConfig('dbTableName').' ORDER BY id DESC'), '~50');
+		$paginator = new Paginator('sql', array('*', 'FROM '.Error_Model::getConfig('dbTableName').' ORDER BY id DESC'), '~50');
 		$data = db::get()->getAll($paginator->getSql(), array());
 		
 		foreach($data as &$row)
-			$row = Core_Error_Model::forceLoad($row['id'], $row)->printHTML($return = TRUE);
+			$row = Error_Model::forceLoad($row['id'], $row)->printHTML($return = TRUE);
 		
 		$this->_pagination = $paginator->getButtons();
 		$this->_linkTags = $paginator->getLinkTags();

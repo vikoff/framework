@@ -12,7 +12,7 @@
  * 		
  * 		
  */
-class UserStatistics{
+class UserStatistics_Model{
 	
 	private $_statisticsEnabled = null;
 	
@@ -36,7 +36,7 @@ class UserStatistics{
 			if(array_key_exists($key, self::$_config)){
 				self::$_config[$key] = $val;
 			}else{
-				trigger_error('Не удалось установить конфигурацию класса UserStatistics. Неизвестный ключ ['.$key.']', E_USER_ERROR);
+				trigger_error('Не удалось установить конфигурацию класса UserStatistics_Model. Неизвестный ключ ['.$key.']', E_USER_ERROR);
 			}
 		}
 	}
@@ -57,7 +57,7 @@ class UserStatistics{
 	public static function get(){
 	
 		if(is_null(self::$_instance))
-			self::$_instance = new UserStatistics();
+			self::$_instance = new UserStatistics_Model();
 			
 		return self::$_instance;
 	}
@@ -323,14 +323,14 @@ class UserStatisticsCollection extends GenericObjectCollection{
 		
 		$sorter = new Sorter('s.id', 'DESC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array('s.*, u.name, u.surname, u.level',
-			'FROM '.UserStatistics::getConfig('dbTableName').' AS s
+			'FROM '.UserStatistics_Model::getConfig('dbTableName').' AS s
 			LEFT JOIN '.User::TABLE.' AS u ON u.id=s.uid
 			ORDER BY '.$sorter->getOrderBy()), '~50');
 		
 		$data = db::get()->getAll($paginator->getSql(), array());
 		
 		foreach($data as &$row)
-			$row = UserStatistics::beforeDisplay($row);
+			$row = UserStatistics_Model::beforeDisplay($row);
 		
 		$this->_sortableLinks = $sorter->getSortableLinks();
 		$this->_pagination = $paginator->getButtons();

@@ -236,7 +236,7 @@ class Controller{
 	// ОБРАБОТЧИК ОШИБКИ
 	public function errorHandler($msg, $line = 0){
 		
-		$msg = $msg.(USER_AUTH_PERMS >= Error::getConfig('minPermsForDisplay') && !empty($line) ? ' (#'.$line.')' : '');
+		$msg = $msg.(USER_AUTH_PERMS >= Error_Model::getConfig('minPermsForDisplay') && !empty($line) ? ' (#'.$line.')' : '');
 		
 		if(App::$adminMode)
 			BackendViewer::get()->error($msg);
@@ -247,23 +247,19 @@ class Controller{
 	// ОБРАБОТЧИК ОШИБКИ 403
 	public function error403handler($msg, $line = 0){
 		
-		$msg = USER_AUTH_PERMS >= Error::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
+		$msg = USER_AUTH_PERMS >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
 		
-		if(App::$adminMode)
-			BackendViewer::get()->error403($msg);
-		else
-			FrontendViewer::get()->error403($msg);
+		$layoutClass = App::get()->isAdminMode() ? 'BackendLayout' : 'FrontendLayout';
+		$layoutClass::get()->error403($msg);
 	}
 	
 	// ОБРАБОТЧИК ОШИБКИ 404
 	public function error404handler($msg, $line = 0){
 		
-		$msg = USER_AUTH_PERMS >= Error::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
+		$msg = USER_AUTH_PERMS >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
 		
-		if(App::$adminMode)
-			BackendViewer::get()->error404($msg);
-		else
-			FrontendViewer::get()->error404($msg);
+		$layoutClass = App::get()->isAdminMode() ? 'BackendLayout' : 'FrontendLayout';
+		$layoutClass::get()->error404($msg);
 	}
 	
 	// ВЫПОЛНЕНИЕ МЕТОДА ПО УМОЛЧАНИЮ

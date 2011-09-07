@@ -138,7 +138,7 @@ class CurUser extends User_Model{
 	// ПРОВЕРКА АВТОРИЗОВАН ЛИ ПОЛЬЗОВАТЕЛЬ
 	 public function isLogged(){
 		
-		return (is_numeric($_SESSION[$this->_authPrefix.'userAuthData']['id']) && in_array($_SESSION[$this->_authPrefix.'userAuthData']['perms'], User::getPermsList()) && $_SESSION[$this->_authPrefix.'userAuthData']['perms'] > PERMS_UNREG)
+		return (is_numeric($_SESSION[$this->_authPrefix.'userAuthData']['id']) && in_array($_SESSION[$this->_authPrefix.'userAuthData']['perms'], User_Model::getPermsList()) && $_SESSION[$this->_authPrefix.'userAuthData']['perms'] > PERMS_UNREG)
 			? TRUE
 			: FALSE;
 	}

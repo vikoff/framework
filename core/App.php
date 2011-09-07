@@ -10,7 +10,6 @@
  *		CFG_SMARTY_TRIMWHITESPACES,
  *		CFG_SITE_NAME,
  *		WWW_URI,
- *		WWW_PREFIX
  */
 class App{
 	
@@ -81,37 +80,20 @@ class App{
 		return $this->_adminMode;
 	}
 	
-	/**  ВЫПОЛНЕНИЕ ПРИЛОЖЕНИЯ */
+	/** ЗАПУСК ПРИЛОЖЕНИЯ */
 	public function run(){
 		
-		// проверка контроллера отображения
-		if(is_null($this->_requestController)){
-			// Debugger::get()->log('Контроллер не найден');
-			$this->error404();
-		}
-		
-		// определение и выполнение действия
 		$this->_checkAction();
-		
-		// выполнение отображения (если не приостановлено)
-		if(!$this->_preventDisplay){
-			$displayControllerInstance = new $this->_requestController();
-			$displayControllerInstance->performDisplay($this->_requestMethodIdentifier, $this->_requestParams);
-		}
+		$this->_checkDisplay();
 	}
 	
-	/**  ВЫПОЛНЕНИЕ AJAX-ЗАПРОСА */
+	/** ЗАПУСК ПРИЛОЖЕНИЯ В AJAX-РЕЖИМЕ */
 	public function ajax(){
 		
-		// проверка контроллера отображения
-		if(is_null($this->_requestController)){
-			// Debugger::get()->log('Контроллер не найден');
-			$this->error404();
-		}
-		
-		// выполнение ajax-метода
-		$controllerInstance = new $this->_requestController();
-		$controllerInstance->performAjax($this->_requestMethodIdentifier, $this->_requestParams);
+		if($this->_checkAction())
+			exit;
+			
+		$this->_checkAjax();
 	}
 
 	
@@ -140,13 +122,41 @@ class App{
 		$method = self::getActionMethodName($_method);
 		
 		if(is_null($controller)){
-			// Debugger::get()->log('Контроллер не найден по идентификатору "'.$_controller.'"');
-			$this->error404('Неизвестное действие');
+			Debugger::get()->log('Контроллер не найден по идентификатору "'.$_controller.'"');
+			$this->error404('Неизвестное действие "'.$_controller.'"');
 		}
 		
 		$controllerInstance = new $controller();
 		$controllerInstance->performAction($method, $redirect);
 		return TRUE;
+	}
+	
+	/** ПРОВЕРКА НЕОБХОДИМОСТИ ВЫПОЛНЕНИЯ ОТОБРАЖЕНИЯ */
+	protected function _checkDisplay(){
+		
+		$controller = self::getControllerClassName($this->_requestControllerIdentifier);
+		
+		if(empty($controller)){
+			self::error404('Controller "'.$this->_requestControllerIdentifier.'" does not exists');
+			return;
+		}
+		
+		$controllerInstance = new $controller();
+		$controllerInstance->performDisplay($this->_requestMethodIdentifier, $this->_requestParams);
+	}
+	
+	/** ПРОВЕРКА НЕОБХОДИМОСТИ ВЫПОЛНЕНИЯ AJAX */
+	protected function _checkAjax(){
+		
+		$controller = self::getControllerClassName($this->_requestControllerIdentifier);
+		
+		if(empty($controller)){
+			self::error404('Controller "'.$this->_requestControllerIdentifier.'" does not exists');
+			return;
+		}
+		
+		$controllerInstance = new $controller();
+		$controllerInstance->performAjax($this->_requestMethodIdentifier, $this->_requestParams);
 	}
 	
 	/**
@@ -161,11 +171,15 @@ class App{
 			return null;
 		
 		// если идентификатор контроллера содержит недопустимые символы, вернем null
-		if(!preg_match('/^[\w\-]$/', $controllerIdentifier))
+		if(!preg_match('/^[\w\-]+$/', $controllerIdentifier))
 			return null;
-			
-		// преобразует строку вида 'any-class-name' в 'AnyClassNameController'
-		$controller = str_replace(' ', '', ucwords(str_replace('-', ' ', strtolower($controllerIdentifier)))).'Controller';
+		
+		// преобразует строку вида 'any-class-name' в 'AnyClassName_Controller'
+		// 'user' => 'UserController
+		// 'user-profile' => User_ProfileController
+		$_controller = str_replace(' ', '_', ucwords(str_replace('-', ' ', strtolower($controllerIdentifier))));
+		$controller = $_controller.(strpos($_controller, '_') ? 'Controller' : '_Controller');
+		// die($controller);
 		return class_exists($controller) ? $controller : null;
 	}
 	
