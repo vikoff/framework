@@ -63,7 +63,7 @@ class GenericObject{
 			
 			// принудительная загрузка существующего объекта
 			case self::INIT_EXISTS_FORCE:
-			
+				
 				$this->id = (int)$id;
 				$this->isExistsObj = TRUE;
 				$this->isNewObj = FALSE;

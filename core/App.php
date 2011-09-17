@@ -105,9 +105,14 @@ class App{
 		return isset($this->_modulesConfig[$module]);
 	}
 	
-	public function getModule($module){
+	public function getModule($module, $adminMode = FALSE){
 		
-		return new $this->_modulesConfig[$module]['controller'] ();
+		$key = $adminMode ? 'adminController' : 'controller';
+		if(!isset($this->_modulesConfig[$module][$key])){
+			$this->error404('Модуль "'.$module.'" не найден');
+			exit;
+		}
+		return new $this->_modulesConfig[$module][$key] ();
 	}
 
 	
@@ -118,26 +123,22 @@ class App{
 		
 		if(!isset($_POST['action']) || !App::checkFormDuplication())
 			return FALSE;
-			
+		
 		$isArr = is_array($_POST['action']);
 		$action = strtolower($isArr ? YArray::getFirstKey($_POST['action']) : $_POST['action']);
 		$redirect = $isArr && is_array($_POST['action'][$action])
 			? YArray::getFirstKey($_POST['action'][$action])
 			: (isset($_POST['redirect']) ? $_POST['redirect'] : '');
 		
-		// параметр action должен иметь вид 'module/method'
-		if(strpos($action, '/') === FALSE){
+		$params = YArray::trim(explode('/', $action));
+		
+		// параметр action должен иметь вид 'module/method[/param][/param]'
+		if(count($params) == 1){
 			trigger_error('Неверный формат параметра action: '.$action.' (требуется разделитель)', E_USER_ERROR);
 		}
 		
-		list($module, $method) = YArray::trim(explode('/', $action));
-		
-		if(!$this->isModule($module)){
-			$this->error404('Модуль "'.$module.'" не найден');
-			return FALSE;
-		}
-		
-		$this->getModule($module)->action($method, $redirect);
+		$module = array_shift($params);
+		$this->getModule($module)->action($params, $redirect);
 		return TRUE;
 	}
 	
@@ -343,8 +344,8 @@ class App{
 			header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden'); // 'HTTP/1.1 403 Forbidden'
 			echo $msg;
 		}else{
-			$layoutClass = $this->_adminMode ? 'BackendLayout' : 'FrontendLayout';
-			$layoutClass::get()->error404($msg);
+			$layoutClass = $this->_adminMode ? BackendLayout::get() : FrontendLayout::get();
+			$layoutClass->error403($msg);
 		}
 		exit();
 	}
@@ -356,8 +357,8 @@ class App{
 			header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found'); // 'HTTP/1.1 404 Not Found'
 			echo $msg;
 		}else{
-			$layoutClass = $this->_adminMode ? 'BackendLayout' : 'FrontendLayout';
-			$layoutClass::get()->error404($msg);
+			$layoutClass = $this->_adminMode ? BackendLayout::get() : FrontendLayout::get();
+			$layoutClass->error404($msg);
 		}
 		exit();
 	}

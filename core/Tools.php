@@ -273,7 +273,7 @@ class Tools {
 	 * @param string $fullName - полное имя файла (включая путь)
 	 * @return string имя файла без пути
 	 */
-	public function basename($fullName){
+	public static function basename($fullName){
 	
 		$fullName = str_replace('\\', '/', $fullName);
 		if(substr($fullName, -1, 1) == '/')
@@ -281,6 +281,14 @@ class Tools {
 		$fullNameArr = explode('/', $fullName);
 		return end($fullNameArr);
 	}
+
+	/** УБРАТЬ ЭКРАНИРУЮЩИЕ СЛЕШИ ЕСЛИ НАДО */
+	public static function unescape($string){
+		 return get_magic_quotes_gpc()
+			? stripslashes($string)
+			: $string;
+	}
+
 }
 
 ?>

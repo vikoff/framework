@@ -3,7 +3,7 @@
 class Admin_Controller extends Controller{
 	
 	const DEFAULT_VIEW = 1;
-	const TPL_PATH = 'Admin/';
+	const TPL_PATH = 'modules/Admin/templates/';
 	
 	// методы, отображаемые по умолчанию
 	protected $_defaultFrontendDisplay = FALSE;
@@ -15,6 +15,7 @@ class Admin_Controller extends Controller{
 		'display_content'	=> PERMS_ADMIN,
 		'display_users' 	=> PERMS_ADMIN,
 		'display_root' 		=> PERMS_ADMIN,
+		'display_sql' 		=> PERMS_ADMIN,
 		
 		'action_sql_dump' 	=> PERMS_ROOT,
 		'actionSave' 		=> PERMS_ADMIN,
@@ -25,13 +26,7 @@ class Admin_Controller extends Controller{
 	
 	public function init(){
 	
-		$this->_adminMode = TRUE;
 		BackendLayout::get()->setTitle('Административная панель');
-	}
-	
-	// МОДИФИКАЦИЯ ИМЕНИ МЕТОДА
-	public function modifyMethodName(&$method){
-		// для этого контроллера модификация имен не требуется
 	}
 	
 	
@@ -151,6 +146,11 @@ class Admin_Controller extends Controller{
 		$viewer->render();
 	}
 
+	public function display_sql($params = array()){
+		
+		$controller = new Admin_SqlController();
+		$controller->display($params);
+	}
 	
 	//////////////////////
 	////// SNIPPETS //////

@@ -35,6 +35,28 @@
 			font-style: italic;
 			margin-top: 5px;
 		}
+		.vik-user-message{
+			padding: 10px;
+			margin: 5px;
+			font-size: 13px;
+		}
+		.vik-user-message.success{
+			border: solid 2px #00cc00;
+			background-color: #eeffee;
+		}
+		.vik-user-message.info{
+			border: solid 2px #0000cc;
+			background-color: #eeeeff;
+		}
+		.vik-user-message.error{
+			border: solid 2px #cc0000;
+			background-color: #ffeeee;
+		}
+		.vik-user-message .detail{
+			margin: 5px 15px 5px;
+			font-size: 12px;
+			font-style: italic;
+		}
 	</style>
 </head>
 <body>
@@ -46,7 +68,7 @@
 	<?=$this->errorMessage;?>
 	
 	<form action="" method="post">
-		<input type="hidden" name="action" value="user-profile/login" />
+		<input type="hidden" name="action" value="user/profile/login" />
 		<?=FORMCODE;?>
 		
 		<table style="width: 100%;">

@@ -35,7 +35,7 @@ class Layout{
 	/** КОНСТРУКТОР */
 	protected function __construct(){
 		
-		$this->_layoutDir = FS_ROOT.'layouts/'.$this->_layoutName.'/';
+		$this->_layoutDir = 'layouts/'.$this->_layoutName.'/';
 	}
 	
 	public function setTitle($title){
@@ -134,7 +134,7 @@ class Layout{
 	/** ПОЛУЧИТЬ КОНТЕНТ ИЗ ПРОИЗВОЛЬНОГО ФАЙЛА (БЕЗ ИНТЕРПРЕТАЦИИ) */
 	public function setContentHtmlFile($file){
 		
-		$this->_htmlContent .= file_get_contents($file);
+		$this->_htmlContent .= file_get_contents(FS_ROOT.$file);
 		return $this;
 	}
 	
@@ -145,7 +145,7 @@ class Layout{
 			$this->$k = $v;
 			
 		ob_start();
-		include($file);
+		include(FS_ROOT.$file);
 		$this->_htmlContent .= ob_get_clean();
 		
 		return $this;
@@ -260,7 +260,7 @@ class Layout{
 		);
 		$this
 			->setTitle('Ошибка')
-			->setContentPhpFile('error.php', $variables)
+			->setContentPhpFile($this->_layoutDir.'error.php', $variables)
 			->render();
 		exit();
 	}
@@ -275,7 +275,7 @@ class Layout{
 		}else{
 			$this
 				->setTitle('Доступ запрещен')
-				->setContentPhpFile('403.php', array('message' => $message))
+				->setContentPhpFile($this->_layoutDir.'error403.php', array('message' => $message))
 				->render();
 		}
 		exit();
@@ -334,7 +334,7 @@ class Layout{
 		if($boolReturn)
 			ob_start();
 			
-		include($this->_layoutDir.'layout.php');
+		include(FS_ROOT.$this->_layoutDir.'layout.php');
 		
 		if($boolReturn)
 			return ob_get_clean();

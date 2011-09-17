@@ -3,11 +3,10 @@
 class Controller{
 	
 	/**
-	 * Режим администратора. Задается в конструкторе.
-	 * Автоматически устанавливается в TRUE при вызове из адм. панели
-	 * @var bool
+	 * массив пар 'идентификатор' => 'Имя контроллера'
+	 * для проксирования запросов на указанное действие/отображение в другой контроллер
 	 */
-	protected $_adminMode = FALSE;
+	protected $_proxy = array();
 	
 	/*
 	 * Идентификатор метода, вызываемого по умолчанию для фронтенда.
@@ -82,23 +81,15 @@ class Controller{
 	
 	public function __construct($adminMode = FALSE){
 	
-		$this->_adminMode = $adminMode;
 		$this->init();
 	}
 	
-	// ИНИЦИАЛИЗАЦИЯ КОНТРОЛЛЕРА
+	/**
+	 * НАЧАЛЬНАЯ ИНИЦИАЛИЗАЦИЯ КОНТРОЛЛЕРА
+	 * метод может быть объявлен в наследниках класса для вызова каких-либо действий
+	 */
 	public function init(){}
 	
-	/**
-	 * Получить заголовок контроллера
-	 * Если заголовок не задан, возвращается имя класса
-	 * (например "user" для UserController)
-	 * @return string - заголовок контроллера
-	 */
-	public function getTitle(){
-	
-		return !is_null($this->_title) ? $this->_title : strtolower(str_replace('Controller', '', __CLASS__));
-	}
 	
 	/** ДОСТАТОЧНО ЛИ ПРАВ ДЛЯ ВЫПОЛНЕНИЯ */
 	public function hasPermission($method, $userperm){
@@ -111,7 +102,7 @@ class Controller{
 		// если действие не найдено
 		if(!method_exists($this, $method)){
 			
-			$this->error404handler(__CLASS__.'::'.$method, __LINE__);
+			$this->error404handler(get_class().'::'.$method, __LINE__);
 			return FALSE;
 		}
 		
@@ -130,9 +121,6 @@ class Controller{
 	/** ВЫПОЛНЕНИЕ ОТОБРАЖЕНИЯ */
 	public function display($params){
 		
-		if(!is_array($params))
-			trigger_error('Ожидается массив, передан '.gettype($params), E_USER_ERROR);
-		
 		$method = array_shift($params);
 		
 		// если метод не указан, то выполняется метод по умолчанию
@@ -141,16 +129,18 @@ class Controller{
 			return TRUE;
 		}
 		
-		$method = $this->getDisplayMethodName($method);
+		// проксирование на вложенный контроллер
+		if(isset($this->_proxy[$method])){
+			$controller = new $this->_proxy[$method] ();
+			return $controller->display($params);
+		}
 		
-		// модификация имени метода
-		$this->modifyMethodName($method);
+		$method = $this->getDisplayMethodName($method);
 		
 		if(!$this->checkMethod($method, $params))
 			return FALSE;
 			
 		try{
-			echo $method; die;
 			$this->$method($params);
 		}
 		catch(Exception404 $e){$this->error404handler($e->getMessage());}
@@ -168,8 +158,18 @@ class Controller{
 	 * @param string $redirectUrl - url, куда надо сделать редирект после успешного выполнения
 	 * @return void
 	 */
-	public function action($method, $redirectUrl = null){
+	public function action($params, $redirectUrl = null){
 	
+		$method = array_shift($params);
+		
+		// проксирование на вложенный контроллер
+		if(isset($this->_proxy[$method])){
+			$controller = new $this->_proxy[$method] ();
+			return $controller->action($params);
+		}
+		
+		$method = $this->getActionMethodName($method);
+		
 		// если метод не прошел проверку, запускается error handler
 		// и дальнейший вывод прекращается
 		if(!$this->checkMethod($method)){
@@ -201,6 +201,31 @@ class Controller{
 		catch(Exception $e){$this->errorHandler($e->getMessage());}
 	}
 	
+	/** ВЫПОЛНЕНИЕ AJAX */
+	public function ajax($params){
+		
+		$method = array_shift($params);
+		
+		// проксирование на вложенный контроллер
+		if(isset($this->_proxy[$method])){
+			$controller = new $this->_proxy[$method] ();
+			return $controller->ajax($params);
+		}
+		
+		$method = $this->getAjaxMethodName($method);
+		
+		if(!$this->checkMethod($method, $params))
+			return FALSE;
+			
+		try{
+			$this->$method($params);
+		}
+		catch(Exception404 $e){$this->error404handler($e->getMessage());}
+		catch(Exception403 $e){$this->error403handler($e->getMessage());}
+		catch(Exception $e){$this->errorHandler($e->getMessage());}
+		
+	}
+	
 	/** ПОЛУЧИТЬ ИМЯ МЕТОДА ОТОБРАЖЕНИЯ ПО ИДЕНТИФИКАТОРУ */
 	public function getDisplayMethodName($method){
 	
@@ -223,35 +248,6 @@ class Controller{
 		// преобразует строку вида 'any-Method-name' в 'any_method_name'
 		$method = 'ajax_'.strtolower(str_replace('-', '_', $method));
 		return $method;
-	}
-	
-	/**
-	 * МОДИФИКАЦИЯ ИМЕНИ МЕТОДА
-	 * применяется к display методам
-	 */
-	public function modifyMethodName(&$method){
-		
-		// добавляет всем методам, запущенным из адм. панели суффикс 'admin_'
-		if(App::get()->isAdminMode()){
-			$method = 'admin_'.$method;
-		}
-	}
-	
-	// ВЫПОЛНЕНИЕ AJAX
-	public function performAjax($method, $params){
-		
-		$method = App::getAjaxMethodName($method);
-		
-		if($this->checkMethod($method, $params)){
-			
-			try{
-				$this->$method($params);
-			}
-			catch(Exception404 $e){$this->error404handler($e->getMessage());}
-			catch(Exception403 $e){$this->error403handler($e->getMessage());}
-			catch(Exception $e){$this->errorHandler($e->getMessage());}
-		}
-		
 	}
 	
 	// ЗАДАТЬ URL ДЛЯ РЕДИРЕКТА после выполнения действия (action)
@@ -282,8 +278,8 @@ class Controller{
 		
 		$msg = USER_AUTH_PERMS >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
 		
-		$layoutClass = App::get()->isAdminMode() ? 'BackendLayout' : 'FrontendLayout';
-		$layoutClass::get()->error403($msg);
+		$layoutClass = App::get()->isAdminMode() ? BackendLayout::get() : FrontendLayout::get();
+		$layoutClass->error403($msg);
 	}
 	
 	// ОБРАБОТЧИК ОШИБКИ 404
@@ -291,8 +287,8 @@ class Controller{
 		
 		$msg = USER_AUTH_PERMS >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
 		
-		$layoutClass = App::get()->isAdminMode() ? 'BackendLayout' : 'FrontendLayout';
-		$layoutClass::get()->error404($msg);
+		$layoutClass = App::get()->isAdminMode() ? BackendLayout::get() : FrontendLayout::get();
+		$layoutClass->error404($msg);
 	}
 	
 	// ВЫПОЛНЕНИЕ МЕТОДА ПО УМОЛЧАНИЮ
@@ -310,9 +306,9 @@ class Controller{
 			}
 		}else{
 			if($defaultMethodIdentifier === FALSE){
-				$this->error404handler(__CLASS__.'::default_method_for_'.($this->_adminMode ? 'backend' : 'frontend'), __LINE__);
+				$this->error404handler(get_class().'::default_method_for_'.(App::get()->isAdminMode() ? 'backend' : 'frontend'), __LINE__);
 			}else{
-				trigger_error('Неверное значение _default'.($this->_adminMode ? 'Backend' : 'Frontend').'Display для контроллера '.get_class($this).'. Допускается идентификатор метода, или FALSE', E_USER_ERROR);
+				trigger_error('Неверное значение _default'.(App::get()->isAdminMode() ? 'Backend' : 'Frontend').'Display для контроллера '.get_class($this).'. Допускается идентификатор метода, или FALSE', E_USER_ERROR);
 			}
 		}
 		
@@ -320,7 +316,7 @@ class Controller{
 	
 	protected function _getDisplayDefaultIdentifier(){
 		
-		return $this->_adminMode
+		return App::get()->isAdminMode()
 			? $this->_defaultBackendDisplay
 			: $this->_defaultFrontendDisplay;
 	}

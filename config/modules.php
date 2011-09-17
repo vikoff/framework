@@ -8,6 +8,12 @@ return array(
 	
 	'page' => array(
 		'controller' => 'Page_Controller',
+		'adminController' => 'Page_AdminController',
+	),
+	
+	'user' => array(
+		'controller' => 'User_Controller',
+		'adminController' => 'User_AdminController',
 	),
 
 

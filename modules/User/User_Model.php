@@ -29,12 +29,6 @@ class User_Model extends GenericObject{
 		return new User_Model($id, self::INIT_EXISTS_FORCE, $fieldvalues);
 	}
 	
-	// КОНСТРУКТОР
-	public function __construct($id){
-		
-		parent::__construct($id, self::INIT_ANY);
-	}
-	
 	/** СЛУЖЕБНЫЙ МЕТОД (получение констант из родителя) */
 	public function getConst($name){
 		return constant(__CLASS__.'::'.$name);

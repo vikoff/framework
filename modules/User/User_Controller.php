@@ -1,6 +1,6 @@
 <?php
 
-class UserController extends Controller{
+class User_Controller extends Controller{
 	
 	const DEFAULT_VIEW = 1;
 	const TPL_PATH = 'User/';
@@ -8,6 +8,10 @@ class UserController extends Controller{
 	// методы, отображаемые по умолчанию
 	protected $_defaultFrontendDisplay = FALSE;
 	protected $_defaultBackendDisplay = 'list';
+	
+	protected $_proxy = array(
+		'profile' => 'User_ProfileController',
+	);
 	
 	// права на выполнение методов контроллера
 	public $permissions = array(

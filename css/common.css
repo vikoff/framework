@@ -83,24 +83,24 @@ a:hover{
 
 /* ИНФОРМАЦИОННЫЕ СООБЩЕНИЯ */
 
-.voc-user-message{
+.vik-user-message{
 	padding: 10px;
 	margin: 5px;
 	font-size: 13px;
 }
-.voc-user-message.success{
+.vik-user-message.success{
 	border: solid 2px #00cc00;
 	background-color: #eeffee;
 }
-.voc-user-message.info{
+.vik-user-message.info{
 	border: solid 2px #0000cc;
 	background-color: #eeeeff;
 }
-.voc-user-message.error{
+.vik-user-message.error{
 	border: solid 2px #cc0000;
 	background-color: #ffeeee;
 }
-.voc-user-message .detail{
+.vik-user-message .detail{
 	margin: 5px 15px 5px;
 	font-size: 12px;
 	font-style: italic;

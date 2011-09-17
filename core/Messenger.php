@@ -115,7 +115,7 @@ class Messenger{
 				}
 			}
 			if($msgs)
-				$html .= '<div class="voc-user-message success">'.$msgs.'</div>';
+				$html .= '<div class="vik-user-message success">'.$msgs.'</div>';
 		}
 
 		if(count($this->_infoMsgs)){
@@ -135,7 +135,7 @@ class Messenger{
 				}
 			}
 			if($msgs)
-				$html .= '<div class="voc-user-message info">'.$msgs.'</div>';
+				$html .= '<div class="vik-user-message info">'.$msgs.'</div>';
 		}
 
 		if(count($this->_errorMsgs)){
@@ -155,7 +155,7 @@ class Messenger{
 				}
 			}
 			if($msgs)
-				$html .= '<div class="voc-user-message error">'.$msgs.'</div>';
+				$html .= '<div class="vik-user-message error">'.$msgs.'</div>';
 		}
 
 		return $html;
@@ -208,7 +208,7 @@ class Messenger{
 				}
 			}
 			if($msgs)
-				$html .= '<div class="voc-user-message error">'.$msgs.'</div>';
+				$html .= '<div class="vik-user-message error">'.$msgs.'</div>';
 		}
 		
 		return $html;

@@ -8,6 +8,7 @@ class BackendLayout extends Layout{
 		'content' => array('perms' => PERMS_ADMIN, 'title' => 'Контент'           ),
 		'users'   => array('perms' => PERMS_ADMIN, 'title' => 'Пользователи'      ),
 		'root'    => array('perms' => PERMS_ADMIN, 'title' => 'Администрирование' ),
+		'sql'     => array('perms' => PERMS_ADMIN, 'title' => 'SQL'       ),
 	);
 	private $_topMenuActive = '';
 	
@@ -24,11 +25,14 @@ class BackendLayout extends Layout{
 		),
 		'root' => array(
 			'user-statistics' => 'Статистика посещений',
-			'sql-console' => 'SQL-консоль',
-			'sql-dump' => 'Создание дампа БД',
 			'error-log' => 'Лог ошибок',
 			'settings' => 'Настройки для сайта',
 			'service' => 'Обслуживание',
+		),
+		'sql' => array(
+			'console' => 'консоль',
+			'make-dump' => 'Создание дампа БД',
+			'load-dump' => 'Загрузка дампа БД',
 		),
 	);
 	
@@ -137,8 +141,8 @@ class BackendLayout extends Layout{
 	
 	public function showLoginPage(){
 		
-		$isLogged = CurUser::get()->isLogged();
-		$errorMessage = Messenger::get()->ns('login')->getAll();
+		$this->isLogged = CurUser::get()->isLogged();
+		$this->errorMessage = Messenger::get()->ns('login')->getAll();
 		include($this->_layoutDir.'login.php');
 	}
 	

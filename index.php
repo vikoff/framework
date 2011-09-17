@@ -11,7 +11,7 @@ define('FS_ROOT', realpath('.').DIRECTORY_SEPARATOR);
 define('AJAX_MODE', isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 
 /** контроллер отображения по умолчанию */
-define('DEFAULT_CONTROLLER', 'Page');
+define('DEFAULT_CONTROLLER', 'page');
 
 /** индекс файл */
 define('INDEX_FILE', basename(__FILE__));

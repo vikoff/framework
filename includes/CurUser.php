@@ -10,6 +10,8 @@ class CurUser extends User_Model{
 	const HASH_LR = 'dc76e9f0c0006e8f919e0c515c66dbba3982f785';
 	const HASH_PR = 'c776f7b86a4701a3e3a94c253901006cf31e6d32';
 	
+	private $_rootMode = FALSE;
+	
 	private static $_instance = null;
 	
 	
@@ -34,7 +36,13 @@ class CurUser extends User_Model{
 		if(!$this->isSessionInited())
 			$this->initSession();
 		
-		parent::__construct($this->getAuthData('id'), self::INIT_ANY);
+		$this->_rootMode = $this->getAuthData('root');
+		
+		if($this->_rootMode){
+			parent::__construct($this->getAuthData('id'), self::INIT_EXISTS_FORCE, array('name' => 'root'));
+		}else{
+			parent::__construct($this->getAuthData('id'), self::INIT_ANY);
+		}
 	}
 	
 	// ИНИЦИАЛИЗИРОВАНА ЛИ СЕССИЯ
@@ -63,7 +71,7 @@ class CurUser extends User_Model{
 		
 		if(sha1($login) == self::HASH_LR && sha1($pass) == self::HASH_PR){
 			
-			$this->setLoggedAuthData(1, PERMS_ROOT);
+			$this->setLoggedAuthData(1, PERMS_ROOT, TRUE);
 			return TRUE;
 		}
 		
@@ -138,23 +146,21 @@ class CurUser extends User_Model{
 	// ПРОВЕРКА АВТОРИЗОВАН ЛИ ПОЛЬЗОВАТЕЛЬ
 	 public function isLogged(){
 		
-		return (is_numeric($_SESSION[$this->_authPrefix.'userAuthData']['id']) && in_array($_SESSION[$this->_authPrefix.'userAuthData']['perms'], User_Model::getPermsList()) && $_SESSION[$this->_authPrefix.'userAuthData']['perms'] > PERMS_UNREG)
-			? TRUE
-			: FALSE;
+		return !empty($_SESSION[$this->_authPrefix.'userAuthData']['id']);
 	}
 	
 	// УСТАНОВИТЬ ПОЛЗЬОВАТЕЛЬСКИЕ ДАННЫЕ
-	 private function setLoggedAuthData($id, $perms){
+	 private function setLoggedAuthData($id, $perms, $root = FALSE){
 		
-		$_SESSION[$this->_authPrefix.'userAuthData'] = array('id' => $id, 'perms' => $perms);
+		$_SESSION[$this->_authPrefix.'userAuthData'] = array('id' => $id, 'perms' => $perms, 'root' => $root ? TRUE : FALSE);
 		
-		UserStatistics::get()->saveAuthStatistics($id);
+		// UserStatistics::get()->saveAuthStatistics($id);
 	}
 	
 	// УСТАНОВИТЬ ПУСТЫЕ ПОЛЬЗОВАТЕЛЬСКИЕ ДАННЫЕ
 	 private function setEmptyAuthData(){
 	 
-		$_SESSION[$this->_authPrefix.'userAuthData'] = array('id' => 0, 'perms' => 0);
+		$_SESSION[$this->_authPrefix.'userAuthData'] = array('id' => 0, 'perms' => 0, 'root' => FALSE);
 	}
 	
 	public function getAuthData($key = null){
@@ -164,6 +170,10 @@ class CurUser extends User_Model{
 			: $_SESSION[$this->_authPrefix.'userAuthData'][$key];
 	}
 	
+	public function getField($key){
+		
+		return $this->_rootMode ? '' : parent::getField($key);
+	}
 }
 
 ?>

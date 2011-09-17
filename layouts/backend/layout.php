@@ -18,12 +18,12 @@
 	<link rel="stylesheet" href="css/backend.css" type="text/css" />
 	<!-- <link rel="icon" type="image/png" href="favicon.ico" /> -->
 	
-	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://scripts.vik-off.net/debug.js"></script>
+	
 	<script type="text/javascript" src="js/jquery.validate.pack.js"></script>
-	<script type="text/javascript" src="js/jquery.defaultval.min.js"></script>
 	<script type="text/javascript" src="js/jquery.ctrlentersend.min.js"></script>
 	<script type="text/javascript" src="js/jquery.floatblock.js"></script>
-	<script type="text/javascript" src="js/autoresize.jquery.min.js"></script>
 	<script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
 	
@@ -78,7 +78,7 @@
 	<?=CFG_SITE_NAME;?>
 </div>
 
-<?=$this->_getPhpPageStatistics();?>
+<?= Debugger::get()->getPageStatisticsHtml();?>
 
 </body>
 </html>
