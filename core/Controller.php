@@ -114,6 +114,7 @@ class Controller{
 			$this->error404handler(__CLASS__.'::'.$method, __LINE__);
 			return FALSE;
 		}
+		
 		// если недостаточно прав
 		elseif(!$this->hasPermission($method, USER_AUTH_PERMS)){
 		
@@ -126,6 +127,38 @@ class Controller{
 		
 	}
 	
+	/** ВЫПОЛНЕНИЕ ОТОБРАЖЕНИЯ */
+	public function display($params){
+		
+		if(!is_array($params))
+			trigger_error('Ожидается массив, передан '.gettype($params), E_USER_ERROR);
+		
+		$method = array_shift($params);
+		
+		// если метод не указан, то выполняется метод по умолчанию
+		if(!$method){
+			$this->_displayDefault($params);
+			return TRUE;
+		}
+		
+		$method = $this->getDisplayMethodName($method);
+		
+		// модификация имени метода
+		$this->modifyMethodName($method);
+		
+		if(!$this->checkMethod($method, $params))
+			return FALSE;
+			
+		try{
+			echo $method; die;
+			$this->$method($params);
+		}
+		catch(Exception404 $e){$this->error404handler($e->getMessage());}
+		catch(Exception403 $e){$this->error403handler($e->getMessage());}
+		catch(Exception $e){$this->errorHandler($e->getMessage());}
+		
+	}
+	
 	/**
 	 * ВЫПОЛНЕНИЕ ДЕЙСТВИЯ
 	 * @exception Exception - ловит стандартные исключения
@@ -135,7 +168,7 @@ class Controller{
 	 * @param string $redirectUrl - url, куда надо сделать редирект после успешного выполнения
 	 * @return void
 	 */
-	public function performAction($method, $redirectUrl){
+	public function action($method, $redirectUrl = null){
 	
 		// если метод не прошел проверку, запускается error handler
 		// и дальнейший вывод прекращается
@@ -157,10 +190,10 @@ class Controller{
 				
 				// выполнение редиректа (если надо)
 				if(!empty($this->_redirectUrl))
-					App::redirectHref(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
+					App::redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
 			}else{
 				if($this->_forceRedirect && !empty($this->_redirectUrl))
-					App::redirectHref(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
+					App::redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
 			}
 		}
 		catch(Exception404 $e){$this->error404handler($e->getMessage());}
@@ -168,38 +201,38 @@ class Controller{
 		catch(Exception $e){$this->errorHandler($e->getMessage());}
 	}
 	
-	// ВЫПОЛНЕНИЕ ОТОБРАЖЕНИЯ
-	public function performDisplay($method, $params){
-		
-		// если метод не указан, то выполняется метод по умолчанию
-		if(!$method){
-			$this->_displayDefault($params);
-			return;
-		}
-		
-		$method = App::getDisplayMethodName($method);
-		
-		// модификация имени метода
-		$this->modifyMethodName($method);
-		
-		if($this->checkMethod($method, $params)){
-			
-			try{
-				$this->$method($params);
-			}
-			catch(Exception404 $e){$this->error404handler($e->getMessage());}
-			catch(Exception403 $e){$this->error403handler($e->getMessage());}
-			catch(Exception $e){$this->errorHandler($e->getMessage());}
-		}
-		
+	/** ПОЛУЧИТЬ ИМЯ МЕТОДА ОТОБРАЖЕНИЯ ПО ИДЕНТИФИКАТОРУ */
+	public function getDisplayMethodName($method){
+	
+		// преобразует строку вида 'any-Method-name' в 'any_method_name'
+		$method = 'display_'.(strlen($method) ? strtolower(str_replace('-', '_', $method)) : 'default');
+		return $method;
 	}
 	
-	// МОДИФИКАЦИЯ ИМЕНИ МЕТОДА
-	// применяется к display методам
+	/** ПОЛУЧИТЬ ИМЯ МЕТОДА ДЕЙСТВИЯ ПО ИДЕНТИФИКАТОРУ */
+	public function getActionMethodName($method){
+	
+		// преобразует строку вида 'any-Method-name' в 'any_method_name'
+		$method = 'action_'.strtolower(str_replace('-', '_', $method));
+		return $method;
+	}
+	
+	/** ПОЛУЧИТЬ ИМЯ AJAX МЕТОДА ПО ИДЕНТИФИКАТОРУ */
+	public function getAjaxMethodName($method){
+	
+		// преобразует строку вида 'any-Method-name' в 'any_method_name'
+		$method = 'ajax_'.strtolower(str_replace('-', '_', $method));
+		return $method;
+	}
+	
+	/**
+	 * МОДИФИКАЦИЯ ИМЕНИ МЕТОДА
+	 * применяется к display методам
+	 */
 	public function modifyMethodName(&$method){
 		
 		// добавляет всем методам, запущенным из адм. панели суффикс 'admin_'
-		if($this->_adminMode){
+		if(App::get()->isAdminMode()){
 			$method = 'admin_'.$method;
 		}
 	}
@@ -271,7 +304,9 @@ class Controller{
 			if(CFG_REDIRECT_DEFAULT_DISPLAY){
 				App::redirectHref(Request::get()->getAppended($defaultMethodIdentifier));
 			}else{
-				$this->performDisplay($defaultMethodIdentifier, $params);
+				$displayParams = $params;
+				array_unshift($displayParams, $defaultMethodIdentifier);
+				$this->display($displayParams);
 			}
 		}else{
 			if($defaultMethodIdentifier === FALSE){

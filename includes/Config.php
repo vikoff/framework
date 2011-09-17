@@ -26,7 +26,11 @@ class Config {
 		// подключение файлов
 		require(FS_ROOT.'config/config.'.RUN_MODE.'.php');
 		require(FS_ROOT.'config/global.php');
-		require(FS_ROOT.'config/modules.php');
+	}
+	
+	public function getModulesConfig(){
+		
+		return require(FS_ROOT.'config/modules.php');
 	}
 
 }

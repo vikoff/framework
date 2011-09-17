@@ -24,12 +24,18 @@ class App{
 	private static $_instance = null;
 	private static $_smartyInstance = null;
 	
+	private $_requestModuleName = null;
+	private $_requestModuleParams = array();
+	
 	private $_requestControllerIdentifier = null;
 	private $_requestMethodIdentifier = null;
 	private $_requestController = null;
 	private $_requestParams = null;
 	
 	private $_adminMode = FALSE;
+	
+	/** массив конфигурации модулей */
+	private $_modulesConfig = array();
 
 	
 	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР КЛАССА */
@@ -45,15 +51,13 @@ class App{
 	private function __construct(){
 		
 		// извлечение параметров запроса
-		list($this->_requestControllerIdentifier,
-		     $this->_requestMethodIdentifier,
-			 $this->_requestParams) = Request::get()->getArray();
+		list($this->_requestModuleName, $this->_requestModuleParams) = Request::get()->getArray();
 		
-		// назначить класс контроллера
-		$this->_defineRequestController();
+		// получение конфигурации модулей
+		$this->_modulesConfig = Config::get()->getModulesConfig();
 		
 		// определение режима администратора
-		$this->_adminMode = $this->_requestControllerIdentifier == 'admin';
+		$this->_adminMode = $this->_requestModuleName == 'admin';
 	}
 	
 	/** ОПРЕДЕЛИТЬ КЛАСС КОНТРОЛЛЕРА ПО ПЕРЕДАННОМУ ИДЕНТИФИКАТОРУ */
@@ -95,6 +99,16 @@ class App{
 			
 		$this->_checkAjax();
 	}
+	
+	public function isModule($module){
+		
+		return isset($this->_modulesConfig[$module]);
+	}
+	
+	public function getModule($module){
+		
+		return new $this->_modulesConfig[$module]['controller'] ();
+	}
 
 	
 	#### ПОДГОТОВКА К ВЫПОЛНЕНИЮ ОПЕРАЦИЙ ####
@@ -111,38 +125,33 @@ class App{
 			? YArray::getFirstKey($_POST['action'][$action])
 			: (isset($_POST['redirect']) ? $_POST['redirect'] : '');
 		
-		// параметр action должен иметь вид 'controller/method'
+		// параметр action должен иметь вид 'module/method'
 		if(strpos($action, '/') === FALSE){
 			trigger_error('Неверный формат параметра action: '.$action.' (требуется разделитель)', E_USER_ERROR);
 		}
 		
-		list($_controller, $_method) = YArray::trim(explode('/', $action));
+		list($module, $method) = YArray::trim(explode('/', $action));
 		
-		$controller = self::getControllerClassName($_controller);
-		$method = self::getActionMethodName($_method);
-		
-		if(is_null($controller)){
-			Debugger::get()->log('Контроллер не найден по идентификатору "'.$_controller.'"');
-			$this->error404('Неизвестное действие "'.$_controller.'"');
+		if(!$this->isModule($module)){
+			$this->error404('Модуль "'.$module.'" не найден');
+			return FALSE;
 		}
 		
-		$controllerInstance = new $controller();
-		$controllerInstance->performAction($method, $redirect);
+		$this->getModule($module)->action($method, $redirect);
 		return TRUE;
 	}
 	
 	/** ПРОВЕРКА НЕОБХОДИМОСТИ ВЫПОЛНЕНИЯ ОТОБРАЖЕНИЯ */
 	protected function _checkDisplay(){
 		
-		$controller = self::getControllerClassName($this->_requestControllerIdentifier);
+		$module = !empty($this->_requestModuleName) ? $this->_requestModuleName : DEFAULT_CONTROLLER;
 		
-		if(empty($controller)){
-			self::error404('Controller "'.$this->_requestControllerIdentifier.'" does not exists');
-			return;
+		if(!$this->isModule($module)){
+			$this->error404('Модуль "'.$module.'" не найден');
+			return FALSE;
 		}
 		
-		$controllerInstance = new $controller();
-		$controllerInstance->performDisplay($this->_requestMethodIdentifier, $this->_requestParams);
+		$this->getModule($module)->display($this->_requestModuleParams);
 	}
 	
 	/** ПРОВЕРКА НЕОБХОДИМОСТИ ВЫПОЛНЕНИЯ AJAX */
@@ -181,30 +190,6 @@ class App{
 		$controller = $_controller.(strpos($_controller, '_') ? 'Controller' : '_Controller');
 		// die($controller);
 		return class_exists($controller) ? $controller : null;
-	}
-	
-	// ПОЛУЧИТЬ ИМЯ МЕТОДА ОТОБРАЖЕНИЯ ПО ИДЕНТИФИКАТОРУ
-	public static function getDisplayMethodName($method){
-	
-		// преобразует строку вида 'any-Method-name' в 'any_method_name'
-		$method = 'display_'.(strlen($method) ? strtolower(str_replace('-', '_', $method)) : 'default');
-		return $method;
-	}
-	
-	// ПОЛУЧИТЬ ИМЯ МЕТОДА ДЕЙСТВИЯ ПО ИДЕНТИФИКАТОРУ
-	public static function getActionMethodName($method){
-	
-		// преобразует строку вида 'any-Method-name' в 'any_method_name'
-		$method = 'action_'.strtolower(str_replace('-', '_', $method));
-		return $method;
-	}
-	
-	// ПОЛУЧИТЬ ИМЯ AJAX МЕТОДА ПО ИДЕНТИФИКАТОРУ
-	public static function getAjaxMethodName($method){
-	
-		// преобразует строку вида 'any-Method-name' в 'any_method_name'
-		$method = 'ajax_'.strtolower(str_replace('-', '_', $method));
-		return $method;
 	}
 	
 	/** ЗАПРЕТ ОТОБРАЖЕНИЯ */

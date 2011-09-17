@@ -7,7 +7,6 @@ class Request{
 	private $_requestString = '';
 	private $_requestArr = array();
 	private $_controller = null;
-	private $_display = null;
 	private $_params = null;
 	
 	// ТОЧКА ВХОДА В КЛАСС
@@ -37,26 +36,14 @@ class Request{
 		
 		$this->_requestArr = $_rArr = YArray::trim(explode('/', $this->_requestString));
 		
-		// $this->modifyRequest($requestArr);
-		
 		$this->_controller = array_shift($_rArr);	// string
-		$this->_display = array_shift($_rArr);		// string
 		$this->_params = $_rArr;					// array
 		
 	}
 	
-	// СПЕЦИАЛЬНОЕ ПРЕОБРАЗОВАНИЕ URL
-	public function modifyRequest(&$requestArr){
-		
-		// индексы элементов
-		$iController = 0;
-		$iDisplay	 = 1;
-		//$iParams	 = Все остальные элементы массива;
-	}
-	
 	public function getArray(){
 	
-		return array($this->_controller, $this->_display, $this->_params);
+		return array($this->_controller, $this->_params);
 	
 	}
 	

@@ -3,7 +3,7 @@
  * 
  * 
  * @using:
- * 		const: CFG_SITE_NAME, FS_ROOT, WWW_ROOT
+ * 		const: CFG_SITE_NAME, FS_ROOT, WWW_ROOT, AJAX_MODE
  * 
  */
 class Layout{
@@ -17,6 +17,8 @@ class Layout{
 	protected $_breadcrumbs = array();
 	protected $_isAutoBreadcrumbsAdded = FALSE;
 	protected $_htmlContent = '';
+	
+	protected $_layoutRender = 'auto';
 	
 	private static $_instance = null;
 	
@@ -115,18 +117,28 @@ class Layout{
 		$this->_breadcrumbs = array();
 	}
 	
+	/** ОЧИСТИТЬ КОНТЕНТ */
+	public function clearContent(){
+	
+		$this->_htmlContent = '';
+		return $this;
+	}
+	
+	/** ЗАДАТЬ КОНТЕНТ */
 	public function setContent($content){
 	
-		$this->_htmlContent = $content;
+		$this->_htmlContent .= $content;
 		return $this;
 	}
 	
+	/** ПОЛУЧИТЬ КОНТЕНТ ИЗ ПРОИЗВОЛЬНОГО ФАЙЛА (БЕЗ ИНТЕРПРЕТАЦИИ) */
 	public function setContentHtmlFile($file){
 		
-		$this->_htmlContent = file_get_contents($file);
+		$this->_htmlContent .= file_get_contents($file);
 		return $this;
 	}
 	
+	/** ПОЛУЧИТЬ КОНТЕНТ ИЗ PHP-ФАЙЛА */
 	public function setContentPhpFile($file, $variables = array()){
 		
 		foreach($variables as $k => $v)
@@ -134,7 +146,7 @@ class Layout{
 			
 		ob_start();
 		include($file);
-		$this->_htmlContent = ob_get_clean();
+		$this->_htmlContent .= ob_get_clean();
 		
 		return $this;
 	}
@@ -145,6 +157,31 @@ class Layout{
 		$smarty->assign($variables);
 		$this->_htmlContent = $smarty->fetch($template);
 		$smarty->clear_all_assign();
+		return $this;
+	}
+	
+	/** 
+	 * ТИП ОТОБРАЖЕНИЯ КОНТЕНТА ВЫБИРАЕТСЯ АВТОМАТИЧЕСКИ
+	 * внутри макета для обычных запросов;
+	 * без макета для AJAX-запросов.
+	 */
+	public function autoLayout(){
+		
+		$this->_layoutRender = 'auto';
+		return $this;
+	}
+	
+	/** ВСЕГДА ОТОБРАЖАТЬ КОНТЕНТ ВНУТРИ МАКЕТА */
+	public function enableLayout(){
+		
+		$this->_layoutRender = 'on';
+		return $this;
+	}
+	
+	/** ВСЕГДА ОТОБРАЖАТЬ КОНТЕНТ БЕЗ МАКЕТА */
+	public function disableLayout(){
+		
+		$this->_layoutRender = 'off';
 		return $this;
 	}
 	
@@ -205,23 +242,6 @@ class Layout{
 			: '';
 	}
 	
-	/** RENDER ALL */
-	public function render($boolReturn = FALSE){
-		
-		// сохранение пользовательской статистики
-		UserStatistics_Model::get()->savePrimaryStatistics();
-		
-		if($boolReturn)
-			ob_start();
-			
-		include($this->_layoutDir.'layout.php');
-		
-		if($boolReturn)
-			return ob_get_clean();
-		else
-			return $this;
-	}
-	
 	/** RENDER ERROR PAGE */
 	public function error($message = ''){
 		
@@ -277,6 +297,50 @@ class Layout{
 		exit();
 	}
 	
+	/** RENDER ALL */
+	public function render($boolReturn = FALSE){
+		
+		// вывод без макета
+		if($this->_layoutRender == 'off' || ($this->_layoutRender == 'auto' && AJAX_MODE))
+			return $this->_renderNoLayout($boolReturn);
+		
+		// вывод с макетом
+		else
+			return $this->_renderWithLayout($boolReturn);
+	}
+	
+	/**
+	 * ВЫВЕСТИ/ВЕРНУТЬ КОНТЕНТ БЕЗ МАКЕТА
+	 * @access protected
+	 * @param bool $boolReturn - флаг, возвращать контент, или выводить
+	 * @param void|string контент
+	 */
+	protected function _renderNoLayout($boolReturn){
+		
+		if($boolReturn)
+			return $this->_getHtmlContent();
+		else
+			echo $this->_getHtmlContent();
+	}
+	
+	/**
+	 * ВЫВЕСТИ/ВЕРНУТЬ КОНТЕНТ В МАКЕТЕ
+	 * @access protected
+	 * @param bool $boolReturn - флаг, возвращать контент, или выводить
+	 * @param void|string контент
+	 */
+	protected function _renderWithLayout($boolReturn){
+		
+		if($boolReturn)
+			ob_start();
+			
+		include($this->_layoutDir.'layout.php');
+		
+		if($boolReturn)
+			return ob_get_clean();
+	}
+	
+	/** АКСЕССОР ДЛЯ ШАБЛОНОВ */
 	public function __get($name){
 		
 		return isset($this->$name) ? $this->$name : '';
