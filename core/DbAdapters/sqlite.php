@@ -2,31 +2,38 @@
 
 class DbAdapter_sqlite extends DbAdapter{
 	
-	// ПОДКЛЮЧИТЬСЯ К БАЗЕ ДАННЫХ
+	/** ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ */
 	public function connect(){
 		
 		$this->_dbrs = sqlite_open($this->connDatabase)or $this->error('Невозможно подключиться к базе данных');
 		$this->_connected = TRUE;
 	}
 
-	// УСТАНОВИТЬ КОДИРОВКУ СОЕДИНЕНИЯ
+	/** УСТАНОВИТЬ КОДИРОВКУ СОЕДИНЕНИЯ */
 	public function setEncoding($encoding){
 	
 	}
 	
-	// ПОЛУЧИТЬ ПОСЛЕДНИЙ ВСТАВЛЕННЫЙ PRIMARY KEY
+	/** ВЫБРАТЬ БАЗУ ДАННЫХ */
+	public function selectDb($db){}
+	
+	/** ПОЛУЧИТЬ ПОСЛЕДНИЙ ВСТАВЛЕННЫЙ PRIMARY KEY */
 	public function getLastId(){
 	
 		return sqlite_last_insert_rowid($this->_dbrs);
 	}
 	
-	// ПОЛУЧИТЬ КОЛИЧЕСТВО СТРОК, ЗАТРОНУТЫХ ПОСЛЕДНЕЙ ОПЕРАЦИЕЙ
+	/** ПОЛУЧИТЬ КОЛИЧЕСТВО СТРОК, ЗАТРОНУТЫХ ПОСЛЕДНЕЙ ОПЕРАЦИЕЙ */
 	public function getAffectedNum(){
 		
 		return sqlite_changes($this->_dbrs);
 	}
 
-	// функция QUERY
+	/**
+	 * ВЫПОЛНИТЬ ЗАПРОС
+	 * @param string $query - SQL-запрос
+	 * @return resource - ресурс ответа базы данных
+	 */
 	public function query($query){
 		
 		$sql = $query;
@@ -40,7 +47,13 @@ class DbAdapter_sqlite extends DbAdapter{
 		return $rs;
 	}
 	
-	//функция GET ONE выполняет запрос и возвращает единственное значение (первая строка, первый столбец)
+	/**
+	 * GET ONE
+	 * выполнить запрос и вернуть единственное значение (первая строка, первый столбец)
+	 * @param string $query - SQL-запрос
+	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
+	 * @return mixed|$default_value
+	 */
 	public function getOne($query, $default_value = 0){
 		
 		$rs = $this->query($query);
@@ -51,9 +64,18 @@ class DbAdapter_sqlite extends DbAdapter{
 			return $default_value;
 	}
 	
-	//функция GET CELL выполняет запрос и возвращает единственное значение (указанные строка и столбец)
+	/**
+	 * GET CELL
+	 * выполнить запрос и вернуть единственное значение (указанные строка и столбец)
+	 * @param string $query - SQL-запрос
+	 * @param integer $row - номер строки, значение которой будет возвращено
+	 * @param integer $column - номер столбца, значение которого будет возвращено
+	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
+	 * @return mixed|$default_value
+	 */
 	public function getCell($query, $row, $column, $default_value = 0){
 		
+		trigger_error('not implemented', E_USER_ERROR);
 		// $rs = $this->query($query);
 		// if(mysql_num_rows($rs))
 			// $cell = mysql_result($rs, $row, $column);
@@ -63,9 +85,19 @@ class DbAdapter_sqlite extends DbAdapter{
 		// return $cell;
 	}
 	
-	// функция GET STATIC ONE возвращает единственную строку, а если строка не найдена, то вставляет ее в таблицу
+	/**
+	 * GET STATIC ONE
+	 * выполнить запрос и вернуть единственное значение (первая строка, первый столбец)
+	 * а если строка не найдена, то вставить ее в таблицу
+	 * @param string $query - SQL-запрос
+	 * @param string $table - таблица для вставки
+	 * @param array $fieldsvalues - ассоциативный массив данных для вставки
+	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
+	 * @return mixed|$default_value
+	 */
 	public function getStaticOne($query, $table, $fieldsvalues, $default_value = array()){
 		
+		trigger_error('not implemented', E_USER_ERROR);
 		// $rs = $this->query($query);
 		// if(mysql_num_rows($rs)){
 			// $row = mysql_result($rs, 0, 0);
@@ -76,7 +108,13 @@ class DbAdapter_sqlite extends DbAdapter{
 		// return $row;
 	}
 	
-	// функция GET COL возвращает единственный столбец (первый в наборе)
+	/**
+	 * GET COL
+	 * выполнить запрос и вернуть единственный столбец (первый)
+	 * @param string $query - SQL-запрос
+	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
+	 * @return array|$default_value
+	 */
 	public function getCol($query, $default_value = array()){
 		
 		$rs = $this->query($query);
@@ -107,7 +145,13 @@ class DbAdapter_sqlite extends DbAdapter{
 		return $col;
 	}
 
-	// функция GET ROW возвращает единственную строку (первую в наборе)
+	/**
+	 * GET ROW
+	 * выполнить запрос и вернуть единственную строку (первую)
+	 * @param string $query - SQL-запрос
+	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
+	 * @return array|$default_value
+	 */
 	public function getRow($query, $default_value = 0){
 		
 		$rs = $this->query($query);
@@ -118,7 +162,15 @@ class DbAdapter_sqlite extends DbAdapter{
 			return $default_value;
 	}
 	
-	// функция GET STATIC ROW возвращает единственную строку, а если строка не найдена, то вставляет ее в таблицу
+	/**
+	 * GET STATIC ROW
+	 * выполнить запрос и вернуть единственную строку (первую)
+	 * а если строка не найдена, то вставить ее в таблицу
+	 * @param string $query - SQL-запрос
+	 * @param string $table - таблица для вставки
+	 * @param array $fieldsvalues - ассоциативный массив данных для вставки
+	 * @return array|$fieldsvalues
+	 */
 	public function getStaticRow($query, $table, $fieldsvalues, $default_value = array()){
 		
 		$rs = $this->query($query);
@@ -131,7 +183,13 @@ class DbAdapter_sqlite extends DbAdapter{
 		return $row;
 	}
 	
-	// функция GET ALL формирует многомерный ассоциативный массив
+	/**
+	 * GET ALL
+	 * выполнить запрос и вернуть многомерный ассоциативный массив данных
+	 * @param string $query - SQL-запрос
+	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
+	 * @return array|$default_value
+	 */
 	public function getAll($query, $default_value = array()){
 
 		$rs = $this->query($query);
@@ -142,7 +200,16 @@ class DbAdapter_sqlite extends DbAdapter{
 			return $default_value;
 	}
 	
-	// функция GET ALL INDEXED формирует многомерный индексированный ассоциативный массив 
+	/**
+	 * GET ALL INDEXED
+	 * выполнить запрос и вернуть многомерный индексированных ассоциативный массив данных
+	 * @param string $query - SQL-запрос
+	 * @param string $index - имя поля, по которому будет индексироваться массив результатов.
+	 *        Важно проследить, чтобы значение у индекса было уникальным у каждой строки,
+	 *        иначе дублирующиеся строки будут затерты.
+	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
+	 * @return array|$default_value
+	 */
 	public function getAllIndexed($query, $index, $default_value = 0){
 		
 		// $rs = $this->query($query);
@@ -153,7 +220,12 @@ class DbAdapter_sqlite extends DbAdapter{
 		// return $data;
 	}
 	
-	// ESCAPE
+	/**
+	 * ЭКРАНИРОВАНИЕ ДАННЫХ
+	 * выполняется с учетом типа данных для предотвращения SQL-инъекций
+	 * @param mixed строка для экранирования
+	 * @param mixed - безопасная строка
+	 */
 	public function escape($str){
 		
 		if(!in_array(strtolower(gettype($str)), array('integer', 'double', 'boolean', 'null'))){
@@ -164,40 +236,74 @@ class DbAdapter_sqlite extends DbAdapter{
 		return $str;
 	}
 	
-	// QUOTE FIELD NAME
+	/**
+	 * ЗАКЛЮЧЕНИЕ ИМЕНИ ПОЛЯ В КАВЫЧКИ
+	 * для полей, имена которых совпадают с ключевыми словами
+	 * @param string $fieldname - имя поля
+	 * @param string - имя поля, заключенное в кавычки
+	 */
 	public function quoteFieldName($field){
 		return "'".$field."'";
 	}
 	
-	// DESCRIBE
+	/**
+	 * DESCRIBE
+	 * получить массив, описывающий структуру таблицы
+	 * @param string $table - имя таблицы
+	 * @return array - структура таблицы
+	 */
 	public function describe($table){
 		
 		return $this->getAll('PRAGMA table_info('.$table.')');
 	}
 	
-	// ПОЛУЧИТЬ СПИСОК ТАБЛИЦ
+	/**
+	 * ПОЛУЧИТЬ СПИСОК ТАБЛИЦ
+	 * в текущей базе данных
+	 * @return array - массив-список таблиц
+	 */
 	public function showTables(){
 	
 		return $this->getCol('SELECT name FROM sqlite_master WHERE type = "table"');
 	}
 	
-	// ПОКАЗАТЬ СТРОКУ CREATE TABLE
+	/**
+	 * ПОЛУЧИТЬ СПИСОК БД
+	 * @return array - массив-список баз данных
+	 */
+	public function showDatabases(){
+	
+		return array($this->connDatabase);
+	}
+	
+	/**
+	 * ПОКАЗАТЬ СТРОКУ CREATE TABLE
+	 * @param string $table - имя таблицы
+	 * @return string - строка CREATE TABLE
+	 */
 	public function showCreateTable($table){
 	
 		return $this->getOne('SELECT sql FROM sqlite_master WHERE type = "table" AND name= "'.$table.'"');
 	}
 	
-	// СОЗДАТЬ ДАМП ДАННЫХ
-	public function makeDump(){
+	/**
+	 * СОЗДАТЬ ДАМП БАЗЫ ДАННЫХ
+	 * @param string|null $database - база данных (или дефолтная, если null)
+	 * @param array|null $tables - список таблиц (или все, если null)
+	 * @output выдает текст sql-дампа
+	 * @return void
+	 */
+	public function makeDump($database = null, $tables = null){
 
 		$lf = "\n";
-		$cmnt = '#';
-		$tables = array();
+		$cmnt = '--';
 		$createtable = array();
 		
-		$cmnt = '--';
-		
-		$tables = $this->showTables();
+		if(!is_null($database))
+			$this->selectDb($database);
+			
+		if(is_null($tables))
+			$tables = $this->showTables();
 
 		// get 'table create' parts for all tables
 		foreach ($tables as $table){
@@ -208,7 +314,7 @@ class DbAdapter_sqlite extends DbAdapter{
 		header('Cache-Control: private');
 		header('Pragma: cache');
 		header('Content-type: application/download');
-		header('Content-Disposition: attachment; filename='.strtolower(date("Y_m_d")).'_backup_'.$this->connDatabase.'.sql');
+		header('Content-Disposition: attachment; filename='.strtolower(date("Y_m_d")).'_db_'.$this->connDatabase.'.sql');
 		
 		echo $cmnt." ".$lf;
 		echo $cmnt." START SQLITE DATABASE DUMP".$lf;
@@ -216,7 +322,8 @@ class DbAdapter_sqlite extends DbAdapter{
 		echo $cmnt." ".$lf;
 		echo $cmnt." Host: ".$_SERVER['SERVER_NAME'].$lf;
 		echo $cmnt." Database : ".$this->connDatabase.$lf;
-		echo $cmnt." Generation Time: ".date("d M Y H:i:s", (time() - date("Z") + 10800)).$lf;
+		echo $cmnt." Encoding : ".$this->_encoding.$lf;
+		echo $cmnt." Generation Time: ".date("d M Y H:i:s").$lf;
 		echo $cmnt." PHP Version: ".phpversion().$lf;
 		echo $cmnt."";
 
@@ -229,7 +336,7 @@ class DbAdapter_sqlite extends DbAdapter{
 			echo $cmnt.' TABLE '.$table.' STRUCTURE'.$lf;
 			echo $cmnt."".$lf;
 			echo $lf;
-				
+			
 			echo "DROP TABLE IF EXISTS ".$table.';'.$lf;
 			echo $lf;
 				

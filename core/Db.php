@@ -539,17 +539,11 @@ abstract class DbAdapter{
 		while(!feof($rs)){
 		
 			$row = fgets($rs);
+			$row = preg_replace('/;\r\n/', ";\n", $row);
 			$singleQuery .= $row;
 			
 			if(substr($row, -2) == ";\n"){
-				try{
-					$this->query($singleQuery);
-					$completeCommands++;
-				}
-				catch(Exception $e){
-					echo 'error: '.$e->getMessage().'<br />';
-					$failedCommands++;
-				}
+				$this->query($singleQuery);
 				$singleQuery = '';
 				$numCommands++;
 			}

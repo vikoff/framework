@@ -93,15 +93,6 @@ class GenericObject{
 		
 	}  
 	
-	/** 
-	 * ПОЛУЧИТЬ КОНСТАНТУ КЛАССА НАСЛЕДНИКА
-	 * @param string $name - имя константы
-	 * @return string - значение константы
-	 */
-	public function getConst($name){
-		trigger_error('Метод <b>getConst</b> не определен в классе наследнике GenericObject', E_USER_ERROR);
-	}
-	
 	/** ЗАГРУЗКА ДАННЫХ ИЗ БАЗЫ ДАННЫХ */
 	private function _loadData(){
 		
@@ -320,6 +311,12 @@ class GenericObject{
 	
 	public function hasError(){
 		return count($this->_errors);
+	}
+	
+	/** ПОЛУЧИТЬ КОНСТАНТУ ИЗ КЛАССА-ПОТОМКА */
+	public function getConst($name){
+		
+		return constant($this->getClass().'::'.$name);
 	}
 	
 	

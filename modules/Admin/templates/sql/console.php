@@ -30,7 +30,6 @@
 					return false;
 				}
 			});
-		$('.thead-floatblock').floatblock({placeholder: 'clone'});
 	});
 </script>
 
@@ -43,7 +42,7 @@
 			
 				<div>Запрос #<?= $index; ?></div>
 				
-				<table class="std-grid" style="margin: 0px auto;">
+				<table class="std-grid narrow" style="margin: 0px;">
 				<thead class="thead-floatblock">
 					<tr>
 					<? foreach($result[0] as $field => $val)

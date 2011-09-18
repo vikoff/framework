@@ -10,10 +10,13 @@ class CurUser extends User_Model{
 	const HASH_LR = 'dc76e9f0c0006e8f919e0c515c66dbba3982f785';
 	const HASH_PR = 'c776f7b86a4701a3e3a94c253901006cf31e6d32';
 	
-	private $_rootMode = FALSE;
-	
 	private static $_instance = null;
 	
+	private $_rootMode = FALSE;
+	
+	private $_allowedResources = array(
+	
+	);
 	
 	// ИНИЦИАЛИЗАЦИЯ ЭКЗЕМПЛЯРА КЛАССА
 	public static function init(){
@@ -173,6 +176,14 @@ class CurUser extends User_Model{
 	public function getField($key){
 		
 		return $this->_rootMode ? '' : parent::getField($key);
+	}
+	
+	public function isResourceAllowed($module, $resource){
+		
+		if($this->_rootMode)
+			return TRUE;
+		
+		return !empty($this->_allowedResources[$module][$resource]);
 	}
 }
 

@@ -34,7 +34,14 @@ class Request{
 	// РАЗБОР URL ЗАПРОСА
 	public function parseRequest(){
 		
-		$this->_requestArr = $_rArr = YArray::trim(explode('/', $this->_requestString));
+		$_rArr = array();
+		foreach(explode('/', $this->_requestString) as $item){
+			$item = trim($item);
+			if(strlen($item))
+				$_rArr[] = $item;
+		}
+		
+		$this->_requestArr = $_rArr;
 		
 		$this->_controller = array_shift($_rArr);	// string
 		$this->_params = $_rArr;					// array

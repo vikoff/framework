@@ -5,23 +5,26 @@ class Admin_Controller extends Controller{
 	const DEFAULT_VIEW = 1;
 	const TPL_PATH = 'modules/Admin/templates/';
 	
+	const MODULE = 'admin';
+	
 	// методы, отображаемые по умолчанию
-	protected $_defaultFrontendDisplay = FALSE;
-	protected $_defaultBackendDisplay = 'content';
+	protected $_displayIndex = 'content';
 	
 	// права на выполнение методов контроллера
 	public $permissions = array(
 	
 		'display_content'	=> PERMS_ADMIN,
 		'display_users' 	=> PERMS_ADMIN,
+		'display_modules' 	=> PERMS_ADMIN,
 		'display_root' 		=> PERMS_ADMIN,
-		'display_sql' 		=> PERMS_ADMIN,
 		
-		'action_sql_dump' 	=> PERMS_ROOT,
 		'actionSave' 		=> PERMS_ADMIN,
 		'actionDelete' 		=> PERMS_ADMIN,
-		
-		'ajax_get_tables_by_db' => PERMS_ROOT,
+	);
+	
+	public $_proxy = array(
+		'sql' => 'Admin_SqlController',
+		'modules' => 'Admin_ModulesController',
 	);
 	
 	public function init(){
@@ -40,31 +43,26 @@ class Admin_Controller extends Controller{
 		$viewer = BackendLayout::get();
 		$viewer
 			->setTopMenuActiveItem('content')
-			->setLeftMenuType('content');
-
+			->setLeftMenuType('content')
+			->setBreadcrumbs('auto');
+		
+		// display index
 		if(empty($params[0])){
 			$viewer
 				->setContentHtmlFile(self::TPL_PATH.'content_index.tpl')
-				->setBreadcrumbs('auto')
 				->render();
 			exit();
 		}
 		
-		$controllerIdentifier = array_shift($params);
-		$controllerClass = App::getControllerClassName($controllerIdentifier);
-		$displayMethodIdentifier = array_shift($params);
+		$module = array_shift($params);
 		
-		if(!$controllerClass){
+		if(!App::get()->isModule($module, TRUE)){
 			BackendLayout::get()->error404('Контроллер не найден');
 			exit();
 		}
 		
-		$controllerInstance = new $controllerClass($adminMode = TRUE);
-		$controllerInstance->performDisplay($displayMethodIdentifier, $params);
-		$viewer
-			->setLeftMenuActiveItem($controllerIdentifier)
-			->setBreadcrumbs('auto')
-			->render();
+		$viewer->setLeftMenuActiveItem($module);
+		App::get()->getModule($module, TRUE)->display($params);
 	}
 
 	// DISPLAY USERS
@@ -116,16 +114,6 @@ class Admin_Controller extends Controller{
 		
 		switch($section){
 			
-			case 'sql-console':
-				
-				$this->snippet_sql_console();
-				break;
-			
-			case 'sql-dump':
-				
-				$this->snippet_sql_dump();
-				break;
-			
 			case 'error-log':
 				$this->snippet_error_log();
 				break;
@@ -145,47 +133,10 @@ class Admin_Controller extends Controller{
 		
 		$viewer->render();
 	}
-
-	public function display_sql($params = array()){
-		
-		$controller = new Admin_SqlController();
-		$controller->display($params);
-	}
 	
 	//////////////////////
 	////// SNIPPETS //////
 	//////////////////////
-	
-	// SNIPPET SQL CONSOLE
-	public function snippet_sql_console(){
-		
-		$variables = array();
-		$query = stripslashes(getVar($_POST['query']));
-		$variables['query'] = $query;
-		
-		if($query){
-		
-			$variables['data'] = $this->_execSql($query);
-			$variables['sql_error'] = db::get()->hasError() ? db::get()->getError() : '';
-		}
-		BackendLayout::get()
-			->setContentPhpFile(self::TPL_PATH.'root_sql_console.php', $variables);
-	}
-	
-	// SNIPPET SQL DUMP
-	public function snippet_sql_dump(){
-		
-		$db = db::get();
-		
-		$variables = array(
-			'databases' => $db->showDatabases(),
-			'curDatabase' => $db->getDatabase(),
-			'encoding' => $db->getEncoding(),
-		);
-
-		BackendLayout::get()
-			->setContentPhpFile(self::TPL_PATH.'root_sql_dump.php', $variables);
-	}
 	
 	// SNIPPET ERROR LOG
 	public function snippet_error_log(){
@@ -202,31 +153,6 @@ class Admin_Controller extends Controller{
 	////////////////////
 	////// ACTION //////
 	////////////////////
-	
-	public function action_sql_dump(){
-		
-		$tblInputType = $_POST['tables-input-type'];
-		$database = getVar($_POST['database'], null);
-		$encoding = getVar($_POST['encoding'], null);
-		$tables = null;
-		$db = db::get();
-		
-		if($tblInputType == 'text'){
-			$tables = explode(',', getVar($_POST['tables-text']));
-			foreach($tables as &$tbl)
-				$tbl = trim($tbl);
-		}
-		elseif($tblInputType == 'select'){
-			$tables = getVar($_POST['tables-select']);
-		}
-		
-		// установка корировки соединения (если задана)
-		if(!empty($encoding))
-			$db->setEncoding($encoding);
-		
-		$db->makeDump($database, $tables);
-		exit;
-	}
 	
 	public function action_smarty_clear_compiled_tpl($params = array()){
 	
@@ -269,50 +195,22 @@ class Admin_Controller extends Controller{
 	}
 	
 	////////////////////
-	////// OTHER  //////
-	////////////////////
-	
-	////////////////////
 	////// AJAX   //////
 	////////////////////
-	
-	// AJAX GET TABLES BY DB
-	public function ajax_get_tables_by_db($params = array()){
-		
-		$dbName = getVar($_POST['db']);
-		if(empty($dbName))
-			return '';
-		
-		$db = db::get();
-		$db->selectDb($dbName);
-		echo json_encode($db->showTables());
-	}
-	
-	// EXEC SQL (FORM SQL CONSOLE)
-	private function _execSql($sqls){
-		
-		$db = db::get();
-		$sqls = preg_replace('/;\r\n/', ";\n", $sqls);
-		$sqlsArr = explode(";\n", $sqls);
-		$results = array();
-		
-		$db->enableErrorHandlingMode();
-		
-		foreach($sqlsArr as $sql){
-			$sql = trim($sql);
-			if(!empty($sql))
-				$results[] = $db->getAll($sql, array());
-		}
-		
-		$db->disableErrorHandlingMode();
-		
-		return $results;
-	}
 	
 	// ОБРАБОТЧИК 403
 	public function error403handler($method, $line = 0){
 		
 		BackendLayout::get()->showLoginPage();
+	}
+	
+	
+	////////////////////
+	////// OTHER  //////
+	////////////////////
+	
+	public function getClass(){
+		return __CLASS__;
 	}
 
 }

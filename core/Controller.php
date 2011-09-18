@@ -125,7 +125,7 @@ class Controller{
 		
 		// если метод не указан, то выполняется метод по умолчанию
 		if(!$method){
-			$this->_displayDefault($params);
+			$this->_displayIndex($params);
 			return TRUE;
 		}
 		
@@ -139,7 +139,9 @@ class Controller{
 		
 		if(!$this->checkMethod($method, $params))
 			return FALSE;
-			
+		
+		App::get()->setPerformedDisplay($this->getConst('MODULE'), $method, $params);
+		
 		try{
 			$this->$method($params);
 		}
@@ -147,6 +149,7 @@ class Controller{
 		catch(Exception403 $e){$this->error403handler($e->getMessage());}
 		catch(Exception $e){$this->errorHandler($e->getMessage());}
 		
+		return TRUE;
 	}
 	
 	/**
@@ -199,6 +202,8 @@ class Controller{
 		catch(Exception404 $e){$this->error404handler($e->getMessage());}
 		catch(Exception403 $e){$this->error403handler($e->getMessage());}
 		catch(Exception $e){$this->errorHandler($e->getMessage());}
+		
+		return TRUE;
 	}
 	
 	/** ВЫПОЛНЕНИЕ AJAX */
@@ -224,6 +229,7 @@ class Controller{
 		catch(Exception403 $e){$this->error403handler($e->getMessage());}
 		catch(Exception $e){$this->errorHandler($e->getMessage());}
 		
+		return TRUE;
 	}
 	
 	/** ПОЛУЧИТЬ ИМЯ МЕТОДА ОТОБРАЖЕНИЯ ПО ИДЕНТИФИКАТОРУ */
@@ -292,10 +298,11 @@ class Controller{
 	}
 	
 	// ВЫПОЛНЕНИЕ МЕТОДА ПО УМОЛЧАНИЮ
-	protected function _displayDefault($params){
+	protected function _displayIndex($params){
 		
-		$defaultMethodIdentifier = $this->_getDisplayDefaultIdentifier();
+		$defaultMethodIdentifier = $this->_getDisplayIndex();
 		
+		// если метод по умолчанию определен
 		if($defaultMethodIdentifier){
 			if(CFG_REDIRECT_DEFAULT_DISPLAY){
 				App::redirectHref(Request::get()->getAppended($defaultMethodIdentifier));
@@ -304,21 +311,27 @@ class Controller{
 				array_unshift($displayParams, $defaultMethodIdentifier);
 				$this->display($displayParams);
 			}
-		}else{
+		}
+		// если метод по умолчанию не определен
+		else{
 			if($defaultMethodIdentifier === FALSE){
 				$this->error404handler(get_class().'::default_method_for_'.(App::get()->isAdminMode() ? 'backend' : 'frontend'), __LINE__);
 			}else{
-				trigger_error('Неверное значение _default'.(App::get()->isAdminMode() ? 'Backend' : 'Frontend').'Display для контроллера '.get_class($this).'. Допускается идентификатор метода, или FALSE', E_USER_ERROR);
+				trigger_error('Неверное значение '.get_class($this).'::$_displayIndex для контроллера . Допускается идентификатор метода, или FALSE', E_USER_ERROR);
 			}
 		}
 		
 	}
 	
-	protected function _getDisplayDefaultIdentifier(){
+	protected function _getDisplayIndex(){
 		
-		return App::get()->isAdminMode()
-			? $this->_defaultBackendDisplay
-			: $this->_defaultFrontendDisplay;
+		return $this->_displayIndex;
+	}
+	
+	/** ПОЛУЧИТЬ КОНСТАНТУ ИЗ КЛАССА-ПОТОМКА */
+	public function getConst($name){
+		
+		return constant($this->getClass().'::'.$name);
 	}
 	
 }

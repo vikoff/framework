@@ -18,3 +18,12 @@ function getVar(&$varname, $defaultVal = '', $type = ''){
 	return $varname;
 }
 
+function href($href){
+	
+	return WWW_ROOT.(CFG_USE_SEF
+		// http://site.com/controller/method?param=value
+		? $href
+		// http://site.com/index.php?r=controller/method&param=value
+		: 'index.php'.(!empty($href) ? '?r='.str_replace('?', '&', $href) : ''));
+}
+

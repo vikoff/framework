@@ -46,7 +46,7 @@
 					
 					s.data('db', db);
 					
-					$.post('admin/get-tables-by-db', {db: db}, function(response){
+					$.post('admin/sql/get-tables', {db: db}, function(response){
 						s.empty();
 						for(var i = 0, l = response.length; i < l; i++)
 							s.append('<option value="' + response[i] + '">' + response[i] + '</option>');
@@ -75,7 +75,7 @@
 		</div>
 
 		<div class="paragraph">
-			<input type="submit" name="action[admin/sql-dump]" value="Создать" />
+			<input type="submit" name="action[admin/sql/make-dump]" value="Создать" />
 		</div>
 	</form>
 	

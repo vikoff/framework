@@ -35,6 +35,10 @@ class Page_Model extends GenericObject{
 		return new Page_Model($data['id'], self::INIT_EXISTS_FORCE, $data);
 	}
 	
+	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
+	public function getClass(){
+		return __CLASS__;
+	}
 	/** СЛУЖЕБНЫЙ МЕТОД (получение констант из родителя) */
 	public function getConst($name){
 		return constant(__CLASS__.'::'.$name);
@@ -47,7 +51,7 @@ class Page_Model extends GenericObject{
 	 */
 	protected function _accessCheck(){
 		
-		if(!App::$adminMode && !$this->getField('published'))
+		if(!App::get()->isAdminMode() && !$this->getField('published'))
 			throw new Exception403('Доступ к странице ограничен');
 	}
 	
@@ -160,7 +164,7 @@ class Page_Model extends GenericObject{
 	
 }
 
-class PageCollection extends GenericObjectCollection{
+class Page_Collection extends GenericObjectCollection{
 	
 	// поля, по которым возможна сортировка коллекции
 	// каждый ключ должен быть корректным выражением для SQL ORDER BY
@@ -177,7 +181,7 @@ class PageCollection extends GenericObjectCollection{
 	// ТОЧКА ВХОДА В КЛАСС
 	public static function Load(){
 			
-		$instance = new PageCollection();
+		$instance = new Page_Collection();
 		return $instance;
 	}
 	

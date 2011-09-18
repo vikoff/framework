@@ -5,7 +5,7 @@ class Error_Model{
 	const HANDLER_MODE = 1;
 	const DISPLAY_MODE = 2;
 	
-	const MODULE = 'Error';
+	const MODULE = 'error';
 	
 	/** путь к шаблонам (относительно FS_ROOT) */
 	const TPL_PATH = 'modules/Error/templates/';

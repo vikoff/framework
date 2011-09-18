@@ -49,18 +49,12 @@ function __autoload($className){
 	
 	/*
 	MODULES, LAYOUTS
-
-	new Page_Model;
-	new Page_Forms_Form1;
 	
-	new Core_User_Model
-	new Core_User_Forms_Form1
+	Page_Controller, Page_Model, Page_Collection, Page_Forms_Form1
 
 	Page/
 		Forms/
 			Form1.php
-			Form2.php
-			Form3.php
 		PageModel.php
 		PageController.php
 	*/
@@ -68,9 +62,9 @@ function __autoload($className){
 		
 		list($module, $classIdentifier) = explode('_', $className, 2);
 		
-		// класс [SomeClass]Collection всегда лежит в файле [SomeClass].php
+		// класс ModuleName_Collection всегда лежит в файле ModuleName_Model.php
 		if(substr($classIdentifier, -10) == 'Collection')
-			$classIdentifier = substr($classIdentifier, 0, -10);
+			$classIdentifier = substr($classIdentifier, 0, -10).'Model';
 		
 		$path = 'modules/'.$module.'/';
 		

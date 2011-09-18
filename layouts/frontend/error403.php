@@ -10,5 +10,5 @@
 </div>
 
 <div style="text-align: center; padding: 1em;">
-	<?=$message;?>
+	<?=$this->message;?>
 </div>

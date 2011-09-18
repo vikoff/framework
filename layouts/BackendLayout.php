@@ -7,6 +7,7 @@ class BackendLayout extends Layout{
 	private $_topMenu = array(
 		'content' => array('perms' => PERMS_ADMIN, 'title' => 'Контент'           ),
 		'users'   => array('perms' => PERMS_ADMIN, 'title' => 'Пользователи'      ),
+		'modules' => array('perms' => PERMS_ADMIN, 'title' => 'Модули'            ),
 		'root'    => array('perms' => PERMS_ADMIN, 'title' => 'Администрирование' ),
 		'sql'     => array('perms' => PERMS_ADMIN, 'title' => 'SQL'       ),
 	);
@@ -22,6 +23,9 @@ class BackendLayout extends Layout{
 			'list' => 'Список пользователей',
 			'create' => 'Создание пользователя',
 			'ban-list' => 'Блокировки',
+		),
+		'modules' => array(
+			'read-config' => 'Получение данных о&nbsp;модулях',
 		),
 		'root' => array(
 			'user-statistics' => 'Статистика посещений',

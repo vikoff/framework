@@ -15,10 +15,6 @@ class App{
 	
 	private $_preventDisplay = FALSE;
 	
-	public static $displayController = null;
-	public static $displayMethodIdentifier = null;
-	public static $displayMethodParams = array();
-	
 	public static $adminMode = FALSE;
 	
 	private static $_instance = null;
@@ -27,11 +23,14 @@ class App{
 	private $_requestModuleName = null;
 	private $_requestModuleParams = array();
 	
-	private $_requestControllerIdentifier = null;
-	private $_requestMethodIdentifier = null;
-	private $_requestController = null;
-	private $_requestParams = null;
+	/** массив данных о конечном вызванном методе отображения */
+	private $_performedDisplay = array(
+		'module' => null,
+		'method' => null,
+		'params' => array()
+	);
 	
+	/** флаг, включен ли режим администратора */
 	private $_adminMode = FALSE;
 	
 	/** массив конфигурации модулей */
@@ -60,25 +59,7 @@ class App{
 		$this->_adminMode = $this->_requestModuleName == 'admin';
 	}
 	
-	/** ОПРЕДЕЛИТЬ КЛАСС КОНТРОЛЛЕРА ПО ПЕРЕДАННОМУ ИДЕНТИФИКАТОРУ */
-	private function _defineRequestController(){
-		
-		// если контроллер не передан в request
-		if(empty($this->_requestControllerIdentifier)){
-			
-			if(CFG_REDIRECT_DEFAULT_DISPLAY){
-				App::redirectHref(Request::get()->getAppended(strtolower(DEFAULT_CONTROLLER)));
-			}else{
-				$this->_requestControllerIdentifier = DEFAULT_CONTROLLER;
-			}
-		}
-		$this->_requestController = self::getControllerClassName($this->_requestControllerIdentifier);
-	}
-	
-	/**
-	 * Проверить, включен ли режим администратора 
-	 * @return bool
-	 */
+	/** ПРОВЕРИТЬ, ВКЛЮЧЕН ЛИ РЕЖИМ АДМИНИСТРАТОРА */
 	public function isAdminMode(){
 		
 		return $this->_adminMode;
@@ -96,13 +77,19 @@ class App{
 		
 		if($this->_checkAction())
 			exit;
-			
-		$this->_checkAjax();
+		
+		if($this->_checkAjax())
+			exit;
+		
+		if($this->_checkDisplay())
+			exit;
+		
+		$this->error404();
 	}
 	
-	public function isModule($module){
+	public function isModule($module, $adminMode = FALSE){
 		
-		return isset($this->_modulesConfig[$module]);
+		return isset($this->_modulesConfig[$module][$adminMode ? 'adminController' : 'controller']);
 	}
 	
 	public function getModule($module, $adminMode = FALSE){
@@ -115,9 +102,6 @@ class App{
 		return new $this->_modulesConfig[$module][$key] ();
 	}
 
-	
-	#### ПОДГОТОВКА К ВЫПОЛНЕНИЮ ОПЕРАЦИЙ ####
-	
 	/** ПРОВЕРИТЬ НЕОБХОДИМОСТЬ ВЫПОЛЕННИЯ ДЕЙСТВИЯ */
 	public function _checkAction(){
 		
@@ -147,50 +131,19 @@ class App{
 		
 		$module = !empty($this->_requestModuleName) ? $this->_requestModuleName : DEFAULT_CONTROLLER;
 		
-		if(!$this->isModule($module)){
-			$this->error404('Модуль "'.$module.'" не найден');
+		if(!$this->isModule($module))
 			return FALSE;
-		}
 		
-		$this->getModule($module)->display($this->_requestModuleParams);
+		return $this->getModule($module)->display($this->_requestModuleParams);
 	}
 	
 	/** ПРОВЕРКА НЕОБХОДИМОСТИ ВЫПОЛНЕНИЯ AJAX */
 	protected function _checkAjax(){
 		
-		$controller = self::getControllerClassName($this->_requestControllerIdentifier);
-		
-		if(empty($controller)){
-			self::error404('Controller "'.$this->_requestControllerIdentifier.'" does not exists');
-			return;
-		}
-		
-		$controllerInstance = new $controller();
-		$controllerInstance->performAjax($this->_requestMethodIdentifier, $this->_requestParams);
-	}
-	
-	/**
-	 * ПОЛУЧИТЬ ИМЯ КЛАССА КОНТРОЛЛЕРА ПО ИДЕНТИФИКАТОРУ
-	 * @param string $controllerIdentifier - идентификатор контроллера
-	 * @return string|null - имя класса контроллера или null, если контроллер не найден
-	 */
-	public static function getControllerClassName($controllerIdentifier){
-			
-		// если идентификатор контроллера не передан, вернем null
-		if(empty($controllerIdentifier))
-			return null;
-		
-		// если идентификатор контроллера содержит недопустимые символы, вернем null
-		if(!preg_match('/^[\w\-]+$/', $controllerIdentifier))
-			return null;
-		
-		// преобразует строку вида 'any-class-name' в 'AnyClassName_Controller'
-		// 'user' => 'UserController
-		// 'user-profile' => User_ProfileController
-		$_controller = str_replace(' ', '_', ucwords(str_replace('-', ' ', strtolower($controllerIdentifier))));
-		$controller = $_controller.(strpos($_controller, '_') ? 'Controller' : '_Controller');
-		// die($controller);
-		return class_exists($controller) ? $controller : null;
+		if(empty($this->_requestModuleName) || !$this->isModule($this->_requestModuleName))
+			return FALSE;
+
+		return $this->getModule($this->_requestModuleName)->ajax($this->_requestModuleParams);
 	}
 	
 	/** ЗАПРЕТ ОТОБРАЖЕНИЯ */
@@ -199,6 +152,9 @@ class App{
 		$this->_preventDisplay = (bool)$prevent;
 	}
 	
+	public function setPerformedDisplay($module, $method, $params){
+		
+	}
 	
 	#### ВЫПОЛНЕНИЕ РЕДИРЕКТОВ ####
 	
@@ -297,9 +253,7 @@ class App{
 	 */
 	public static function href($href){
 	
-		return WWW_ROOT.(CFG_USE_SEF
-			? $href											// http://site.com/controller/method?param=value
-			: 'index.php?r='.str_replace('?', '&', $href));	// http://site.com/index.php?r=controller/method&param=value
+		return href($href);
 	}
 	
 	/**
@@ -368,12 +322,12 @@ class App{
 	
 		if(is_null(self::$_smartyInstance)){
 		
-			require_once(FS_ROOT.'includes/smarty/libs/Smarty.class.php');
-			require_once(FS_ROOT.'includes/smarty/VIKOFF_SmartyPlugins.php');
+			require_once(FS_ROOT.'libs/smarty/libs/Smarty.class.php');
+			require_once(FS_ROOT.'libs/smarty/VIKOFF_SmartyPlugins.php');
 			
 			self::$_smartyInstance = new Smarty();
 			
-			$path = FS_ROOT.'includes/smarty/';
+			$path = FS_ROOT.'libs/smarty/';
 			
 			self::$_smartyInstance->template_dir = FS_ROOT.'templates/';
 			self::$_smartyInstance->compile_dir = $path.'templates_c/';
