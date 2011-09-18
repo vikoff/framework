@@ -43,6 +43,18 @@ class Admin_ModulesController extends Controller {
 	
 	public function action_read_config($params = array()){
 		
+		$modulesDir = FS_ROOT.'modules/';
+		
+		foreach(scandir($modulesDir) as $elm){
+			
+			if($elm == '.' || $elm == '..' || !is_dir($modulesDir.$elm))
+				continue;
+			
+			if(file_exists($modulesDir.$elm.'/config.php'))
+				;
+			
+			
+		Messenger::get()->addSuccess('Конфигурация модулей обновлена');
 	}
 	
 	

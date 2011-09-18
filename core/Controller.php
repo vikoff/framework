@@ -78,6 +78,9 @@ class Controller{
 	 */
 	protected $_title = null;
 	
+	/** Контейнер для обмена данными внутри контроллера */
+	protected $_data = array();
+	
 	
 	public function __construct($adminMode = FALSE){
 	

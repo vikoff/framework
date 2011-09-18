@@ -1,10 +1,10 @@
 <?
 
 return array(
-	'isCallable' => true,
-	'required' => true,
-	'mainController' => 'User_Controller',
-	'dependence' => array(),
+	'name' => 'user',
+	'title' => 'Управление пользователями',
+	'controller' => 'User_Controller',
+	'adminController' => 'User_AdminController',
 );
 
 ?>
