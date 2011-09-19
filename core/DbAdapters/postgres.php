@@ -236,7 +236,7 @@ class DbAdapter_postgres extends DbAdapter{
 		header('Cache-Control: private');
 		header('Pragma: cache');
 		header('Content-type: application/download');
-		header('Content-Disposition: attachment; filename='.strtolower(date("d_M_Y")).'_db_'.self::$connDatabase.'_backup.sql');
+		header('Content-Disposition: attachment; filename='.$this->connDatabase.'_'.strtolower(date("d-m-Y_H-i")).'.sql');
 		
 		echo $cmnt." ".$lf;
 		echo $cmnt." START DATABASE DUMP".$lf;
