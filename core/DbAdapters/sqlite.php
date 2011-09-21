@@ -314,7 +314,7 @@ class DbAdapter_sqlite extends DbAdapter{
 		header('Cache-Control: private');
 		header('Pragma: cache');
 		header('Content-type: application/download');
-		header('Content-Disposition: attachment; filename='.strtolower(date("Y_m_d")).'_db_'.$this->connDatabase.'.sql');
+		header('Content-Disposition: attachment; filename='.$this->connDatabase.'_'.strtolower(date("d-m-Y_H-i")).'.sql');
 		
 		echo $cmnt." ".$lf;
 		echo $cmnt." START SQLITE DATABASE DUMP".$lf;
