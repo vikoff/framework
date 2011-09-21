@@ -335,7 +335,11 @@ table.std-grid tr.unpublished{
 table.std-grid tr.unpublished a{
 	color: #99B;
 }
-table.std-grid .options .item{
+table.std-grid td.options{
+	width: 90px;
+	text-align: center;
+}
+table.std-grid .options a{
 	padding: 0px 3px;
 }
 
@@ -372,7 +376,11 @@ table.grid td.right{
 table.grid td a{
 	color: #47E;
 }
-table.grid .options .item{
+table.grid td.options{
+	width: 90px;
+	text-align: center;
+}
+table.grid .options a{
 	padding: 0px 3px;
 }
 
