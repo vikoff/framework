@@ -17,6 +17,11 @@ class Page_Controller extends Controller{
 		'display_view' => 'view',
 	);
 	
+	public function getResourcePermission($resource){
+		
+		return ACL_Model::get()->isResourceAllowed(self::MODULE, $resource);
+	}
+	
 	/** ВЫПОЛНЕНИЕ ОТОБРАЖЕНИЯ */
 	public function display($params){
 		

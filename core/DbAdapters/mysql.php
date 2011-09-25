@@ -352,7 +352,7 @@ class DbAdapter_mysql extends DbAdapter{
 		header('Cache-Control: private');
 		header('Pragma: cache');
 		header('Content-type: application/download');
-		header('Content-Disposition: attachment; filename='.$this->connDatabase.'_'.strtolower(date("d-m-Y_H-i")).'.sql');
+		header('Content-Disposition: attachment; filename='.$this->connDatabase.'_'.strtolower(date("Y-m-d_H-i")).'.sql');
 		
 		echo $cmnt." ".$lf;
 		echo $cmnt." START MYSQL DATABASE DUMP".$lf;
@@ -402,8 +402,10 @@ class DbAdapter_mysql extends DbAdapter{
 					$rows = db::get()->getAll('SELECT * FROM '.$table.' LIMIT '.($i * $rowsPerIteration).', '.$rowsPerIteration, array());
 					foreach($rows as $rowIndex => $row){
 						foreach($row as &$cell){
-							$cell = str_replace("\n", '\\r\\n', $cell);
-							$cell = str_replace("\r", '', $cell);
+							if(is_string($cell)){
+								$cell = str_replace("\n", '\\r\\n', $cell);
+								$cell = str_replace("\r", '', $cell);
+							}
 							$cell = $this->qe($cell);
 						}
 						$rows[$rowIndex] = $lf."\t(".implode(',', $row).")";

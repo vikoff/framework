@@ -147,9 +147,14 @@ class CurUser extends User_Model{
 	}
 	
 	// ПРОВЕРКА АВТОРИЗОВАН ЛИ ПОЛЬЗОВАТЕЛЬ
-	 public function isLogged(){
+	public function isLogged(){
 		
 		return !empty($_SESSION[$this->_authPrefix.'userAuthData']['id']);
+	}
+	
+	public function isRoot(){
+		
+		return $this->_rootMode;
 	}
 	
 	// УСТАНОВИТЬ ПОЛЗЬОВАТЕЛЬСКИЕ ДАННЫЕ
@@ -177,14 +182,7 @@ class CurUser extends User_Model{
 		
 		return $this->_rootMode ? '' : parent::getField($key);
 	}
-	
-	public function isResourceAllowed($module, $resource){
-		
-		if($this->_rootMode)
-			return TRUE;
-		
-		return !empty($this->_allowedResources[$module][$resource]);
-	}
+
 }
 
 ?>

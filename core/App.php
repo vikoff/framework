@@ -13,6 +13,9 @@
  */
 class App{
 	
+	const ERROR_403 = 403;
+	const ERROR_404 = 404;
+	
 	private $_preventDisplay = FALSE;
 	
 	public static $adminMode = FALSE;
@@ -152,10 +155,6 @@ class App{
 		$this->_preventDisplay = (bool)$prevent;
 	}
 	
-	public function setPerformedDisplay($module, $method, $params){
-		
-	}
-	
 	#### ВЫПОЛНЕНИЕ РЕДИРЕКТОВ ####
 	
 	
@@ -290,6 +289,16 @@ class App{
 	}
 
 	#### ПРОЧЕЕ ####
+	
+	public function setControllerErrCode($code){
+		
+		$this->_controllerErrCode = $code;
+	}
+	
+	public function getControllerErrCode(){
+		
+		return $this->_controllerErrCode;
+	}
 	
 	// ERROR 403
 	public static function error403($msg = ''){

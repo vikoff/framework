@@ -127,7 +127,7 @@ class Controller{
 		$method = array_shift($params);
 		
 		// если метод не указан, то выполняется метод по умолчанию
-		if(!$method){
+		if(empty($method)){
 			$this->_displayIndex($params);
 			return TRUE;
 		}
@@ -309,10 +309,11 @@ class Controller{
 		if($defaultMethodIdentifier){
 			if(CFG_REDIRECT_DEFAULT_DISPLAY){
 				App::redirectHref(Request::get()->getAppended($defaultMethodIdentifier));
+				exit();
 			}else{
 				$displayParams = $params;
 				array_unshift($displayParams, $defaultMethodIdentifier);
-				$this->display($displayParams);
+				return $this->display($displayParams);
 			}
 		}
 		// если метод по умолчанию не определен
@@ -322,6 +323,7 @@ class Controller{
 			}else{
 				trigger_error('Неверное значение '.get_class($this).'::$_displayIndex для контроллера . Допускается идентификатор метода, или FALSE', E_USER_ERROR);
 			}
+			exit;
 		}
 		
 	}
