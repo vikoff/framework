@@ -102,7 +102,7 @@ class App{
 			$this->error404('Модуль "'.$module.'" не найден');
 			exit;
 		}
-		return new $this->_modulesConfig[$module][$key] ();
+		return new $this->_modulesConfig[$module][$key]( $this->_modulesConfig[$module] );
 	}
 
 	/** ПРОВЕРИТЬ НЕОБХОДИМОСТЬ ВЫПОЛЕННИЯ ДЕЙСТВИЯ */
