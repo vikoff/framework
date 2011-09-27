@@ -11,15 +11,12 @@ class Admin_Controller extends Controller{
 	protected $_displayIndex = 'content';
 	
 	// права на выполнение методов контроллера
-	public $permissions = array(
+	public $methodResources = array(
 	
-		'display_content'	=> PERMS_ADMIN,
-		'display_users' 	=> PERMS_ADMIN,
-		'display_modules' 	=> PERMS_ADMIN,
-		'display_root' 		=> PERMS_ADMIN,
-		
-		'actionSave' 		=> PERMS_ADMIN,
-		'actionDelete' 		=> PERMS_ADMIN,
+		'display_content'	=> 'content',
+		'display_users' 	=> 'content',
+		'display_modules' 	=> 'content',
+		'display_root' 		=> 'content',
 	);
 	
 	public $_proxy = array(
@@ -30,6 +27,12 @@ class Admin_Controller extends Controller{
 	public function init(){
 	
 		BackendLayout::get()->setTitle('Административная панель');
+	}
+	
+	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
+	public function checkResourcePermission($resource){
+		
+		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
 	
