@@ -127,10 +127,8 @@ class Controller{
 		$method = array_shift($params);
 		
 		// если метод не указан, то выполняется метод по умолчанию
-		if(empty($method)){
-			$this->_displayIndex($params);
-			return TRUE;
-		}
+		if(empty($method))
+			return $this->_displayIndex($params);
 		
 		// проксирование на вложенный контроллер
 		if(isset($this->_proxy[$method])){
@@ -142,8 +140,6 @@ class Controller{
 		
 		if(!$this->checkMethod($method, $params))
 			return FALSE;
-		
-		App::get()->setPerformedDisplay($this->getConst('MODULE'), $method, $params);
 		
 		try{
 			$this->$method($params);
