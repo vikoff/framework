@@ -5,8 +5,12 @@ class DbAdapter_sqlite extends DbAdapter{
 	/** ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ */
 	public function connect(){
 		
+		$start = microtime(1);
+		
 		$this->_dbrs = sqlite_open($this->connDatabase)or $this->error('Невозможно подключиться к базе данных');
 		$this->_connected = TRUE;
+		
+		$this->_saveConnectTime(microtime(1) - $start);
 	}
 
 	/** УСТАНОВИТЬ КОДИРОВКУ СОЕДИНЕНИЯ */

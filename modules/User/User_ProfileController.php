@@ -2,13 +2,31 @@
 
 class User_ProfileController extends Controller{
 	
+	/** имя модуля */
+	const MODULE = 'user';
+	
 	// методы, отображаемые по умолчанию
 	protected $_defaultFrontendDisplay = 'profile';
 	protected $_defaultBackendDisplay = 'content';
 	
-	public $permissions = array(
-		'action_login' => PERMS_UNREG,
+	public $methodResources = array(
+		'action_login' => 'public',
 	);
+	
+	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
+	public function checkResourcePermission($resource){
+		
+		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
+	}
+	
+	public function getClass(){
+		return __CLASS__;
+	}
+	
+	
+	////////////////////
+	////// ACTION //////
+	////////////////////
 	
 	public function action_login(){
 		

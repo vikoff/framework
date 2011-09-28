@@ -1,30 +1,27 @@
 <?
 
-class Controller{
+abstract class Controller{
+	
+	/**
+	 * конфигурация модуля
+	 * @var array
+	 */
+	protected $_config = array();
 	
 	/**
 	 * массив пар 'идентификатор' => 'Имя контроллера'
-	 * для проксирования запросов на указанное действие/отображение в другой контроллер
+	 * для проксирования запросов в другой контроллер
 	 */
 	protected $_proxy = array();
 	
 	/*
-	 * Идентификатор метода, вызываемого по умолчанию для фронтенда.
+	 * Идентификатор метода, вызываемого по умолчанию.
 	 * Идентификатор задается без префикса 'display_'.
 	 * Значение 'list' - верно; 'display_list' - неверно.
-	 * Должно быть указано явно в классах наследниках.
+	 * Должен быть задан явно в классах наследниках.
 	 * @var string
 	 */
-	protected $_defaultFrontendDisplay = null;
-	
-	/*
-	 * Идентификатор метода, вызываемого по умолчанию для бэкенда.
-	 * Идентификатор задается без префикса 'admin_display_'.
-	 * Значение 'list' - верно; 'admin_display_list' - неверно.
-	 * Должно быть указано явно в классах наследниках
-	 * @var string
-	 */
-	protected $_defaultBackendDisplay = null;
+	protected $_displayIndex = null;
 	
 	/**
 	 * URL для редиректа после выполнения действия (action).
@@ -45,45 +42,23 @@ class Controller{
 	protected $_forceRedirect = FALSE;
 	
 	/**
-	 * Тип проверки разрешений на выполнение методов контроллера.
-	 * Допустимые значения:
-	 *     'inline' - права указываются в php-коде
-	 *     'db'     - права хранятся в таблице базы данных
-	 * @var string
-	 */
-	public $permissionsType = 'inline';
-	
-	/**
-	 * Группы разрешений.
-	 * Имеют смысл только при self::$_permissionsType установелнном в режиме 'db'
-	 * Этот массив хранит возможные группы действий и их тайтлы для редактирования
-	 * например: array('edit' => 'Редактирование', 'read' => 'Просмотр' и т.д.)
-	 * права на которые хранятся в базе данных (таблица group_perms)
+	 * Ассоциация методов контроллера с ресурсами
+	 * @example array('display_list' => 'view')
 	 * @var array
 	 */
-	public $permissionsGroups = array();
-	
-	/**
-	 * Ассоциативный массив методов класса (action, display, ajax)
-	 * и пользовательских прав, необходимых для выполнения этих методов
-	 * @var array
-	 */
-	public $permssions = array();
-	
-	/**
-	 * Заголовок контроллера
-	 * Используется для хлебных крошек и прочих подобных случаев
-	 * Доступ через акксессор self::getTitle()
-	 * @var null|string
-	 */
-	protected $_title = null;
+	public $methodResources = array();
 	
 	/** Контейнер для обмена данными внутри контроллера */
 	protected $_data = array();
 	
 	
-	public function __construct($adminMode = FALSE){
-	
+	/**
+	 * КОНСТРУКТОР
+	 * @param array $config - конфигурация модуля
+	 */
+	public function __construct($config){
+		
+		$this->_config = $config;
 		$this->init();
 	}
 	
@@ -93,31 +68,30 @@ class Controller{
 	 */
 	public function init(){}
 	
-	
-	/** ДОСТАТОЧНО ЛИ ПРАВ ДЛЯ ВЫПОЛНЕНИЯ */
-	public function hasPermission($method, $userperm){
-		return (isset($this->permissions[$method]) && $this->permissions[$method] <= $userperm) ? TRUE : FALSE;
-	}
+	/**
+	 * ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА
+	 * @abstract
+	 * @param string $resource - имя ресурса
+	 * @return bool - есть ли у пользователя разрешение на выполнение ресурса
+	 */
+	abstract public function checkResourcePermission($resource);
 	
 	/** ПРОВЕРКА КОРРЕКТНОСТИ МЕТОДА */
 	public function checkMethod(&$method){
-			
-		// если действие не найдено
-		if(!method_exists($this, $method)){
-			
-			$this->error404handler(get_class().'::'.$method, __LINE__);
-			return FALSE;
-		}
+		
+		// если ресурс для метода не определен
+		if(empty($this->methodResources[$method]))
+			trigger_error('resource of '.$method.' method not specified', E_USER_ERROR);
+		
 		
 		// если недостаточно прав
-		elseif(!$this->hasPermission($method, USER_AUTH_PERMS)){
-		
-			$this->error403handler($method, __LINE__);
-			return FALSE;
+		if(!$this->checkResourcePermission($this->methodResources[$method])){
+			
+			Debugger::get()->log($this->getClass().'::'.$method.' (resource: '.$this->methodResources[$method].')');
+			$resourceTitle = $this->_config['resources'][ $this->methodResources[$method] ];
+			$this->error403handler('Недостаточно прав, чтобы выполнить '.$resourceTitle, __LINE__);
+			exit;
 		}
-		
-		// если прошел проверки, то все ок
-		return TRUE;
 		
 	}
 	
@@ -132,14 +106,18 @@ class Controller{
 		
 		// проксирование на вложенный контроллер
 		if(isset($this->_proxy[$method])){
-			$controller = new $this->_proxy[$method] ();
+			$controller = new $this->_proxy[$method]( $this->_config );
 			return $controller->display($params);
 		}
 		
 		$method = $this->getDisplayMethodName($method);
 		
-		if(!$this->checkMethod($method, $params))
+		// если метод не найден
+		if(!method_exists($this, $method))
 			return FALSE;
+		
+		// проверка метода
+		$this->checkMethod($method, $params);
 		
 		try{
 			$this->$method($params);
@@ -166,7 +144,7 @@ class Controller{
 		
 		// проксирование на вложенный контроллер
 		if(isset($this->_proxy[$method])){
-			$controller = new $this->_proxy[$method] ();
+			$controller = new $this->_proxy[$method]( $this->_config );
 			return $controller->action($params);
 		}
 		
@@ -174,9 +152,7 @@ class Controller{
 		
 		// если метод не прошел проверку, запускается error handler
 		// и дальнейший вывод прекращается
-		if(!$this->checkMethod($method)){
-			exit();
-		}
+		$this->checkMethod($method);
 		
 		// назначение URL для редиректа (если задан).
 		// назначается раньше выполнения метода, чтобы
@@ -212,14 +188,18 @@ class Controller{
 		
 		// проксирование на вложенный контроллер
 		if(isset($this->_proxy[$method])){
-			$controller = new $this->_proxy[$method] ();
+			$controller = new $this->_proxy[$method]( $this->_config );
 			return $controller->ajax($params);
 		}
 		
 		$method = $this->getAjaxMethodName($method);
 		
-		if(!$this->checkMethod($method, $params))
+		// если метод не найден
+		if(!method_exists($this, $method))
 			return FALSE;
+		
+		// проверка метода
+		$this->checkMethod($method, $params);
 			
 		try{
 			$this->$method($params);

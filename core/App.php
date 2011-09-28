@@ -72,7 +72,11 @@ class App{
 	public function run(){
 		
 		$this->_checkAction();
-		$this->_checkDisplay();
+		
+		if($this->_checkDisplay())
+			exit;
+		
+		$this->error404();
 	}
 	
 	/** ЗАПУСК ПРИЛОЖЕНИЯ В AJAX-РЕЖИМЕ */
@@ -102,7 +106,7 @@ class App{
 			$this->error404('Модуль "'.$module.'" не найден');
 			exit;
 		}
-		return new $this->_modulesConfig[$module][$key] ();
+		return new $this->_modulesConfig[$module][$key]( $this->_modulesConfig[$module] );
 	}
 
 	/** ПРОВЕРИТЬ НЕОБХОДИМОСТЬ ВЫПОЛЕННИЯ ДЕЙСТВИЯ */

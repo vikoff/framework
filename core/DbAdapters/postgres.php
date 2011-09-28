@@ -5,8 +5,12 @@ class DbAdapter_postgres extends DbAdapter{
 	/** ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ */
 	public function connect(){
 		
+		$start = microtime(1);
+		
 		$connString = 'host='.$this->connHost.' port='.$this->connPort.' user='.$this->connUser.' password='.$this->connPass.' dbname='.$this->connDatabase;
 		$this->_dbrs = pg_connect($connString) or $this->error('Невозможно подключиться к серверу PgSQL');
+		
+		$this->_saveConnectTime(microtime(1) - $start);
 		
 		// if(!empty($this->_encoding))
 			// mysql_query('SET NAMES '.$this->_params['encoding'], $this->_dbrs)or $this->error('Невозможно установить кодировку соединения с БД: '.mysql_error());

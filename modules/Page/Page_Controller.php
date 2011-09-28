@@ -2,24 +2,27 @@
 
 class Page_Controller extends Controller{
 	
-	const DEFAULT_VIEW = 'main';
+	/** имя модуля */
+	const MODULE = 'page';
 	
+	const DEFAULT_VIEW = 'main';
 	
 	/** путь к шаблонам (относительно FS_ROOT) */
 	const TPL_PATH = 'modules/Page/templates/';
-	const MODULE = 'page';
 	
 	/** метод, отображаемый по умолачанию */
 	protected $_displayIndex = 'view';
 	
-	// права на выполнение методов контроллера
-	public $resources = array(
+	/** ассоциация методов контроллера с ресурсами */
+	public $methodResources = array(
 		'display_view' => 'view',
 	);
 	
-	public function getResourcePermission($resource){
+	
+	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
+	public function checkResourcePermission($resource){
 		
-		return ACL_Model::get()->isResourceAllowed(self::MODULE, $resource);
+		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
 	/** ВЫПОЛНЕНИЕ ОТОБРАЖЕНИЯ */
@@ -29,7 +32,11 @@ class Page_Controller extends Controller{
 		// а метод всегда только view
 		array_unshift($params, 'view');
 		
-		parent::display($params);
+		return parent::display($params);
+	}
+	
+	public function getClass(){
+		return __CLASS__;
 	}
 	
 	
@@ -54,15 +61,6 @@ class Page_Controller extends Controller{
 			->setTopMenuActiveItem($topMenuActiveItem)
 			->setContentPhpFile(self::TPL_PATH.'view.php', $variables)
 			->render();
-	}
-	
-	
-	////////////////////
-	////// OTHER  //////
-	////////////////////
-	
-	public function getClass(){
-		return __CLASS__;
 	}
 	
 }
