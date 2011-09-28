@@ -28,6 +28,7 @@ class Acl_Manager {
 		// DEBUG
 		$_data = array(
 			array('module' => 'page', 'resource' => 'view'),
+			array('module' => 'user', 'resource' => 'public'),
 		);
 		
 		foreach($_data as $row)
@@ -36,6 +37,9 @@ class Acl_Manager {
 	
 	public function isResourceAllowed($module, $resource){
 		
+		if(CurUser::get()->isRoot())
+			return TRUE;
+			
 		return isset($this->_userPermissions[ $module ][ $resource ]);
 	}
 }

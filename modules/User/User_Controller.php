@@ -2,6 +2,9 @@
 
 class User_Controller extends Controller{
 	
+	/** имя модуля */
+	const MODULE = 'user';
+	
 	const DEFAULT_VIEW = 1;
 	const TPL_PATH = 'User/';
 	
@@ -14,22 +17,33 @@ class User_Controller extends Controller{
 	);
 	
 	// права на выполнение методов контроллера
-	public $permissions = array(
+	public $methodResources = array(
 		
-		'admin_display_list'	=> PERMS_ADMIN,
-		'admin_display_view'	=> PERMS_ADMIN,
-		'admin_display_create'	=> PERMS_ADMIN,
-		'admin_display_edit'	=> PERMS_ADMIN,
-		'admin_display_delete'	=> PERMS_ADMIN,
+		'admin_display_list'	=> 'edit',
+		'admin_display_view'	=> 'edit',
+		'admin_display_create'	=> 'edit',
+		'admin_display_edit'	=> 'edit',
+		'admin_display_delete'	=> 'edit',
 
-		'action_save_perms' 	=> PERMS_ADMIN,
-		'action_delete' 		=> PERMS_ADMIN,
-		'action_admin_create' 	=> PERMS_ADMIN,
-		'action_admin_edit' 	=> PERMS_ADMIN,
+		'action_save_perms' 	=> 'edit',
+		'action_delete' 		=> 'edit',
+		'action_admin_create' 	=> 'edit',
+		'action_admin_edit' 	=> 'edit',
 		
-		'ajax_generate_password' => PERMS_REG,
-		'ajax_check_login_unique' => PERMS_REG,
+		'ajax_generate_password' => 'public',
+		'ajax_check_login_unique' => 'public',
 	);
+	
+	
+	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
+	public function checkResourcePermission($resource){
+		
+		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
+	}
+	
+	public function getClass(){
+		return __CLASS__;
+	}
 	
 	
 	///////////////////////////

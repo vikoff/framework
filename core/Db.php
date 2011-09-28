@@ -116,6 +116,9 @@ abstract class DbAdapter{
 	/** флаг о необходимости логирования sql в файл */
 	protected $_keepFileLog = FALSE;
 	
+	/** время подключения к БД */
+	protected $_connectTime = null;
+	
 	/** массив сохраненных SQL запросов */
 	protected $_sqls = array();
 	
@@ -422,12 +425,27 @@ abstract class DbAdapter{
 	}
 	
 	/** 
+	 * СОХРАНИТЬ ВРЕМЯ ПОДКЛЮЧЕНИЯ К БД
+	 * @access protected
+	 */
+	protected function _saveConnectTime($t){
+	
+		$this->_connectTime = $t;
+	}
+	
+	/** 
 	 * СОХРАНИТЬ ВРЕМЯ ИСПОЛНЕНИЯ ЗАПРОСА
 	 * @access protected
 	 */
 	protected function _saveQueryTime($t){
 	
 		$this->_queriesTime[] = $t;
+	}
+	
+	/** ПОЛУЧИТЬ ВРЕМЯ ПОДКЛЮЧЕНИЯ К БД */
+	public function getConnectTime(){
+		
+		return $this->_connectTime;
 	}
 	
 	/** ПОЛУЧИТЬ ЧИСЛО ВЫПОЛНЕННЫХ SQL ЗАПРОСОВ */

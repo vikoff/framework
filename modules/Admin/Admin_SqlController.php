@@ -7,19 +7,30 @@ class Admin_SqlController extends Controller {
 	
 	protected $_displayIndex = 'index';
 	
-	public $permissions = array(
+	public $methodResources = array(
 	
-		'display_index' => PERMS_ADMIN,
-		'display_console' => PERMS_ADMIN,
-		'display_make_dump' => PERMS_ADMIN,
-		'display_load_dump' => PERMS_ADMIN,
+		'display_index' => 'sql',
+		'display_console' => 'sql',
+		'display_make_dump' => 'sql',
+		'display_load_dump' => 'sql',
 		
+		'ajax_get_tables' => 'sql',
 		
-		'ajax_get_tables' => PERMS_ADMIN,
-		
-		'action_make_dump' => PERMS_ADMIN,
-		'action_load_dump' => PERMS_ADMIN,
+		'action_make_dump' => 'sql',
+		'action_load_dump' => 'sql',
 	);
+	
+	
+	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
+	public function checkResourcePermission($resource){
+		
+		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
+	}
+	
+	
+	/////////////////////
+	////// DISPLAY //////
+	/////////////////////
 	
 	public function display_index($params = array()){
 		

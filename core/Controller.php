@@ -108,7 +108,7 @@ abstract class Controller{
 		
 		// проксирование на вложенный контроллер
 		if(isset($this->_proxy[$method])){
-			$controller = new $this->_proxy[$method] ();
+			$controller = new $this->_proxy[$method]( $this->_config );
 			return $controller->display($params);
 		}
 		
@@ -146,7 +146,7 @@ abstract class Controller{
 		
 		// проксирование на вложенный контроллер
 		if(isset($this->_proxy[$method])){
-			$controller = new $this->_proxy[$method] ();
+			$controller = new $this->_proxy[$method]( $this->_config );
 			return $controller->action($params);
 		}
 		
@@ -190,7 +190,7 @@ abstract class Controller{
 		
 		// проксирование на вложенный контроллер
 		if(isset($this->_proxy[$method])){
-			$controller = new $this->_proxy[$method] ();
+			$controller = new $this->_proxy[$method]( $this->_config );
 			return $controller->ajax($params);
 		}
 		

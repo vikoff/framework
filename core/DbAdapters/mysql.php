@@ -4,9 +4,13 @@ class DbAdapter_mysql extends DbAdapter{
 	
 	/** ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ */
 	public function connect(){
-	
+		
+		$start = microtime(1);
+		
 		$this->_dbrs = mysql_connect($this->connHost, $this->connUser, $this->connPass, $new_link = TRUE) or $this->error('Невозможно подключиться к серверу MySQL');
 		$this->selectDb($this->connDatabase);
+		
+		$this->_saveConnectTime(microtime(1) - $start);
 		
 		if(!empty($this->_encoding))
 			$this->query('SET NAMES '.$this->_encoding);

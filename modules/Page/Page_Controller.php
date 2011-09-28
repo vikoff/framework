@@ -32,7 +32,11 @@ class Page_Controller extends Controller{
 		// а метод всегда только view
 		array_unshift($params, 'view');
 		
-		parent::display($params);
+		return parent::display($params);
+	}
+	
+	public function getClass(){
+		return __CLASS__;
 	}
 	
 	
@@ -57,15 +61,6 @@ class Page_Controller extends Controller{
 			->setTopMenuActiveItem($topMenuActiveItem)
 			->setContentPhpFile(self::TPL_PATH.'view.php', $variables)
 			->render();
-	}
-	
-	
-	////////////////////
-	////// OTHER  //////
-	////////////////////
-	
-	public function getClass(){
-		return __CLASS__;
 	}
 	
 }

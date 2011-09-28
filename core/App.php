@@ -72,7 +72,11 @@ class App{
 	public function run(){
 		
 		$this->_checkAction();
-		$this->_checkDisplay();
+		
+		if($this->_checkDisplay())
+			exit;
+		
+		$this->error404();
 	}
 	
 	/** ЗАПУСК ПРИЛОЖЕНИЯ В AJAX-РЕЖИМЕ */
