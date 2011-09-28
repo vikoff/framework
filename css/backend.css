@@ -147,58 +147,6 @@ td#body-left{
 	font-style: italic;
 	margin-top: 5px;
 }
-table.stdItemEdit{
-	margin: 10px auto 10px;
-	border: solid 2px #54B6FB;
-}
-table.stdItemEdit th.title{
-	text-align: center;
-	background-color: #54B6FB;
-	color: #FFF;
-	font-size: 16px;
-	padding: 5px 10px 7px;
-}
-table.stdItemEdit th{
-	text-align: right;
-	background-color: #DDD;
-	border: solid 1px #FAFAFA;
-	padding: 8px 10px;
-	
-}
-table.stdItemEdit .required{
-	color: red;
-}
-table.stdItemEdit .description{
-	display: block;
-	font-weight: normal;
-	font-style: italic;
-	font-size: 11px;
-}
-table.stdItemEdit td{
-	background-color: #EEE;
-	border: solid 1px #FAFAFA;
-	padding: 8px 10px;
-}
-table.stdItemEdit .footer{
-	text-align: center;
-	background-color: #54B6FB;
-	color: #FFF;
-	font-size: 11px;
-	font-weight: bold;
-	padding: 4px 10px 2px;
-}
-table.stdItemEdit .footer a{
-	color: #FFF;
-	font-weight: bold;
-}
-table.stdItemEdit .actions{
-	text-align: center;
-}
-table.stdItemEdit .after-action{
-	text-align: center;
-	margin-top: 5px;
-	font-size: 11px;
-}
 label.error{
 	color: red;
 	display: block;
@@ -207,17 +155,6 @@ input.error{
 	border: dashed 1px red;
 }
 
-table.stdAdminList{
-	margin: 10px auto;
-	border: solid 5px #DDD;
-	border-top-width: 5px;
-}
-table.stdAdminList th{
-	border: solid 1px #FFF;
-}
-table.stdAdminList td{
-	border: solid 1px #EEE;
-}
 
 .tr-hover{
 	background-color: #FFFFE2;
@@ -249,6 +186,9 @@ form#edit-form .required{
 }
 form#edit-form label.title{
 	display: block;
+	font-weight: bold;
+}
+form#edit-form label.title-inline{
 	font-weight: bold;
 }
 form#edit-form .description{

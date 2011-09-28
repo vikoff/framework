@@ -9,12 +9,12 @@
 	<input type="hidden" id="redirect-input" name="redirect" value="" />
 
 	<p>
-		<label class="biglabel">Заголовок <span class="required">*</span></label><br />
+		<label class="title">Заголовок <span class="required">*</span></label>
 		<input type="text" name="title" value="<?= $this->title; ?>" style="width: 300px;" />
 	</p>
 	
 	<p>
-		<label class="biglabel">Псевдоним</label><br />
+		<label class="title">Псевдоним</label>
 		<span class="description">
 			уникальный идентификатор страницы [a-z, 0-9].<br />
 			Если не заполнен, система автоматически создаст псевдоним,<br />
@@ -24,34 +24,36 @@
 	</p>
 	
 	<p>
-		<label class="biglabel">Текст</label><br />
+		<label class="title">Текст</label>
 		<textarea class="wysiwyg" style="width: 98%; height: 400px;" name="body"><?= $this->body; ?></textarea>
 	</p>
 	
 	<p>
-		<label class="biglabel">meta description</label><br />
+		<label class="title-inline">Тип:</label>
+		<select name="">
+			<?= HtmlForm::select(array('html', 'php'), $this->type, array('keyEqVal')); ?>
+		</select>
+	</p>
+	
+	<p>
+		<label class="title">meta description</label>
 		<textarea style="width: 300px; height: 60px;" name="meta_description"><?= $this->meta_description; ?></textarea>
 	</p>
 	
 	<p>
-		<label class="biglabel">meta keywords</label><br />
+		<label class="title">meta keywords</label>
 		<textarea style="width: 300px; height: 60px;" name="meta_keywords"><?= $this->meta_keywords; ?></textarea>
 	</p>
 	
 	<p>
-		<input type="checkbox" id="publish-checkbox" name="published" value="1" <? if($this->published): ?>checked="checked"<? endif; ?> />
-		<label for="publish-checkbox">Опубликовать</label>
+		<label class="title">
+			<input type="checkbox" name="published" value="1" <? if($this->published): ?>checked="checked"<? endif; ?> />
+			Опубликовать
+		</label>
 	</p>
 	
-	<? if(CurUser::get()->isResourceAllowed('page', 'root')): ?>
-		<p>
-			<input type="checkbox" id="lock-checkbox" name="locked" value="1" <? if($this->locked): ?>checked="checked"<? endif; ?> />
-			<label for="lock-checkbox">Запретить удаление</label>
-		</p>
-	<? endif; ?>
-	
 	<div class="paragraph" id="submit-box">
-		<input id="submit-save" class="button" type="submit" name="action[page/save][admin/content/page/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
+		<input id="submit-save" class="button" type="submit" name="action[admin/page/save][admin/content/page/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
 		
 		<? if($this->instanceId): ?>
 			<input id="submit-apply" class="button" type="submit" name="action[page/save]" value="Применить" title="Сохранить изменения и продолжить редактирование" />
@@ -59,7 +61,7 @@
 		
 		<a id="submit-cancel" class="button" href="<?= href('admin/content/page/list'); ?>" title="Отменить все изменения и вернуться к списку">отмена</a>
 		
-		<? if($this->instanceId && !$this->locked): ?>
+		<? if($this->instanceId): ?>
 			<a id="submit-delete" class="button" href="<?= href('admin/content/page/delete/'.$this->instanceId); ?>" title="Удалить запись">удалить</a>
 		<? endif; ?>
 		

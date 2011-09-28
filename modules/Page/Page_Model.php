@@ -2,7 +2,7 @@
 
 class Page_Model extends GenericObject{
 	
-	const TABLE = 'page';
+	const TABLE = 'pages';
 	
 	const NOT_FOUND_MESSAGE = 'Страница не найдена';
 
@@ -39,10 +39,6 @@ class Page_Model extends GenericObject{
 	public function getClass(){
 		return __CLASS__;
 	}
-	/** СЛУЖЕБНЫЙ МЕТОД (получение констант из родителя) */
-	public function getConst($name){
-		return constant(__CLASS__.'::'.$name);
-	}
 	
 	/**
 	 * ПРОВЕРКА ВОЗМОЖНОСТИ ДОСТУПА К ОБЪЕКТУ
@@ -63,15 +59,14 @@ class Page_Model extends GenericObject{
 		
 			$this->validator = new Validator();
 			$this->validator->rules(array(
-                'allowed' => array('title', 'alias', 'body', 'published', 'locked', 'modif_date', 'create_date'),
-                'required' => array('title'),
+                'required' => array('title', 'type'),
             ),
 			array(
                 'title' => array('strip' => TRUE, 'length' => array('max' => '65535')),
                 'alias' => array('trim' => TRUE, 'match' => '/^[\w\-]{0,255}$/'),
                 'body' => array('length' => array('max' => '65535')),
-                'published' => array('checkbox' => array('on' => '1', 'off' => '0')),
-                'locked' => array('checkbox' => array('on' => '1', 'off' => '0')),
+                'published' => array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
+                'type' => array('in' => array('php', 'html')),
                 'meta_description' => array('strip' => TRUE, 'length' => array('max' => '65535')),
                 'meta_keywords' => array('strip' => TRUE, 'length' => array('max' => '65535')),
             ));
@@ -81,6 +76,7 @@ class Page_Model extends GenericObject{
                 'alias' => 'Псевдоним',
                 'body' => 'Тело страницы',
                 'published' => 'Опубликовать',
+                'type' => 'Тип',
             ));
 		}
 		
@@ -151,14 +147,14 @@ class Page_Model extends GenericObject{
 	// ОПУБЛИКОВАТЬ СТРАНИЦУ
 	public function publish(){
 	
-		$this->setField('published', '1');
+		$this->setField('published', TRUE);
 		$this->_save();
 	}
 	
 	// СКРЫТЬ СТРАНИЦУ
 	public function unpublish(){
 	
-		$this->setField('published', '0');
+		$this->setField('published', FALSE);
 		$this->_save();
 	}
 	
@@ -174,6 +170,7 @@ class Page_Collection extends GenericObjectCollection{
 		'alias' => 'Псевдоним',
 		'author' => 'author',
 		'published' => 'Публикация',
+		'type' => 'Тип',
 		'modif_date' => 'Последнее изменение',
 	);
 	

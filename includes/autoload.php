@@ -25,7 +25,7 @@ function __autoload($className){
 		'Sorter'			=> 'core/Sorter.php',
 		'Exception403'		=> 'core/Exception.php',
 		'Exception404'		=> 'core/Exception.php',
-		'FormBuilder'		=> 'core/FormBuilder.php',
+		'HtmlForm'			=> 'core/HtmlForm.php',
 		'Debugger'			=> 'core/Debugger.php',
 		
 		'Def'				=> 'components/Def.component.php',

@@ -11,21 +11,26 @@ class Page_AdminController extends Controller{
 	protected $_displayIndex = 'list';
 	
 	// права на выполнение методов контроллера
-	public $permissions = array(
+	public $methodResources = array(
 		
-		'display_list'       => PERMS_ADMIN,
-		'display_new'        => PERMS_ADMIN,
-		'display_edit'       => PERMS_ADMIN,
-		'display_copy'       => PERMS_ADMIN,
-		'display_delete'     => PERMS_ADMIN,
+		'display_list'       => 'edit',
+		'display_new'        => 'edit',
+		'display_edit'       => 'edit',
+		'display_copy'       => 'edit',
+		'display_delete'     => 'edit',
 
-		'action_publish'		=> PERMS_ADMIN,
-		'action_unpublish'		=> PERMS_ADMIN,
-		'action_save'			=> PERMS_ADMIN,
-		'action_delete' 		=> PERMS_ADMIN,
+		'action_publish'		=> 'edit',
+		'action_unpublish'		=> 'edit',
+		'action_save'			=> 'edit',
+		'action_delete' 		=> 'edit',
 	);
 	
-	protected $_title = 'Страницы';
+	
+	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
+	public function checkResourcePermission($resource){
+		
+		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
+	}
 	
 	
 	/////////////////////

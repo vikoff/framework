@@ -43,17 +43,17 @@ if(!in_array("users", $tables)){
 	echo"<div>таблица <b>users</b> создана</div>";
 }
 
-if(!in_array("page", $tables)){
+if(!in_array("pages", $tables)){
 
 	db::get()->query("
-			CREATE TABLE 'page' (
+			CREATE TABLE 'pages' (
 			  'id' 				INTEGER PRIMARY KEY,
 			  'title' 			TEXT NOT NULL,
 			  'alias' 			VARCHAR(255) NOT NULL,
 			  'body' 			TEXT,
 			  'author' 			INTEGER NOT NULL,
-			  'published' 		CHAR(1) DEFAULT '0',
-			  'locked'			CHAR(1) DEFAULT '0',
+			  'published' 		BOOLEAN DEFAULT FALSE,
+			  'type'			CHAR(10),
 			  'meta_description' TEXT,
 			  'meta_keywords'	TEXT,
 			  'modif_date'		INTEGER DEFAULT '0',
@@ -61,7 +61,7 @@ if(!in_array("page", $tables)){
 			)
 	");
 	
-	echo"<div>таблица <b>page</b> создана</div>";
+	echo"<div>таблица <b>pages</b> создана</div>";
 }
 
 if(!in_array("error_log", $tables)){
