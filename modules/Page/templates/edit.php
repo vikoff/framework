@@ -30,8 +30,8 @@
 	
 	<p>
 		<label class="title-inline">Тип:</label>
-		<select name="">
-			<?= HtmlForm::select(array('html', 'php'), $this->type, array('keyEqVal')); ?>
+		<select name="type">
+			<?= HtmlForm::select(array('html', 'php'), $this->type, array('keyEqVal' => true)); ?>
 		</select>
 	</p>
 	
@@ -53,10 +53,10 @@
 	</p>
 	
 	<div class="paragraph" id="submit-box">
-		<input id="submit-save" class="button" type="submit" name="action[admin/page/save][admin/content/page/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
+		<input id="submit-save" class="button" type="submit" name="action[admin/page/<? if($this->instanceId): ?>save<? else: ?>create<? endif; ?>][admin/content/page/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
 		
 		<? if($this->instanceId): ?>
-			<input id="submit-apply" class="button" type="submit" name="action[page/save]" value="Применить" title="Сохранить изменения и продолжить редактирование" />
+			<input id="submit-apply" class="button" type="submit" name="action[admin/page/save]" value="Применить" title="Сохранить изменения и продолжить редактирование" />
 		<? endif; ?>
 		
 		<a id="submit-cancel" class="button" href="<?= href('admin/content/page/list'); ?>" title="Отменить все изменения и вернуться к списку">отмена</a>

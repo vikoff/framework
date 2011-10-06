@@ -21,6 +21,7 @@ class Page_AdminController extends Controller{
 
 		'action_publish'		=> 'edit',
 		'action_unpublish'		=> 'edit',
+		'action_create'			=> 'edit',
 		'action_save'			=> 'edit',
 		'action_delete' 		=> 'edit',
 	);
@@ -138,13 +139,28 @@ class Page_AdminController extends Controller{
 	////////////////////
 	
 	/** ACTION SAVE */
+	public function action_create($params = array()){
+		
+		
+		$instance = Page_Model::create();
+		
+		if($instance->save($_POST)){
+			Messenger::get()->addSuccess('Запись сохранена');
+			return TRUE;
+		}else{
+			Messenger::get()->addError('Не удалось сохранить запись:', $instance->getError());
+			return FALSE;
+		}
+	}
+	
+	/** ACTION SAVE */
 	public function action_save($params = array()){
 		
 		
 		$instanceId = getVar($_POST['id'], 0, 'int');
-		$instance = new Page_Model($instanceId);
+		$instance = Page_Model::load($instanceId);
 		
-		if($instance->Save($_POST)){
+		if($instance->save($_POST)){
 			Messenger::get()->addSuccess('Запись сохранена');
 			return TRUE;
 		}else{

@@ -251,6 +251,25 @@ class DbAdapter_sqlite extends DbAdapter{
 	}
 	
 	/**
+	 * ЗАКЛЮЧЕНИЕ СТРОК В КОВЫЧКИ
+	 * в зависимости от типа данных
+	 * @override DbAdapter method
+	 * @param variant $cell - исходная строка
+	 * @return string заключенная в нужный тип ковычек строка
+	 */
+	public function quote($cell){
+		
+		switch(strtolower(gettype($cell))){
+			case 'boolean':
+				return $cell ? '1' : '0';
+			case 'null':
+				return 'NULL';
+			default:
+				return "'".$cell."'";
+		}
+	}
+	
+	/**
 	 * DESCRIBE
 	 * получить массив, описывающий структуру таблицы
 	 * @param string $table - имя таблицы

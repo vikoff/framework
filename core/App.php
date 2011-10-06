@@ -129,7 +129,16 @@ class App{
 		}
 		
 		$module = array_shift($params);
-		$this->getModule($module)->action($params, $redirect);
+		
+		// admin-режим
+		if($module == 'admin' && count($params) > 1){
+			$module = array_shift($params);
+			$this->getModule($module, TRUE)->action($params, $redirect);
+		}
+		// обычный режим
+		else{
+			$this->getModule($module)->action($params, $redirect);
+		}
 		return TRUE;
 	}
 	
