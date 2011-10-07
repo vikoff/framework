@@ -1,5 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-     "http://www.w3.org/TR/html4/strict.dtd"><html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
 <head>
 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
@@ -7,8 +8,8 @@
 	<base href="<?=$this->_getHtmlBaseHref();?>" />
 	
 	<meta name="robots" content="index, follow" />
-	<meta name="keywords" />
-	<meta name="author" content="Yurij Novikov" />
+	<meta name="keywords" content="" />
+	<meta name="author" content="Yuriy Novikov" />
 	<meta name="description" content="description words" />
 	<meta name="generator" content="vik-off-CMF" />
 

@@ -30,9 +30,11 @@
 	
 	<p>
 		<label class="title-inline">Тип:</label>
-		<select name="">
-			<?= HtmlForm::select(array('html', 'php'), $this->type, array('keyEqVal')); ?>
-		</select>
+		<?= HtmlForm::select(
+			array('name' => 'type'),
+			array('html', 'php'),
+			$this->type,
+			array('keyEqVal')); ?>
 	</p>
 	
 	<p>

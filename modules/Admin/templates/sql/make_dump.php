@@ -11,7 +11,7 @@
 			<table class="grid">
 				<tr>
 					<th>База данных</th>
-					<td><select id="input-database" name="database"><?= FormBuilder::printSelectOptions($this->databases, $this->curDatabase, array('keyEqVal' => TRUE)); ?></select></td>
+					<td><?= HtmlForm::select(array('id'=>'input-database', 'name'=>'database'), $this->databases, $this->curDatabase, array('keyEqVal' => TRUE)); ?></td>
 				</tr>
 				<tr>
 					<th>Таблицы</th>
@@ -39,6 +39,7 @@
 			$(function(){
 				
 				function fillTablesSelect(db){
+					alert(1);
 					
 					var s = $('#tit-input-select');
 					if(s.data('db') == db)
@@ -47,6 +48,7 @@
 					s.data('db', db);
 					
 					$.post('admin/sql/get-tables', {db: db}, function(response){
+						var_dump(response);
 						s.empty();
 						for(var i = 0, l = response.length; i < l; i++)
 							s.append('<option value="' + response[i] + '">' + response[i] + '</option>');
