@@ -31,26 +31,29 @@ class Validator{
 	
 	// хранение сообщений об ошибках для кодов ошибок
 	static private $_errorMsgs = array(
-		'required' 	=> 'поле {fieldname} обязательно для заполнения',
-		'email' 	=> 'в поле {fieldname} введен некорректный email-адрес',
-		'match' 	=> 'поле {fieldname} содержит недопустимые символы или имеет недопустимый формат',
-		'in' 		=> 'поле {fieldname} может принимать только значения {validValues}',
-		'notIn'		=> 'в поле {fieldname} введено недопустимое значение',
-		'equal'		=> 'в поле {fieldname} введено недопустимое значение',
-		'notEqual'	=> 'в поле {fieldname} введено недопустимое значение',
-		'captcha'	=> 'антибот тест не пройден',
-		'compare'	=> 'поля {fieldname} и {field2name} не совпадают',
-		'length'	=> 'поле {fieldname} должно быть длиной {minlength} {maxlength} символов',
-		'dbDate'	=> 'поле {fieldname} должно иметь формат ГГГГ-ММ-ДД',
-		'dbTime'	=> 'поле {fieldname} должно иметь формат ЧЧ-ММ-СС',
+		'invalidDataType' => 'поле {fieldname} имеет недопустимый формат',
+		'required'   => 'поле {fieldname} обязательно для заполнения',
+		'email'      => 'в поле {fieldname} введен некорректный email-адрес',
+		'match'      => 'поле {fieldname} содержит недопустимые символы или имеет недопустимый формат',
+		'in'         => 'поле {fieldname} может принимать только значения {validValues}',
+		'notIn'      => 'в поле {fieldname} введено недопустимое значение',
+		'equal'      => 'в поле {fieldname} введено недопустимое значение',
+		'notEqual'   => 'в поле {fieldname} введено недопустимое значение',
+		'captcha'    => 'антибот тест не пройден',
+		'compare'    => 'поля {fieldname} и {field2name} не совпадают',
+		'length'     => 'поле {fieldname} должно быть длиной {minlength} {maxlength} символов',
+		'dbDate'     => 'поле {fieldname} должно иметь формат ГГГГ-ММ-ДД',
+		'dbTime'     => 'поле {fieldname} должно иметь формат ЧЧ-ММ-СС',
 		'dbDateTime' => 'поле {fieldname} должно иметь формат ГГГГ-ММ-ДД ЧЧ-ММ-СС',
-		'int_type'	=> 'поле {fieldname} должно содержать только цифры',
+		'int_type'   => 'поле {fieldname} должно содержать только цифры',
 		'float_type' => 'поле {fieldname} должно содержать число',
+		'array'      => 'поле {fieldname} имеет неверный формат',
 	);
 	
 	// порядок вызова правил (заодно и полный их список)
 	static public $rulesOrder = array(
 		'allowed',
+		'array',
 		'trim',
 		'settype',
 		'strip',
@@ -76,32 +79,29 @@ class Validator{
 	);
 
 	
-	
 	// ######### ЗАГРУЗКА ИСХОДНЫХ ДАННЫХ В КЛАСС ############# //
 
 	// КОНСТРУКТОР
-	public function __construct($inputData = array()){
-		if(count($inputData))
-			$this -> setInputData($inputData);
-	}
-	
-	// ЗАДАТЬ ИСХОДНЫЕ ДАННЫЕ
-	public function setInputData($inputData = array()){
-		$this->inputData = $inputData;
+	public function __construct($commonRules = array(), $individualRules = array()){
+		
+		if(!empty($commonRules) || !empty($individualRules))
+			$this->rules($commonRules, $individualRules);
 	}
 	
 	// ЗАДАТЬ ЗАГОЛОВКИ ДЛЯ ПОЛЕЙ (ДЛЯ ОТОБРАЖЕНИЯ В СООБЩЕНИЯХ ОБ ОШИБКАХ)
 	public function setFieldTitles($fieldsTitles){
+		
 		$this->_fieldTitles = $fieldsTitles;
+		return $this;
 	}
 	
 	// ЗАДАНИЕ ПРАВИЛ ВАЛИДАЦИИ
-	public function rules($_commonRules, $_individualRules = array(), $databaseValidation = FALSE){
+	public function rules($_commonRules, $_individualRules = array()){
 		
 		$commonRules = array();
 		$individualRules = array();
 		
-		// НАБОР ОБЩИХ ПРАВИЛ ВАЛИДАЦИИ
+		// набор общих правил валидации
 		$allowedCommonRules = array(
 			'allowed',
 			'trim',
@@ -120,8 +120,9 @@ class Validator{
 				$this->fatalError('Правило "'.$name.'" не может быть задано в наборе общих правил');
 		
 		
-		// НАБОР ИНДИВИДУАЛЬНЫХ ПРАВИЛ ВАЛИДАЦИИ
+		// набор индивидуальных правил валидации
 		$allowedIndividualRules = array_unique(array_merge($allowedCommonRules, array(
+			'array',
 			'settype',
 			'truncate',
 			'match',
@@ -212,59 +213,51 @@ class Validator{
 	
 	// ####################### ВАЛИДАЦИЯ ####################### //
 	
-	// ПРИМЕНЕНИЕ ПРАВИЛ ВАЛИДАЦИИ
-	public function validate($inputData = array()){
+	/**
+	 * ПРИМЕНЕНИЕ ПРАВИЛ ВАЛИДАЦИИ
+	 * наличие ошибок в исходных данных можно проверить методом $this->hasError()
+	 * получить сообщения об ошибках (если они есть) можно методом $this->getError()
+	 * @param array $inputData - данные для валидации в виде одномерного ассоциативного массива
+	 * @param null|array $additValidationRules - дополнительные правила валидации
+	 *        вида array('field' => array('rule1' => 'params', 'rule2' => 'params') )
+	 * @return array - валидные данные
+	 */
+	public function validate($inputData, $additValidationRules = null){
 		
-		// загрузка исходных данных (если требуется)
-		if(count($inputData))
-			$this -> setInputData($inputData);
+		// сброс состояния валидатора
+		$this->reset();
 		
-		// проверка исходных данных
-		if(is_null($this->inputData))
-			$this->fatalError('Исходные данные не заданы');
-			
-		// инициализация массива валидных данных (содержит разрешенные и назначенные поля)
-		foreach($this->allRules as $field => $rules)
-			if(isset($this -> inputData[$field]))
-				$this->validData[$field] = $this -> inputData[$field];
+		// загрузка исходных данных
+		$this->inputData = (array)$inputData;
 		
-		// применение правил валидации
-		foreach($this->allRules as $field => $definedRules){
-			foreach(self::$rulesOrder as $regularRule){
-				if($regularRule == 'allowed')
-					continue;
-				if(isset($definedRules[$regularRule])){
-					call_user_func(
-						array($this, 'rule_'.$regularRule), // имя метода			
-						$field,								// имя поля
-						$definedRules[$regularRule]			// параметры для правила
-					);
-				}
+		$allRules = $this->allRules;
+		
+		// добавление дополнительных правил валидации
+		if(!empty($additValidationRules)){
+			foreach($additValidationRules as $field => $rules){
+				if(isset($rules['allowed']) && $rules['allowed'] == FALSE)
+					unset($allRules[$field]);
+				else
+					$allRules[$field] = $rules;
 			}
 		}
 		
-		return $this->validData;
-	}
-	
-	public function validatePart($inputData = array()){
-	
 		
-		// загрузка исходных данных (если требуется)
-		if(count($inputData))
-			$this -> setInputData($inputData);
-		
-		// проверка исходных данных
-		if(is_null($this->inputData))
-			$this->fatalError('Исходные данные не заданы');
-			
 		// инициализация массива валидных данных (содержит разрешенные и назначенные поля)
-		foreach($this->allRules as $field => $rules)
-			if(isset($this -> inputData[$field]))
-				$this->validData[$field] = $this -> inputData[$field];
+		foreach($allRules as $field => $rules)
+			if(isset($this->inputData[$field]))
+				$this->validData[$field] = $this->inputData[$field];
 		
 		// применение правил валидации
-		foreach($this->validData as $field => $value){
-			$definedRules = $this->allRules[$field];
+		foreach($allRules as $field => $definedRules){
+			
+			// проверка, имеет ли поле допустимый формат (скаляр)
+			if(isset($this->validData[$field]) && !is_scalar($this->validData[$field])){
+				$this->setError($this->getErrorText($field, 'invalidDataType'));
+				continue;
+			}
+			
+			// вызов правил валидации
 			foreach(self::$rulesOrder as $regularRule){
 				if($regularRule == 'allowed')
 					continue;
@@ -469,14 +462,14 @@ class Validator{
 	// ЗАДАНО ЛИ ПРАВИЛО ВАЛИДАЦИИ
 	private function _isRuleEnable(&$rule){
 	
-		return isset($rule) ? ($rule === FALSE ? FALSE : TRUE) : FALSE;
+		return (isset($rule) && $rule !== FALSE);
 	}
 	
 	// ЗАДАНО ЛИ ПРАВИЛО ДЛЯ ВСЕХ ЭЛЕМЕНТОВ
 	private function _isRuleApplyToAll(&$rule){
 		
 		$this->_issetFatal($rule, 'Правило валидации не определено');
-		return (count($rule) == 1 && $rule[0] === '*') ? TRUE : FALSE;
+		return (count($rule) === 1 && $rule[0] === '*') ? TRUE : FALSE;
 	}
 
 
@@ -491,6 +484,21 @@ class Validator{
 		$this->validData[$field] = trim($this->validData[$field]);
 		if($this -> _logEnable)
 			$this -> _log('Правило "trim" присвоило элементу "'.$field.'" значение "'.$this->validData[$field].'"');
+	}
+	
+	// ПРАВИЛО TRIM
+	public function rule_array($field, $execute){
+		
+		if(!$execute)
+			return;
+			
+		if(!isset($this->validData[$field])){
+			$this->validData[$field] = array();
+			return;
+		}
+		
+		if(!is_array($this->validData[$field]))
+			$this->setError($this->getErrorText($field, 'array'));
 	}
 	
 	// ПРАВИЛО SETTYPE
@@ -571,10 +579,15 @@ class Validator{
 	
 	// ПРАВИЛО EMAIL
 	public function rule_email($field, $execute){
-		
+			
 		if(!$execute)
 			return;
-		$result = isset($this->validData[$field]) ? preg_match('/^[\w._%+-]+@[\w.-]+\.\w{2,4}$/', $this->validData[$field]) : FALSE;
+		
+		if(empty($this->validData[$field])){
+			$this->validData[$field] = '';
+			return;
+		}
+		$result = preg_match('/^[\w._%+-]+@[\w.-]+\.\w{2,4}$/', $this->validData[$field]);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'email'));
 		if($this -> _logEnable)
@@ -591,7 +604,11 @@ class Validator{
 			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "match"');
 	}
 	
-	// ПРАВИЛО IN
+	/**
+	 * IN
+	 * проверка совпадает ли переданный элемент с одним из допустимых значений
+	 * @syntax 'field' => array( 'in' => array('a', 'b', 'c') )
+	 */
 	public function rule_in($field, $validValues){
 		
 		if(!is_array($validValues))
@@ -868,110 +885,6 @@ class Validator{
 	// ПОЛУЧИТЬ ЗАГОЛОВОК ПОЛЯ
 	private function getFieldTitle($field){
 		return isset($this->_fieldTitles[$field]) ? $this->_fieldTitles[$field] : $field;
-	}
-	
-	// ПРЕОБРАЗОВАНИЕ СТРОКИ В МАССИВ-СПИСОК
-	public function string2array($string, $separator = ','){
-		
-		$string = (string)$string;
-		if(!strlen($string))
-			return array();
-		
-		$output = array();
-		foreach(array_unique(explode($separator, $string)) as $item){
-			$item = trim($item);
-			if(strlen($item))
-				$output[] = $item;
-		}
-		
-		return $output;
-	}
-
-	private function _dbRulesPrepare($struct){
-	
-		foreach($struct as $row){
-			
-			// значение PRIMARY KEY AUTO_INCREMENT является недопустимым для указания полем
-			if(strtoupper($row['Key']) == 'PRI' && strtoupper($row['Extra']) == 'AUTO_INCREMENT')
-				continue;
-			
-			// все остальные поля являются допустимыми
-			$databaseRules['allowed'][] = $row['Field'];
-			
-			// если по умолчанию поле имеет значение NULL, но стоит флаг NOT NULL, то это поле обязательно.
-			if(strtoupper($row['Null']) == 'NO' && strtoupper($row['Default']) == 'NULL'){
-				$databaseRules['individual'][$row['Field']]['required'] = TRUE;
-				$isRequired = TRUE;
-			}else{
-				$isRequired = FALSE;
-			}
-			
-			// распознавание некоторых типов данных
-			if(preg_match('/^(\w+)\s*(\((\d+)\))?\s*(\w*)$/', $row['Type'], $matches)){
-				
-				//print_r($matches);
-				$fieldName = $row['Field'];
-				$colType = strtoupper($matches[1]);
-				$colLength = (int)$matches[3];
-				$colFlags = strtoupper($matches[4]);
-				
-				switch($colType){
-					
-					case 'TINYINT': case 'SMALLINT': case 'MEDIUMINT': case 'INT': case 'INTEGER': case 'BIGINT':
-						$databaseRules['individual'][$fieldName]['settype'] = 'int';
-						break;
-					
-					case 'FLOAT': case 'DOUBLE': case 'REAL': case 'DECIMAL': case 'DEC': case 'NUMERIC': 
-						$databaseRules['individual'][$fieldName]['settype'] = 'float';
-						break;
-					
-					case 'DATE':
-						if($isRequired)
-							$databaseRules['individual'][$fieldName]['dbDate'] =  TRUE;
-						break;
-					
-					case 'TIME':
-						if($isRequired)
-							$databaseRules['individual'][$fieldName]['dbTime'] = TRUE;
-						break;
-					
-					case 'DATETIME':
-						if($isRequired)
-							$databaseRules['individual'][$fieldName]['dbDateTime'] = TRUE;
-						break;
-					
-					case 'VARCHAR': case 'CHAR':
-						$databaseRules['individual'][$fieldName]['safe'] = TRUE;
-						break;
-					
-					case 'TINYTEXT': case 'TINYBLOB':
-						$databaseRules['individual'][$fieldName]['safe'] = TRUE;
-						$databaseRules['individual'][$fieldName]['length'] = array('max' => 255);
-						break;
-					
-					case 'TEXT': case 'BLOB':
-						$databaseRules['individual'][$fieldName]['safe'] = TRUE;
-						$databaseRules['individual'][$fieldName]['length'] = array('max' => 65535);
-						break;
-					
-					case 'MEDIUMTEXT': case 'MEDIUMBLOB':
-						$databaseRules['individual'][$fieldName]['safe'] = TRUE;
-						$databaseRules['individual'][$fieldName]['length'] = array('max' => 16777215);
-						break;
-					
-					case 'LONGTEXT': case 'LONGBLOB':
-						$databaseRules['individual'][$fieldName]['safe'] = TRUE;
-						$databaseRules['individual'][$fieldName]['length'] = array('max' => 4294967295);
-						break;
-				}
-				
-				if($colLength)
-					$databaseRules['individual'][$fieldName]['length'] = array('max' => $colLength);
-					
-			}
-		}
-		
-		return $databaseRules;
 	}
 	
 }
