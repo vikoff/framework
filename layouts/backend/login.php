@@ -59,7 +59,7 @@
 		}
 	</style>
 </head>
-<body>
+<body onload="document.getElementById('login-inp').focus();">
 
 <div id="login-screen">
 	
@@ -72,7 +72,7 @@
 		<?=FORMCODE;?>
 		
 		<table style="width: 100%;">
-		<tr><td>Логин</td><td><input type="text" name="login" value="" style="width: 98%;" /></td></tr>
+		<tr><td>Логин</td><td><input id="login-inp" type="text" name="login" value="" style="width: 98%;" /></td></tr>
 		<tr><td>Пароль</td><td><input type="password" name="pass" value="" style="width: 98%;" /></td></tr>
 		<tr>
 			<td></td>

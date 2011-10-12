@@ -126,7 +126,7 @@ class CurUser extends User_Model{
 	// ВЫХОД ИЗ АККАУНТА
 	public function logout(){
 		
-		UserStatistics::get()->reset();
+		// UserStatistics::get()->reset();
 		$this->setEmptyAuthData();
 		$this->_setEmptyCookie();
 	}

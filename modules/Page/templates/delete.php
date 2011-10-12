@@ -12,7 +12,7 @@
 			<input type="hidden" name="id" value="<?= $this->id; ?>" />
 			<?= FORMCODE; ?>
 			
-			<input class="button" type="submit" name="action[page/delete]" value="Удалить" />
+			<input class="button" type="submit" name="action[admin/page/delete]" value="Удалить" />
 			<a class="button" href="<?= href('admin/content/page/list'); ?>">Отмена</a>
 		</form>
 	</div>

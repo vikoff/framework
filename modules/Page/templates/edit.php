@@ -3,10 +3,43 @@
 
 <h2><?= $this->pageTitle; ?></h2>
 
+<?
+/*
+Html_Form::create('std-div')
+	->method('post')
+	->fields(array(
+		'id' => array('type' => 'hidden'),
+		'title' => array(
+			'type' => 'text',
+			'label' => 'Заголовок',
+			'required' => true,
+		    'attrs' => array('style' => 'width: 300px;')),
+		'alias' => array(
+			'type' => 'text',
+			'label' => 'Псевдоним',
+			'attrs' => array('style' => 'width: 300px;'),
+		    'description' => '
+				уникальный идентификатор страницы [a-z, 0-9].<br />
+				Если не заполнен, система автоматически создаст псевдоним,<br />
+				соответствующий id страницы.'),
+		'body' => array(
+			'type' => 'textarea',
+			'label' => 'Текст',
+			'wysiwyg' => true,
+			'attrs' => array('style' => 'width: 98%; height: 400px;'),
+		)
+	))
+	->values(array(
+		'id' => $this->instanceId,
+		'title' => $this->title,
+		'body' => $this->body,
+	))
+	->render();
+	*/
+?>
 <form id="edit-form" action="" method="post">
 	<?= FORMCODE; ?>
 	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
-	<input type="hidden" id="redirect-input" name="redirect" value="" />
 
 	<p>
 		<label class="title">Заголовок <span class="required">*</span></label>
