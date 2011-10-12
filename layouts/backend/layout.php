@@ -35,7 +35,13 @@
 
 	<div id="top">
 		<div style="float: left; padding: 10px; background-color: #FFD46D;"><strong><?=CFG_SITE_NAME;?></strong> + логотип</div>
-		<div style="text-align: right;"><a href="<?App::href('');?>">На сайт</a></div>
+		<div style="text-align: right;">
+			<a href="<?App::href('');?>">На сайт</a>
+			<form action="" method="post" class="inline" onsubmit="return confirm('Уверены?');">
+				<?= FORMCODE; ?>
+				<input type="submit" class="button" name="action[user/profile/logout]" value="Выход" />
+			</form>
+		</div>
 		
 		<div id="top-menu-list">
 			<?=$this->_getTopMenu();?>

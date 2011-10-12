@@ -6,11 +6,11 @@ class User_ProfileController extends Controller{
 	const MODULE = 'user';
 	
 	// методы, отображаемые по умолчанию
-	protected $_defaultFrontendDisplay = 'profile';
-	protected $_defaultBackendDisplay = 'content';
+	protected $_displayIndex = 'profile';
 	
 	public $methodResources = array(
 		'action_login' => 'public',
+		'action_logout' => 'public',
 	);
 	
 	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
@@ -28,6 +28,7 @@ class User_ProfileController extends Controller{
 	////// ACTION //////
 	////////////////////
 	
+	/** ACTION LOGIN */
 	public function action_login(){
 		
 		try{
@@ -39,4 +40,12 @@ class User_ProfileController extends Controller{
 			return FALSE;
 		}
 	}
+	
+	/** ACTION LOGOUT */
+	public function action_logout($params = array()){
+		
+		CurUser::get()->logout();
+		App::reload();
+	}
+	
 }

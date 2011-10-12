@@ -2,6 +2,9 @@
 
 class Page_Model extends GenericObject{
 	
+	/** имя модуля */
+	const MODULE = 'page';
+	
 	const TABLE = 'pages';
 	
 	const NOT_FOUND_MESSAGE = 'Страница не найдена';

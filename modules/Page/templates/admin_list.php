@@ -31,9 +31,9 @@
 					<input type="hidden" name="id" value="<?= $item['id']; ?>" />
 					<?= FORMCODE; ?>
 					<? if($item['published']): ?>
-						<input class="button-small" type="submit" name="action[page/unpublish]" value="Скрыть" />
+						<input class="button-small" type="submit" name="action[admin/page/unpublish]" value="Скрыть" />
 					<? else: ?>
-						<input class="button-small" type="submit" name="action[page/publish]" value="Опубликовать" />
+						<input class="button-small" type="submit" name="action[admin/page/publish]" value="Опубликовать" />
 					<? endif; ?>
 				</form>
 			</div>

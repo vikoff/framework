@@ -6,11 +6,12 @@ class User_Controller extends Controller{
 	const MODULE = 'user';
 	
 	const DEFAULT_VIEW = 1;
+	
+	/** путь к шаблонам (относительно FS_ROOT) */
 	const TPL_PATH = 'User/';
 	
 	// методы, отображаемые по умолчанию
-	protected $_defaultFrontendDisplay = FALSE;
-	protected $_defaultBackendDisplay = 'list';
+	protected $_displayIndex = FALSE;
 	
 	protected $_proxy = array(
 		'profile' => 'User_ProfileController',
