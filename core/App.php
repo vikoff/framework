@@ -131,14 +131,14 @@ class App{
 		$module = array_shift($params);
 		
 		// admin-режим
-		if($module == 'admin' && count($params) > 1){
-			$module = array_shift($params);
-			$this->getModule($module, TRUE)->action($params, $redirect);
-		}
+		// if($module == 'admin' && count($params) > 1){
+			// $module = array_shift($params);
+			// $this->getModule($module, TRUE)->action($params, $redirect);
+		// }
 		// обычный режим
-		else{
+		// else{
 			$this->getModule($module)->action($params, $redirect);
-		}
+		// }
 		return TRUE;
 	}
 	
@@ -173,7 +173,8 @@ class App{
 	
 	// REDIRECT
 	public static function redirect($uri){
-	
+		
+		$uri = href($uri);
 		// echo '<a href="'.$uri.'">'.$uri.'</a>'; die;
 		header('location: '.$uri);
 		exit();

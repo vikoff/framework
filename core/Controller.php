@@ -139,7 +139,7 @@ abstract class Controller{
 	 * @return void
 	 */
 	public function action($params, $redirectUrl = null){
-	
+		
 		$method = array_shift($params);
 		
 		// проксирование на вложенный контроллер

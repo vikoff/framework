@@ -571,6 +571,17 @@ abstract class DbAdapter{
 	}
 	
 	/**
+	 * СОЗДАТЬ ДАМП БАЗЫ ДАННЫХ
+	 * @param string|null $database - база данных (или дефолтная, если null)
+	 * @param array|null $tables - список таблиц (или все, если null)
+	 * @output выдает текст sql-дампа
+	 * @return void
+	 */
+	public function makeDump($database = null, $tables = null){
+	
+	}
+	
+	/**
 	 * ДЕСТРУКОТР
 	 * запись лога выполненных sql-запросов в файл (если требуется)
 	 */

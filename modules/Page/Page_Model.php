@@ -8,7 +8,9 @@ class Page_Model extends GenericObject{
 	const TABLE = 'pages';
 	
 	const NOT_FOUND_MESSAGE = 'Страница не найдена';
-
+	
+	const TYPE_FULL = 1;
+	const TYPE_CHUNK = 2;
 	
 	/** ТОЧКА ВХОДА В КЛАСС (СОЗДАНИЕ НОВОГО ОБЪЕКТА) */
 	public static function create(){
@@ -57,38 +59,36 @@ class Page_Model extends GenericObject{
 	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР ВАЛИДАТОРА */
 	public function getValidator(){
 		
-		// инициализация экземпляра валидатора
-		if(is_null($this->validator)){
+		$validator = new Validator();
+		$validator->rules(array(
+			'required' => array('type', 'title', 'format'),
+		), array(
+			'type' => array('in' => array(self::TYPE_FULL, self::TYPE_CHUNK)),
+			'title' => array('strip' => TRUE, 'length' => array('max' => '65535')),
+			'alias' => array('trim' => TRUE, 'match' => '/^[\w\-]{0,255}$/'),
+			'body' => array('length' => array('max' => '65535')),
+			'stored_in_file' => array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
+			'published' => array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
+			'format' => array('in' => array('php', 'html')),
+			'meta_description' => array('strip' => TRUE, 'length' => array('max' => '65535')),
+			'meta_keywords' => array('strip' => TRUE, 'length' => array('max' => '65535')),
+		));
+		$validator->setFieldTitles(array(
+			'id' => 'id',
+			'title' => 'Заголовок',
+			'alias' => 'Псевдоним',
+			'body' => 'Тело страницы',
+			'published' => 'Опубликовать',
+			'type' => 'Тип',
+		));
 		
-			$this->validator = new Validator();
-			$this->validator->rules(array(
-                'required' => array('title', 'type'),
-            ),
-			array(
-                'title' => array('strip' => TRUE, 'length' => array('max' => '65535')),
-                'alias' => array('trim' => TRUE, 'match' => '/^[\w\-]{0,255}$/'),
-                'body' => array('length' => array('max' => '65535')),
-                'published' => array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
-                'type' => array('in' => array('php', 'html')),
-                'meta_description' => array('strip' => TRUE, 'length' => array('max' => '65535')),
-                'meta_keywords' => array('strip' => TRUE, 'length' => array('max' => '65535')),
-            ));
-			$this->validator->setFieldTitles(array(
-                'id' => 'id',
-                'title' => 'Заголовок',
-                'alias' => 'Псевдоним',
-                'body' => 'Тело страницы',
-                'published' => 'Опубликовать',
-                'type' => 'Тип',
-            ));
-		}
+		return $validator;
+	}
+	
+	public function preValidation(&$data){
 		
-		// применение специальных правил для редактирования или добавления объекта
-		if($this->isExistsObj){
-		
-		}
-		
-		return $this->validator;
+		$data['type'] = getVar($data['type'], 0, 'int');
+		// echo '<pre>'; print_r($data); die;
 	}
 	
 	// ПОДГОТОВКА ДАННЫХ К СОХРАНЕНИЮ
@@ -104,6 +104,8 @@ class Page_Model extends GenericObject{
 			$data['author'] = USER_AUTH_ID;
 			$data['create_date'] = time();
 		}
+		
+		// echo '<pre>'; var_dump($data); die;
 	}
 	
 	/** ПРОВЕРКА ПСЕВДОНИМА */
@@ -144,6 +146,7 @@ class Page_Model extends GenericObject{
 		
 		$data['modif_date'] = YDate::loadTimestamp($data['modif_date'])->getStrDateShortTime();
 		$data['create_date'] = YDate::loadTimestamp($data['create_date'])->getStrDateShortTime();
+		$data['type_str']    = self::getPageTypeTitle($data['type']);
 		return $data;
 	}
 	
@@ -161,6 +164,21 @@ class Page_Model extends GenericObject{
 		$this->_save();
 	}
 	
+	
+	/** ПРОВЕРИТЬ, ЯВЛЯЕТСЯ ЛИ СТРАНИЦА ФРАГМЕТНОМ */
+	public function isChunk(){
+		
+		return $this->getField('type') == self::TYPE_CHUNK;
+	}
+	
+	public static function getPageTypeTitle($type){
+		
+		switch($type) {
+			case self::TYPE_FULL: return 'Основная';
+			case self::TYPE_CHUNK: return 'Фрагмент';
+			default: trigger_error('Неизвестный тип страницы: '.$type, E_USER_ERROR);
+		}
+	}
 }
 
 class Page_Collection extends GenericObjectCollection{
@@ -179,7 +197,7 @@ class Page_Collection extends GenericObjectCollection{
 	
 	
 	// ТОЧКА ВХОДА В КЛАСС
-	public static function Load(){
+	public static function load(){
 			
 		$instance = new Page_Collection();
 		return $instance;

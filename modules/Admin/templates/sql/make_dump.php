@@ -39,7 +39,6 @@
 			$(function(){
 				
 				function fillTablesSelect(db){
-					alert(1);
 					
 					var s = $('#tit-input-select');
 					if(s.data('db') == db)
@@ -48,7 +47,6 @@
 					s.data('db', db);
 					
 					$.post('admin/sql/get-tables', {db: db}, function(response){
-						var_dump(response);
 						s.empty();
 						for(var i = 0, l = response.length; i < l; i++)
 							s.append('<option value="' + response[i] + '">' + response[i] + '</option>');

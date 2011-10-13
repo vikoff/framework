@@ -20,12 +20,6 @@ class GenericObject{
 	protected $fieldValuesForDisplay = array();
 	protected $hasPreparedFieldsValues = FALSE;
 	
-	/**
-	 * Экземпляр валидатора
-	 * используется в потомках
-	 * @var null|Validator-instance
-	 */
-	protected $validator = null;
 	protected $_errors = array();
 	
 	protected $additData = array();
@@ -120,8 +114,10 @@ class GenericObject{
 		
 		$this->dbFieldValues = $data;
 		
-		if(!$this->id || !is_array($this->dbFieldValues) || !count($this->dbFieldValues))
+		if(!$this->id || !is_array($this->dbFieldValues) || !count($this->dbFieldValues)){
+			var_dump($this->dbFieldValues);
 			throw new Exception404($this->getConst('NOT_FOUND_MESSAGE'));
+		}
 			
 		$this->fieldValuesForDisplay = $this->beforeDisplay($this->dbFieldValues);
 		$this->hasPreparedFieldsValues = TRUE;

@@ -35,6 +35,26 @@ class Admin_Controller extends Controller{
 		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
+	/**
+	 * ВЫПОЛНЕНИЕ ДЕЙСТВИЯ
+	 * @exception Exception - ловит стандартные исключения
+	 * @exception Exception403 - ловит исключения 403
+	 * @exception Exception404 - ловит исключения 404
+	 * @param string $method - идентификатор метода
+	 * @param string $redirectUrl - url, куда надо сделать редирект после успешного выполнения
+	 * @return void
+	 */
+	public function action($params, $redirectUrl = null){
+		
+		// для проксируемых методов, и тех, которые идут непосредственно к Admin_Controller
+		if(isset($this->_proxy[ getVar($params[0]) ]) || count($params) == 1)
+			return parent::action($params, $redirectUrl);
+		
+		// запросы на бэкенд-контроллеры других модулей
+		$module = array_shift($params);
+		return $this->getModule($module, TRUE)->action($params, $redirect);
+	}
+	
 	
 	/////////////////////
 	////// DISPLAY //////
