@@ -588,7 +588,12 @@ abstract class DbAdapter{
 	public function __destruct(){
 		
 		if($this->_keepFileLog){
-			$f = fopen(FS_ROOT.'logs/mysql.log', 'a');
+			
+			$logpath = FS_ROOT.'logs/';
+			if (!is_dir($logpath))
+				mkdir($logpath, 0777, true);
+				
+			$f = fopen($logpath.'sql.log', 'a');
 			fwrite($f, '-------- '.date('Y-m-d H:i:s')." --------\n");
 			fwrite($f, implode("\n", $this->_sqls));
 			fwrite($f, "\n\n");

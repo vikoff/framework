@@ -21,11 +21,24 @@ class Html_Form {
 		$this->_template = $template;
 	}
 	
-	// public function 
-	
-	public function hidden($name, $value){
+	/**
+	 * СГЕГЕРИРОВАТЬ HTML INPUT type="checkbox"
+	 * @param array $attrs - все параметры чекбокса вида 'параметр' => 'значение'
+	 *                       ВАЖНО: параметр 'checked' нужно передавать в виде bool
+	 * @return string html input type=checkbox
+	 */
+	public static function checkbox($attrs){
 		
-		return '<input type="hidden" name="'.$name.'" value="'.$value.'" />';
+		if(!empty($attrs['checked']))
+			$attrs['checked'] = 'checked';
+		else
+			unset($attrs['checked']);
+			
+		$preparedAttrs = array();
+		foreach($attrs as $k => &$v)
+			$preparedAttrs[] = $k.'="'.$v.'"';
+		
+		return '<input type="checkbox" '.implode(' ', $preparedAttrs).' />';
 	}
 	
 	/**

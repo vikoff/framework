@@ -52,7 +52,7 @@ class Admin_Controller extends Controller{
 		
 		// запросы на бэкенд-контроллеры других модулей
 		$module = array_shift($params);
-		return $this->getModule($module, TRUE)->action($params, $redirect);
+		return App::get()->getModule($module, TRUE)->action($params, $redirectUrl);
 	}
 	
 	

@@ -81,10 +81,12 @@ class Page_AdminController extends Controller{
 		$instance = Page_Model::Load($instanceId);
 		
 		$pageTitle = '<span style="font-size: 14px;">Редактирование страницы</span> '.$instance->getField('title');
+		$instanceData = $instance->GetAllFieldsPrepared();
 	
-		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
+		$variables = array_merge($instanceData, array(
 			'instanceId' => $instanceId,
 			'pageTitle'  => $pageTitle,
+			'instanceFields' => array_keys($instanceData),
 			'validation' => $instance->getValidator()->getJsRules(),
 		));
 		

@@ -406,11 +406,13 @@ table#user-input-data-box td{
 }
 #submit-box-floating a{
 	display: block;
-	padding: 32px 3px 2px;
+	padding: 35px 3px 2px;
 	background: no-repeat center 2px;
 	margin: 0 1px;
 	border: solid 1px #FFF;
 	-moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;
+	min-width: 55px;
+	text-align: center;
 }
 #submit-box-floating a:hover{
 	border: outset 1px #BBB;

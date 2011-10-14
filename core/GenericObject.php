@@ -15,10 +15,10 @@ class GenericObject{
 	public $isExistsObj = null;
 	public $isNewlyCreated = FALSE;
 	
-	protected $dbFieldValues = array();
-	protected $modifiedFields = array();
-	protected $fieldValuesForDisplay = array();
-	protected $hasPreparedFieldsValues = FALSE;
+	protected $_dbFieldValues = array();
+	protected $_modifiedFields = array();
+	protected $_fieldValuesForDisplay = array();
+	protected $_hasPreparedFieldsValues = FALSE;
 	
 	protected $_errors = array();
 	
@@ -92,14 +92,14 @@ class GenericObject{
 	/** ЗАГРУЗКА ДАННЫХ ИЗ БД */
 	protected function _loadData(){
 		
-		$this->dbFieldValues = $this->dbGetRow();
+		$this->_dbFieldValues = $this->dbGetRow();
 		
-		if(!is_array($this->dbFieldValues) || !count($this->dbFieldValues))
+		if(!is_array($this->_dbFieldValues) || !count($this->_dbFieldValues))
 			throw new Exception404($this->getConst('NOT_FOUND_MESSAGE'));
 			
-		$this->afterLoad($this->dbFieldValues);
-		$this->fieldValuesForDisplay = $this->beforeDisplay($this->dbFieldValues);
-		$this->hasPreparedFieldsValues = TRUE;
+		$this->_afterLoad($this->_dbFieldValues);
+		$this->_fieldValuesForDisplay = $this->beforeDisplay($this->_dbFieldValues);
+		$this->_hasPreparedFieldsValues = TRUE;
 	}
 	
 	/**
@@ -112,15 +112,16 @@ class GenericObject{
 	 */
 	protected function _forceLoadData($data) {
 		
-		$this->dbFieldValues = $data;
+		$this->_dbFieldValues = $data;
 		
-		if(!$this->id || !is_array($this->dbFieldValues) || !count($this->dbFieldValues)){
-			var_dump($this->dbFieldValues);
+		if(!$this->id || !is_array($this->_dbFieldValues) || !count($this->_dbFieldValues)){
+			var_dump($this->_dbFieldValues);
 			throw new Exception404($this->getConst('NOT_FOUND_MESSAGE'));
 		}
 			
-		$this->fieldValuesForDisplay = $this->beforeDisplay($this->dbFieldValues);
-		$this->hasPreparedFieldsValues = TRUE;
+		$this->_afterForceLoad($this->_dbFieldValues);
+		$this->_fieldValuesForDisplay = $this->beforeDisplay($this->_dbFieldValues);
+		$this->_hasPreparedFieldsValues = TRUE;
 	}
 	
 	/**
@@ -137,13 +138,22 @@ class GenericObject{
 	 * @param array &$data - данные полученные основным запросом
 	 * @return void
 	 */
-	protected function afterLoad(&$data){}
+	protected function _afterLoad(&$data){}
+	
+	/**
+	 * ДОЗАГРУЗКА ДАННЫХ ПОСЛЕ ПРИНУДИТЕЛЬНОЙ ЗАГРУЗКИ
+	 * выполняется после основной загрузки данных
+	 * и только для существующих объектов
+	 * @param array &$data - данные, уже переданные в объект
+	 * @return void
+	 */
+	protected function _afterForceLoad(&$data){}
 	
 	/** ПОЛУЧИТЬ ЗНАЧЕНИЕ ПОЛЯ */
 	public function getField($key){
 		
-		if(array_key_exists($key, $this->dbFieldValues))
-			return $this->dbFieldValues[$key];
+		if(array_key_exists($key, $this->_dbFieldValues))
+			return $this->_dbFieldValues[$key];
 		
 		if($this->isExistsObj)
 			trigger_error('Поле "'.$key.'" не определено в таблице "'.$this->tableName.'"', E_USER_ERROR);
@@ -157,19 +167,19 @@ class GenericObject{
 		if($this->isNewObj)
 			trigger_error('Невозможно вызвать метод self::getAllFields() для нового объекта', E_USER_ERROR);
 			
-		return $this->dbFieldValues;
+		return $this->_dbFieldValues;
 	}
 	
 	/** ПОЛУЧИТЬ ЗНАЧЕНИЕ ПОЛЯ, ПОДГОТОВЛЕННОЕ ДЛЯ ОТОБРАЖЕНИЯ */
 	public function getFieldPrepared($key){
 		
-		if(!$this->hasPreparedFieldsValues){
-			$this->fieldValuesForDisplay = $this->beforeDisplay($this->dbFieldValues);
-			$this->hasPreparedFieldsValues = TRUE;
+		if(!$this->_hasPreparedFieldsValues){
+			$this->_fieldValuesForDisplay = $this->beforeDisplay($this->_dbFieldValues);
+			$this->_hasPreparedFieldsValues = TRUE;
 		}
 			
-		if(array_key_exists($key, $this->fieldValuesForDisplay))
-			return $this->fieldValuesForDisplay[$key];
+		if(array_key_exists($key, $this->_fieldValuesForDisplay))
+			return $this->_fieldValuesForDisplay[$key];
 		
 		if($this->isExistsObj)
 			trigger_error('Неизвестное поле "'.$key.'"', E_USER_ERROR);
@@ -183,22 +193,22 @@ class GenericObject{
 		if($this->isNewObj)
 			trigger_error('Невозможно вызвать метод self::getAllFieldsPrepared() для нового объекта', E_USER_ERROR);
 		
-		if(!$this->hasPreparedFieldsValues){
-			$this->fieldValuesForDisplay = $this->beforeDisplay($this->dbFieldValues);
-			$this->hasPreparedFieldsValues = TRUE;
+		if(!$this->_hasPreparedFieldsValues){
+			$this->_fieldValuesForDisplay = $this->beforeDisplay($this->_dbFieldValues);
+			$this->_hasPreparedFieldsValues = TRUE;
 		}
 			
-		return $this->fieldValuesForDisplay;
+		return $this->_fieldValuesForDisplay;
 	}
 
 	/** УСТАНОВИТЬ ЗНАЧЕНИЕ ПОЛЯ */
 	public function setField($field, $value){
 		
 		// выполнить, если значение не было задано, или же изменилось
-		if(!array_key_exists($field, $this->dbFieldValues) || $this->dbFieldValues[$field] !== $value){
-			$this->dbFieldValues[$field] = $value;
-			$this->modifiedFields[$field] = true;
-			$this->hasPreparedFieldsValues = FALSE;
+		if(!array_key_exists($field, $this->_dbFieldValues) || $this->_dbFieldValues[$field] !== $value){
+			$this->_dbFieldValues[$field] = $value;
+			$this->_modifiedFields[$field] = true;
+			$this->_hasPreparedFieldsValues = FALSE;
 		}
 		
 		return $this;
@@ -208,10 +218,10 @@ class GenericObject{
 	public function setFields($fields){
 	
 		foreach($fields as $field => $value){
-			$this->dbFieldValues[$field] = $value;
-			$this->modifiedFields[$field] = true;
+			$this->_dbFieldValues[$field] = $value;
+			$this->_modifiedFields[$field] = true;
 		}
-		$this->hasPreparedFieldsValues = FALSE;
+		$this->_hasPreparedFieldsValues = FALSE;
 		
 		return $this;
 	}
@@ -246,14 +256,14 @@ class GenericObject{
 		// новый объект
 		if($this->isNewObj){
 
-			foreach($this->dbFieldValues as $key => $val)
+			foreach($this->_dbFieldValues as $key => $val)
 				$fields[$key] = $val;
 			
 			if(!count($fields))
 				trigger_error('Нечего сохранять', E_USER_ERROR);
 				
-			$this->id = $this->dbFieldValues[$this->pkField] = $this->dbInsert($fields);
-			$this->modifiedFields = array();
+			$this->id = $this->_dbFieldValues[$this->pkField] = $this->dbInsert($fields);
+			$this->_modifiedFields = array();
 			$this->isExistsObj = TRUE;
 			$this->isNewObj = FALSE;
 			$this->isNewlyCreated = TRUE;
@@ -261,14 +271,14 @@ class GenericObject{
 		// существующий объект
 		else{
 			
-			foreach($this->modifiedFields as $k => $v)
-				$fields[$k] = $this->dbFieldValues[$k];
+			foreach($this->_modifiedFields as $k => $v)
+				$fields[$k] = $this->_dbFieldValues[$k];
 			
 			if(!count($fields))
 				return;
 				
 			$this->dbUpdate($fields);
-			$this->modifiedFields = array();
+			$this->_modifiedFields = array();
 		}
 	}
 	

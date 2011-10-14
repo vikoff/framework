@@ -47,24 +47,24 @@ Html_Form::create('std-div')
 			<h3>[Page_Model INFO]</h3>
 			
 			<? if($this->type == Page_Model::TYPE_FULL): ?>
-				<p>
+				<div class="paragraph">
 					<label class="title">URL текущей страницы</label>
 					<?= App::href('pages/'.$this->alias); ?>
-				</p>
-				<p>
+				</div>
+				<div class="paragraph">
 					<label class="title">Вставка ссылки в php-код</label>
-					<code>&lt;a href="&lt;?= App::href('pages/<?= $this->alias; ?>'); ?&gt;"&gt;<?= $this->title[$this->curLng]; ?>&lt;/a&gt;</code>
-				</p>
-				<p>
+					<code>&lt;a href="&lt;?= App::href('pages/<?= $this->alias; ?>'); ?&gt;"&gt;<?= $this->title; ?>&lt;/a&gt;</code>
+				</div>
+				<div class="paragraph">
 					<label class="title">Вставка ссылки в smarty-код</label>
-					<code>&lt;a href="{a href='pages/<?= $this->alias; ?>'}"&gt;<?= $this->title[$this->curLng]; ?>&lt;/a&gt;</code>
-				</p>
-				<p>
+					<code>&lt;a href="{a href='pages/<?= $this->alias; ?>'}"&gt;<?= $this->title; ?>&lt;/a&gt;</code>
+				</div>
+				<div class="paragraph">
 					<label class="title">Вставка ссылки в html-код страницы контента</label>
-					<code>&lt;a href="{href('pages/<?= $this->alias; ?>')}"&gt;<?= $this->title[$this->curLng]; ?>&lt;/a&gt;</code>
-				</p>
+					<code>&lt;a href="{href('pages/<?= $this->alias; ?>')}"&gt;<?= $this->title; ?>&lt;/a&gt;</code>
+				</div>
 			<? else: ?>
-				<p>
+				<div class="paragraph">
 					<label class="title">Получение страницы из php-кода</label>
 					<span class="description-inline">более производительный, но менее наглядный способ:</span><br />
 					<code>Page_Model::load(<?= $this->id; ?>)->getAllFieldsPrepared();</code>
@@ -74,13 +74,13 @@ Html_Form::create('std-div')
 					<br />
 					<br />
 					Оба метода возвращают ассоциативный массив с ключами:<br />
-					<code><?= implode(', ', $instanceFields); ?></code>
-				</p>
+					<code><?= implode(', ', $this->instanceFields); ?></code>
+				</div>
 			<? endif; ?>
 		</div>
 	<? endif; ?>
 	
-	<p>
+	<div class="paragraph">
 		<label class="title">Тип страницы <span class="required">*</span></label>
 		
 		<label>
@@ -100,14 +100,14 @@ Html_Form::create('std-div')
 		как текстовый фрагмент в произвольном месте.
 		</span>
 		<br />
-	</p>
+	</div>
 
-	<p>
+	<div class="paragraph">
 		<label class="title">Заголовок <span class="required">*</span></label>
 		<input type="text" name="title" value="<?= $this->title; ?>" style="width: 300px;" />
-	</p>
+	</div>
 	
-	<p>
+	<div class="paragraph">
 		<label class="title">Псевдоним</label>
 		<span class="description">
 			уникальный идентификатор страницы [a-z, 0-9].<br />
@@ -115,44 +115,55 @@ Html_Form::create('std-div')
 			соответствующий id страницы.
 		</span>
 		<input type="text" name="alias" value="<?= $this->alias; ?>" style="width: 300px;" />
-	</p>
+	</div>
 	
-	<p>
-		<label class="title-inline"> <input id="stored-in-file-checkbox" type="checkbox" name="stored_in_file" value="1" /> Хранить текст страницы в файле</label>
-	</p>
+	<div class="paragraph">
+		<label class="title-inline" <? if(!$this->stored_in_file || !$this->instanceId): ?>
+				title="Текст страницы будет храниться в файле вместо БД. Расположение файла можно будет увидеть после сохранения страницы"
+			<? endif; ?>> 
+			<?= Html_Form::checkbox(array('id' => 'stored-in-file-checkbox', 'name' => 'stored_in_file', 'value' => '1', 'checked' => $this->stored_in_file)); ?>
+			Хранить текст страницы в файле
+		</label>
+		<? if($this->instanceId && $this->stored_in_file): ?>
+			<div class="description">
+				Файл, содержащий текст страницы, расположен в:
+				<code><?= Page_Model::FILE_PAGES_PATH.$this->instanceId.'.php' ?></code>
+			</div>
+		<? endif; ?>
+	</div>
 	
 	<div id="text-stored-in-db" <? if($this->stored_in_file): ?>style="display: none;"<? endif; ?>>
-		<p>
+		<div class="paragraph">
 			<label class="title">Текст</label>
 			<textarea class="wysiwyg" style="width: 98%; height: 400px;" name="body"><?= $this->body; ?></textarea>
-		</p>
+		</div>
 		
-		<p>
+		<div class="paragraph">
 			<label class="title-inline">Формат:</label>
 			<?= HtmlForm::select(
 				array('name' => 'format'),
 				array('html', 'php'),
 				$this->format,
 				array('keyEqVal' => true)); ?>
-		</p>
+		</div>
 	</div>
 	
-	<p>
+	<div class="paragraph">
 		<label class="title">meta description</label>
 		<textarea style="width: 300px; height: 60px;" name="meta_description"><?= $this->meta_description; ?></textarea>
-	</p>
+	</div>
 	
-	<p>
+	<div class="paragraph">
 		<label class="title">meta keywords</label>
 		<textarea style="width: 300px; height: 60px;" name="meta_keywords"><?= $this->meta_keywords; ?></textarea>
-	</p>
+	</div>
 	
-	<p>
+	<div class="paragraph">
 		<label class="title">
 			<input type="checkbox" name="published" value="1" <? if($this->published !== FALSE): ?>checked="checked"<? endif; ?> />
 			Опубликовать
 		</label>
-	</p>
+	</div>
 	
 	<div class="paragraph" id="submit-box">
 		<input id="submit-save" class="button" type="submit" name="action[admin/page/<? if($this->instanceId): ?>save<? else: ?>create<? endif; ?>][admin/content/page]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
