@@ -26,7 +26,7 @@ class Page_Model extends GenericObject{
 		
 		return new Page_Model($id, self::INIT_EXISTS);
 	}
-
+	
 	/** ТОЧКА ВХОДА В КЛАСС (ЗАГРУЗКА СУЩЕСТВУЮЩЕГО ОБЪЕКТА) */
 	public static function forceLoad($id, $fieldvalues){
 		

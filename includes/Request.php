@@ -51,7 +51,6 @@ class Request{
 	public function getArray(){
 	
 		return array($this->_controller, $this->_params);
-	
 	}
 	
 	public function getRawArray(){
@@ -62,6 +61,13 @@ class Request{
 	public function getString(){
 		
 		return $this->_requestString;
+	}
+	
+	/** ПОЛУЧИТЬ ВСЕ GET ПАРАМЕТРЫ (кроме 'r') */
+	public function getParams(){
+		$params = $_GET;
+		unset($params['r']);
+		return $params;
 	}
 	
 	/**

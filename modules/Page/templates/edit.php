@@ -25,7 +25,7 @@ Html_Form::create('std-div')
 		'body' => array(
 			'type' => 'textarea',
 			'label' => 'Текст',
-			'wysiwyg' => true,
+			'editor' => true,
 			'attrs' => array('style' => 'width: 98%; height: 400px;'),
 		)
 	))
@@ -135,8 +135,12 @@ Html_Form::create('std-div')
 	<div id="text-stored-in-db" <? if($this->stored_in_file): ?>style="display: none;"<? endif; ?>>
 		<div class="paragraph">
 			<label class="title">Текст</label>
-			<textarea class="wysiwyg" style="width: 98%; height: 400px;" name="body"><?= $this->body; ?></textarea>
+			<textarea id="editor1" class="editor" style="width: 98%; height: 400px;" name="body"><?= $this->body; ?></textarea>
 		</div>
+		
+	<button type="button" onclick="Editor.enable('tinymce');">enable tinymce</button>
+	<button type="button" onclick="Editor.enable('php');">enable php</button>
+	<button type="button" onclick="Editor.disable();">disable</button>
 		
 		<div class="paragraph">
 			<label class="title-inline">Формат:</label>
@@ -185,8 +189,133 @@ Html_Form::create('std-div')
 	</div>
 </form>
 
-<script type="text/javascript" src="libs/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
+
+var Editor = {
+	
+	/** id текстарий, которые будут превращены в редакторы */
+	textareasIds: [
+		'editor1',
+	],
+	
+	enabled: false,
+	type: null,
+	
+	/**
+	 * ВКЛЮЧИТЬ РЕДАКТОР
+	 * @param string type - тип [php|tinymce]
+	 */
+	enable: function(type){
+		
+		// выход при попытке создать такой же редактор, как уже созданный
+		if(this.enabled && this.type == type)
+			return;
+		
+		// удаление предыдущего редактора (если есть)
+		if(this.enabled && this.type != type)
+			this.disable();
+		
+		// применение нового редактора
+		for(var i in this.textareasIds)
+			this._editors[type].apply( document.getElementById(this.textareasIds[i]) );
+			
+		this.type = type;
+		this.enabled = true;
+	},
+	
+	disable: function(){
+		
+		if(this.enabled){
+			for(var i in this.textareasIds)
+				this._editors[this.type].remove( document.getElementById(this.textareasIds[i]) );
+			this.type = null;
+			this.enabled = false;
+		}
+	},
+	
+	_editors: {
+		php: {
+			_inited: false,
+			_jsSrc: [
+				'libs/codemirror/lib/codemirror.js',
+				'libs/codemirror/mode/php/php.js',
+				'libs/codemirror/mode/xml/xml.js',
+				'libs/codemirror/mode/javascript/javascript.js',
+				'libs/codemirror/mode/css/css.js',
+				'libs/codemirror/mode/clike/clike.js',
+			],
+			_cssHref: [
+				'libs/codemirror/lib/codemirror.css',
+				'libs/codemirror/theme/default.css',
+			],
+			_instance: null,
+			
+			_init: function(){
+				for(var i in this._jsSrc)
+					Editor._require(this._jsSrc[i]);
+				for(var i in this._cssHref)
+					Editor._loadCss(this._cssHref[i]);
+				this._inited = true;
+			},
+			apply: function(textarea){
+				
+				if(!this._inited)
+					this._init();
+				
+				var editorHeight = $(textarea).height();
+				textarea.spellcheck = false;
+				this._instance = CodeMirror.fromTextArea(textarea, {
+					lineNumbers: true,
+					matchBrackets: true,
+					mode: "php",
+					indentWithTabs: true,
+					enterMode: "keep",
+					tabMode: "shift",
+				});
+				$('.CodeMirror-scroll').css('height', editorHeight);
+			},
+			remove: function(textarea){
+				if(this._instance){
+					textarea.spellcheck = true;
+					this._instance.toTextArea();
+					this._instance = null;
+				}
+			}
+		},
+		
+		tinymce: {
+			_inited: false,
+			_jsSrc: 'libs/tiny_mce/tiny_mce.js',
+			_enabledNum: 0,
+			
+			_init: function(){
+				Editor._require(this._jsSrc);
+				tinyMCE.baseURL = WWW_ROOT + 'libs/tiny_mce';
+				tinyMCE.init(getDefaultTinyMceSettings());
+				this._inited = true;
+			},
+			apply: function(textarea){
+				if(!this._inited)
+					this._init();
+				tinyMCE.execCommand('mceAddControl', false, textarea.id);
+			},
+			remove: function(textarea){
+				tinyMCE.execCommand('mceRemoveControl', false, textarea.id);
+			}
+		}
+	},
+	
+	_require: function(file){
+		$.ajax({
+			url: file,
+			dataType: 'script',
+			async: false
+		});
+	},
+	_loadCss: function(href){
+		$('<link rel="stylesheet" type="text/css" href="' + href + '" />').appendTo('head');
+	},
+}
 
 $(function(){
 	
@@ -194,10 +323,9 @@ $(function(){
 		$('#text-stored-in-db')[$(this).attr('checked') ? 'slideUp' : 'slideDown']();
 	});
 	
-	tinyMCE.init($.extend(getDefaultTinyMceSettings('<?= WWW_ROOT; ?>'), {
-		mode : 'specific_textareas',
-		editor_selector : 'wysiwyg'
-	}));
+	Editor.enable('tinymce');
+	
+	// var_dump(tinyMCE.activeEditor);
 	
 	enableFloatingSubmits();
 });

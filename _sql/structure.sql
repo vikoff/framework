@@ -100,3 +100,23 @@ CREATE TABLE `test_items` (
   `published`	CHAR(1),
   `date` 		INT(10) UNSIGNED DEFAULT NULL
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+
+
+/* МЕНЮ */
+DROP TABLE IF EXISTS `menus`;
+CREATE TABLE `menus` (
+  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name`			VARCHAR(255),
+  `create_date`		INT(10) UNSIGNED
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+/* ЭЛЕМЕНТЫ МЕНЮ */
+DROP TABLE IF EXISTS `menu_items`;
+CREATE TABLE `menu_items` (
+  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `menu_id`			INT(10) UNSIGNED,
+  `name`			VARCHAR(255),
+  `parent_id`		INT(10) UNSIGNED DEFAULT 0,
+  `request_match`	VARCHAR(255)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

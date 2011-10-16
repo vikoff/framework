@@ -77,6 +77,9 @@ class Page_AdminController extends Controller{
 	/** DISPLAY EDIT */
 	public function display_edit($params = array()){
 		
+		// header('content-type: text/plain');
+		// echo '<pre>'; print_r($_POST); die;
+		
 		$instanceId = getVar($params[0], 0 ,'int');
 		$instance = Page_Model::Load($instanceId);
 		

@@ -1,11 +1,11 @@
-function captcha_reload(){$("#captcha").attr("src",'includes/captcha/captcha.php?rnd='+Math.round(Math.random(0)*1000));}
+function captcha_reload(){$("#captcha").attr("src",'libs/captcha/captcha.php?rnd='+Math.round(Math.random(0)*1000));}
 
 // набор стандартных опций для tinymce
-function getDefaultTinyMceSettings(WWW_ROOT){
+function getDefaultTinyMceSettings(){
 	
 	return {
 	
-		script_url : WWW_ROOT + 'includes/tiny_mce/tiny_mce.js',
+		script_url : WWW_ROOT + 'libs/tiny_mce/tiny_mce.js',
 		
 		language : 'ru',
 		
@@ -25,7 +25,7 @@ function getDefaultTinyMceSettings(WWW_ROOT){
 		theme_advanced_statusbar_location : "bottom",
 		theme_advanced_resizing : true,
 
-		content_css : WWW_ROOT + "css/backend.css"
+		content_css : WWW_ROOT + 'css/common.css,'+WWW_ROOT + 'css/frontend.css'
 	};
 }
 

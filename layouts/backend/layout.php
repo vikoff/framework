@@ -27,7 +27,9 @@
 	<script type="text/javascript" src="js/jquery.floatblock.js"></script>
 	<script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
-	
+	<script type="text/javascript">
+		var WWW_ROOT = '<?= WWW_ROOT; ?>';
+	</script>
 </head>
 <body>
 
