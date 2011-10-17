@@ -311,7 +311,6 @@ abstract class Controller{
 	
 	/** ПОЛУЧИТЬ КОНСТАНТУ ИЗ КЛАССА-ПОТОМКА */
 	public function getConst($name){
-		
 		return constant($this->getClass().'::'.$name);
 	}
 	

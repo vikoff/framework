@@ -25,6 +25,11 @@ class Page_Controller extends Controller{
 		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
+	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
+	public function getClass(){
+		return __CLASS__;
+	}
+	
 	/** ВЫПОЛНЕНИЕ ОТОБРАЖЕНИЯ */
 	public function display($params){
 		
@@ -34,11 +39,6 @@ class Page_Controller extends Controller{
 		
 		return parent::display($params);
 	}
-	
-	public function getClass(){
-		return __CLASS__;
-	}
-	
 	
 	/////////////////////
 	////// DISPLAY //////

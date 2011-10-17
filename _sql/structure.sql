@@ -118,5 +118,6 @@ CREATE TABLE `menu_items` (
   `menu_id`			INT(10) UNSIGNED,
   `name`			VARCHAR(255),
   `parent_id`		INT(10) UNSIGNED DEFAULT 0,
-  `request_match`	VARCHAR(255)
+  `index`			SMALLINT UNSIGNED,
+  `request_active`	VARCHAR(255)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
