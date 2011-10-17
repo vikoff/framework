@@ -13,14 +13,20 @@ class Admin_Controller extends Controller{
 	// права на выполнение методов контроллера
 	public $methodResources = array(
 	
-		'display_content'	=> 'content',
-		'display_users' 	=> 'content',
-		'display_modules' 	=> 'content',
-		'display_root' 		=> 'content',
+		'display_content'   => 'content',
+		'display_users'     => 'content',
+		'display_modules'   => 'content',
+		'display_root'      => 'content',
 	);
 	
+	/**
+	 * массив пар 'идентификатор метода' => 'Класс контроллера или Имя модуля'
+	 * для проксирования запросов в другой контроллер/модуль
+	 * если указан класс контроллера, то он должен принадлежать тому же модулю, что и текущий контроллер.
+	 */
 	public $_proxy = array(
 		'sql' => 'Admin_SqlController',
+		'menu' => 'menu',
 		'modules' => 'Admin_ModulesController',
 	);
 	
@@ -55,12 +61,19 @@ class Admin_Controller extends Controller{
 		return App::get()->getModule($module, TRUE)->action($params, $redirectUrl);
 	}
 	
+	/** ПОЛУЧИТЬ ЭКЗЕМЛЯР КОНТРОЛЛЕРА ДЛЯ ПРОКСИРОВАНИЯ */
+	public function getProxyControllerInstance($proxy){
+		
+		return App::get()->isModule($proxy, TRUE)
+			? App::get()->getModule($proxy, TRUE)
+			: new $proxy($this->_config);
+	}
 	
 	/////////////////////
 	////// DISPLAY //////
 	/////////////////////
 	
-	// DISPLAY CONTENT
+	/** DISPLAY CONTENT */
 	public function display_content($params = array()){
 		
 		$viewer = BackendLayout::get();
@@ -80,15 +93,17 @@ class Admin_Controller extends Controller{
 		$module = array_shift($params);
 		
 		if(!App::get()->isModule($module, TRUE)){
-			BackendLayout::get()->error404('Контроллер не найден');
+			$this->error404handler('модуль <b>'.$module.'</b> не найден');
 			exit();
 		}
 		
 		$viewer->setLeftMenuActiveItem($module);
-		App::get()->getModule($module, TRUE)->display($params);
+		
+		if(!App::get()->getModule($module, TRUE)->display($params))
+			$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
 	}
 
-	// DISPLAY USERS
+	/** DISPLAY USERS */
 	public function display_users($params = array()){
 			
 		$viewer = BackendLayout::get();
@@ -116,7 +131,7 @@ class Admin_Controller extends Controller{
 			->render();
 	}
 	
-	// DISPLAY ROOT
+	/** DISPLAY ROOT */
 	public function display_root($params = array()){
 		
 		$section = getVar($params[0]);
@@ -161,7 +176,7 @@ class Admin_Controller extends Controller{
 	////// SNIPPETS //////
 	//////////////////////
 	
-	// SNIPPET ERROR LOG
+	/** SNIPPET ERROR LOG */
 	public function snippet_error_log(){
 		
 		$collection = new ErrorCollection();

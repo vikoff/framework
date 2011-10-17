@@ -9,8 +9,9 @@ abstract class Controller{
 	protected $_config = array();
 	
 	/**
-	 * массив пар 'идентификатор' => 'Имя контроллера'
-	 * для проксирования запросов в другой контроллер
+	 * массив пар 'идентификатор метода' => 'Класс контроллера или Имя модуля'
+	 * для проксирования запросов в другой контроллер/модуль
+	 * если указан класс контроллера, то он должен принадлежать тому же модулю, что и текущий контроллер.
 	 */
 	protected $_proxy = array();
 	
@@ -81,7 +82,7 @@ abstract class Controller{
 		
 		// если ресурс для метода не определен
 		if(empty($this->methodResources[$method]))
-			trigger_error('resource of '.$method.' method not specified', E_USER_ERROR);
+			trigger_error('resource of '.$this->getClass().'::'.$method.' method not specified', E_USER_ERROR);
 		
 		
 		// если недостаточно прав
@@ -104,11 +105,9 @@ abstract class Controller{
 		if(empty($method))
 			return $this->_displayIndex($params);
 		
-		// проксирование на вложенный контроллер
-		if(isset($this->_proxy[$method])){
-			$controller = new $this->_proxy[$method]( $this->_config );
-			return $controller->display($params);
-		}
+		// проксирование на другой контроллер/модуль
+		if(isset($this->_proxy[$method]))
+			return $this->getProxyControllerInstance($this->_proxy[$method])->display($params);
 		
 		$method = $this->getDisplayMethodName($method);
 		
@@ -142,11 +141,9 @@ abstract class Controller{
 		
 		$method = array_shift($params);
 		
-		// проксирование на вложенный контроллер
-		if(isset($this->_proxy[$method])){
-			$controller = new $this->_proxy[$method]( $this->_config );
-			return $controller->action($params);
-		}
+		// проксирование на другой контроллер/модуль
+		if(isset($this->_proxy[$method]))
+			return $this->getProxyControllerInstance($this->_proxy[$method])->action($params, $redirectUrl);
 		
 		$method = $this->getActionMethodName($method);
 		
@@ -160,6 +157,7 @@ abstract class Controller{
 		$this->_redirectUrl = $redirectUrl;
 		
 		try{
+			
 			// выполнение метода
 			if($this->$method() !== FALSE){
 				
@@ -186,11 +184,9 @@ abstract class Controller{
 		
 		$method = array_shift($params);
 		
-		// проксирование на вложенный контроллер
-		if(isset($this->_proxy[$method])){
-			$controller = new $this->_proxy[$method]( $this->_config );
-			return $controller->ajax($params);
-		}
+		// проксирование на другой контроллер/модуль
+		if(isset($this->_proxy[$method]))
+			return $this->getProxyControllerInstance($this->_proxy[$method])->ajax($params);
 		
 		$method = $this->getAjaxMethodName($method);
 		
@@ -233,6 +229,14 @@ abstract class Controller{
 		// преобразует строку вида 'any-Method-name' в 'any_method_name'
 		$method = 'ajax_'.strtolower(str_replace('-', '_', $method));
 		return $method;
+	}
+	
+	/** ПОЛУЧИТЬ ЭКЗЕМЛЯР КОНТРОЛЛЕРА ДЛЯ ПРОКСИРОВАНИЯ */
+	public function getProxyControllerInstance($proxy){
+		
+		return App::get()->isModule($proxy)
+			? App::get()->getModule($proxy)
+			: new $proxy($this->_config);
 	}
 	
 	// ЗАДАТЬ URL ДЛЯ РЕДИРЕКТА после выполнения действия (action)

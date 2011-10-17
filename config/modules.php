@@ -25,6 +25,16 @@ return array(
 		)
 	),
 	
+	'menu' => array(
+		'title' => 'Меню',
+		'controller' => 'Menu_Controller',
+		'adminController' => 'Menu_AdminController',
+		'resources' => array(
+			'view' => 'Просмотр страниц',
+			'edit' => 'Редактирование страниц',
+		)
+	),
+	
 	'user' => array(
 		'title' => 'Пользователи',
 		'controller' => 'User_Controller',

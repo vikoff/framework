@@ -1,29 +1,29 @@
-<?
+<?php
 
-class Page_AdminController extends Controller{
+class Menu_AdminController extends Controller {
 	
-	const MODULE = 'page';
+	/** имя модуля */
+	const MODULE = 'menu';
+	
+	/** элемент, отображаемый во view по умолчанию */
+	const DEFAULT_VIEW = 1;
 	
 	/** путь к шаблонам (относительно FS_ROOT) */
-	const TPL_PATH = 'modules/Page/templates/';
+	const TPL_PATH = 'modules/Menu/templates/';
 	
 	/** метод, отображаемый по умолачанию */
 	protected $_displayIndex = 'list';
 	
-	// права на выполнение методов контроллера
+	/** ассоциация методов контроллера с ресурсами */
 	public $methodResources = array(
-		
-		'display_list'       => 'edit',
-		'display_new'        => 'edit',
-		'display_edit'       => 'edit',
-		'display_copy'       => 'edit',
-		'display_delete'     => 'edit',
+		'display_list'    => 'edit',
+		'display_new'     => 'edit',
+		'display_edit'    => 'edit',
+		'display_copy'    => 'edit',
+		'display_delete'  => 'edit',
 
-		'action_publish'		=> 'edit',
-		'action_unpublish'		=> 'edit',
-		'action_create'			=> 'edit',
-		'action_save'			=> 'edit',
-		'action_delete' 		=> 'edit',
+		'action_save'     => 'edit',
+		'action_delete'   => 'edit',
 	);
 	
 	
@@ -33,14 +33,20 @@ class Page_AdminController extends Controller{
 		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
+	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
+	public function getClass(){
+		return __CLASS__;
+	}
+	
+	
 	/////////////////////
 	////// DISPLAY //////
 	/////////////////////
 	
-	/** DISPLAY LIST */
+	/** DISPLAY LIST (ADMIN) */
 	public function display_list($params = array()){
 		
-		$collection = new Page_Collection();
+		$collection = new Menu_Collection();
 		$variables = array(
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
@@ -48,13 +54,13 @@ class Page_AdminController extends Controller{
 		);
 		
 		BackendLayout::get()
-			->prependTitle('Список страниц')
+			->prependTitle('Список элементов')
 			->setLinkTags($collection->getLinkTags())
 			->setContentPhpFile(self::TPL_PATH.'admin_list.php', $variables)
 			->render();
 	}
 	
-	/** DISPLAY NEW */
+	/** DISPLAY NEW (ADMIN) */
 	public function display_new($params = array()){
 		
 		$pageTitle = 'Создание новой страницы';
@@ -62,7 +68,7 @@ class Page_AdminController extends Controller{
 		$variables = array_merge($_POST, array(
 			'instanceId' => 0,
 			'pageTitle'  => $pageTitle,
-			'validation' => Page_Model::Create()->getValidator()->getJsRules(),
+			'validation' => Menu_Model::create()->getValidator()->getJsRules(),
 		));
 		
 		BackendLayout::get()
@@ -72,40 +78,34 @@ class Page_AdminController extends Controller{
 			->render();
 	}
 	
-	/** DISPLAY EDIT */
+	/** DISPLAY EDIT (ADMIN) */
 	public function display_edit($params = array()){
 		
-		// header('content-type: text/plain');
-		// echo '<pre>'; print_r($_POST); die;
-		
 		$instanceId = getVar($params[0], 0 ,'int');
-		$instance = Page_Model::Load($instanceId);
+		$instance = Menu_Model::load($instanceId);
 		
-		$pageTitle = '<span style="font-size: 14px;">Редактирование страницы</span> '.$instance->getField('title');
-		$instanceData = $instance->GetAllFieldsPrepared();
+		$pageTitle = '<span style="font-size: 14px;">Редактирование элемента</span> #'.$instance->getField('id');
 	
-		$variables = array_merge($instanceData, array(
+		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
 			'instanceId' => $instanceId,
 			'pageTitle'  => $pageTitle,
-			'instanceFields' => array_keys($instanceData),
 			'validation' => $instance->getValidator()->getJsRules(),
 		));
 		
 		BackendLayout::get()
-			->prependTitle('Редактирование страницы')
-			->setBreadcrumbs('add', array(null, 'Редактирование страницы'))
+			->prependTitle('Редактирование записи')
+			->setBreadcrumbs('add', array(null, 'Редактирование записи'))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
-		
 	}
 	
-	/** DISPLAY COPY */
+	/** DISPLAY COPY (ADMIN) */
 	public function display_copy($params = array()){
 		
 		$instanceId = getVar($params[0], 0 ,'int');
-		$instance = Page_Model::Load($instanceId);
+		$instance = Menu_Model::load($instanceId);
 		
-		$pageTitle = 'Копирование страницы';
+		$pageTitle = 'Копирование записи';
 	
 		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
 			'instanceId' => 0,
@@ -120,20 +120,21 @@ class Page_AdminController extends Controller{
 			->render();
 	}
 	
-	/** DISPLAY DELETE */
+	/** DISPLAY DELETE (ADMIN) */
 	public function display_delete($params = array()){
 		
 		$instanceId = getVar($params[0], 0 ,'int');
-		$instance = Page_Model::Load($instanceId);
+		$instance = Menu_Model::load($instanceId);
 
-		$variables = array_merge($instance->GetAllFieldsPrepared(), array());
+		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
+			'instanceId' => $instanceId,
+		));
 		
 		BackendLayout::get()
 			->prependTitle('Удаление записи')
-			->setBreadcrumbs('add', array(null, 'Удаление страницы'))
+			->setBreadcrumbs('add', array(null, 'Удаление записи'))
 			->setContentPhpFile(self::TPL_PATH.'delete.php', $variables)
 			->render();
-		
 	}
 	
 
@@ -141,30 +142,17 @@ class Page_AdminController extends Controller{
 	////// ACTION //////
 	////////////////////
 	
-	/** ACTION SAVE */
-	public function action_create($params = array()){
-		
-		
-		$instance = Page_Model::create();
-		
-		if($instance->save($_POST)){
-			Messenger::get()->addSuccess('Запись сохранена');
-			return TRUE;
-		}else{
-			Messenger::get()->addError('Не удалось сохранить запись:', $instance->getError());
-			return FALSE;
-		}
-	}
-	
-	/** ACTION SAVE */
+	/** ACTION SAVE (ADMIN) */
 	public function action_save($params = array()){
 		
-		
 		$instanceId = getVar($_POST['id'], 0, 'int');
-		$instance = Page_Model::load($instanceId);
+		$instance = new Menu_Model($instanceId);
 		
 		if($instance->save($_POST)){
 			Messenger::get()->addSuccess('Запись сохранена');
+			$this->_redirectUrl = !empty($this->_redirectUrl)
+				? preg_replace('/\(%([\w\-]+)%\)/e', '$instance->getField("$1")', $this->_redirectUrl)
+				: null;
 			return TRUE;
 		}else{
 			Messenger::get()->addError('Не удалось сохранить запись:', $instance->getError());
@@ -172,53 +160,25 @@ class Page_AdminController extends Controller{
 		}
 	}
 	
-	/** ACTION PUBLISH */
-	public function action_publish($params = array()){
-		
-		$instance = Page_Model::Load(getVar($_POST['id'], 0, 'int'));
-		$instance->publish();
-		Messenger::get()->addSuccess('Страница "'.$instance->getField('title').'" опубликована');
-		return TRUE;
-	}
-	
-	/** ACTION UNPUBLISH */
-	public function action_unpublish($params = array()){
-		
-		$instance = Page_Model::Load(getVar($_POST['id'], 0, 'int'));
-		$instance->unpublish();
-		Messenger::get()->addSuccess('Страница "'.$instance->getField('title').'" скрыта');
-		return TRUE;
-	}
-	
-	/** ACTION DELETE */
+	/** ACTION DELETE (ADMIN) */
 	public function action_delete($params = array()){
 		
 		$instanceId = getVar($_POST['id'], 0, 'int');
-		$instance = Page_Model::Load($instanceId);
+		$instance = Menu_Model::load($instanceId);
 		
 		// установить редирект на admin-list
-		$this->setRedirectUrl('admin/content/page/list');
+		$this->setRedirectUrl('admin//menu/list');
 	
-		if($instance->Destroy()){
-			Messenger::get()->addSuccess('Страница удалена');
+		if($instance->destroy()){
+			Messenger::get()->addSuccess('Запись удалена');
 			return TRUE;
 		}else{
-			Messenger::get()->addError('Не удалось удалить страницу:', $instance->getError());
+			Messenger::get()->addError('Не удалось удалить запись:', $instance->getError());
 			// выполнить редирект принудительно
 			$this->forceRedirect();
 			return FALSE;
 		}
 
-	}
-	
-	
-	////////////////////
-	////// OTHER  //////
-	////////////////////
-	
-	
-	public function getClass(){
-		return __CLASS__;
 	}
 	
 }
