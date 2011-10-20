@@ -17,7 +17,9 @@
 	<link rel="stylesheet" href="css/common.css" type="text/css" />
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://scripts.vik-off.net/debug.js"></script>
-	
+	<script type="text/javascript">
+		var WWW_ROOT = '<?= WWW_ROOT; ?>';
+	</script>
 </head>
 <body>
 

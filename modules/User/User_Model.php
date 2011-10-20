@@ -1,6 +1,6 @@
 <?
 
-class User_Model extends GenericObject{
+class User_Model extends ActiveRecord{
 	
 	// пол
 	const GENDER_FEMALE 	= 'f';
@@ -242,7 +242,7 @@ class User_Model extends GenericObject{
 }
 
 
-class UserCollection extends GenericObjectCollection{
+class UserCollection extends ARCollection{
 
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',

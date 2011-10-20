@@ -1,6 +1,6 @@
 <?php
 
-class Menu_Model extends GenericObject {
+class Menu_Model extends ActiveRecord {
 	
 	/** имя модуля */
 	const MODULE = 'menu';
@@ -101,7 +101,7 @@ class Menu_Model extends GenericObject {
 	
 }
 
-class Menu_Collection extends GenericObjectCollection{
+class Menu_Collection extends ARCollection{
 	
 	/**
 	 * поля, по которым возможна сортировка коллекции

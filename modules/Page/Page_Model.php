@@ -1,6 +1,6 @@
 <?
 
-class Page_Model extends GenericObject{
+class Page_Model extends ActiveRecord{
 	
 	/** имя модуля */
 	const MODULE = 'page';
@@ -236,7 +236,7 @@ class Page_Model extends GenericObject{
 	}
 }
 
-class Page_Collection extends GenericObjectCollection{
+class Page_Collection extends ARCollection{
 	
 	// поля, по которым возможна сортировка коллекции
 	// каждый ключ должен быть корректным выражением для SQL ORDER BY

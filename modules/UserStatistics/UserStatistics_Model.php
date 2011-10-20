@@ -296,7 +296,7 @@ class UserStatistics_Model{
 }
 
 
-class UserStatisticsCollection extends GenericObjectCollection{
+class UserStatisticsCollection extends ARCollection{
 	
 	// поля, по которым возможно сортировка коллекции
 	// каждый ключ должен быть корректным выражением для SQL ORDER BY

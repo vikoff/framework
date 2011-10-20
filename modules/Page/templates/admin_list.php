@@ -7,7 +7,7 @@
 
 <? if($this->collection): ?>
 
-	<table class="std-grid tr-highlight">
+	<table class="grid wide tr-highlight">
 	<tr>
 		<th><?= $this->sorters['id']; ?></th>
 		<th><?= $this->sorters['title']; ?></th>

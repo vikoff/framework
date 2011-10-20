@@ -350,7 +350,7 @@ class Error_Model{
 	
 }
 
-class ErrorCollection extends GenericObjectCollection{
+class ErrorCollection extends ARCollection{
 	
 	// ТОЧКА ВХОДА В КЛАСС
 	public static function Load(){
