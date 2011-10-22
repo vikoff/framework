@@ -35,6 +35,16 @@ return array(
 		)
 	),
 	
+	'testItem' => array(
+		'title' => 'Тестовые сущности',
+		'controller' => 'TestItem_Controller',
+		'adminController' => 'TestItem_AdminController',
+		'resources' => array(
+			'view' => 'Просмотр страниц',
+			'edit' => 'Редактирование страниц',
+		)
+	),
+	
 	'user' => array(
 		'title' => 'Пользователи',
 		'controller' => 'User_Controller',

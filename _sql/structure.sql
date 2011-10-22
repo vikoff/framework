@@ -121,3 +121,14 @@ CREATE TABLE `menu_items` (
   `index`			SMALLINT UNSIGNED,
   `request_active`	VARCHAR(255)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+/* ТЕСТОВЫЕ СУЩНОСТИ */
+DROP TABLE IF EXISTS `test_items`;
+CREATE TABLE `test_items` (
+  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `login`			VARCHAR(255),
+  `password`		VARCHAR(255),
+  `text`			TEXT,
+  `type`			SMALLINT UNSIGNED,
+  `is_active`		BOOLEAN
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

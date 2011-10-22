@@ -1,6 +1,6 @@
 <?php
 
-class GenericObject{
+class ActiveRecord {
 	
 	const INIT_NEW = 1;
 	const INIT_EXISTS = 2;
@@ -367,7 +367,7 @@ class GenericObject{
 }
 
 
-class GenericObjectCollection{
+class ARCollection{
 	
 	protected $_pagination = '';
 	protected $_linkTags = array();

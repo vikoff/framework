@@ -2,42 +2,12 @@
 
 class Tools {
 	
-	/* БЕЗОПАСНЫЕ ТЕКСТ */
-	
-	static function safeText($text, $len = 254)
-	{
-		if(get_magic_quotes_gpc() || get_magic_quotes_runtime()){$text = stripslashes($text);}
-		$len = intval($len);
-		$output = trim($text);
-		$output = htmlspecialchars($output, ENT_QUOTES);
-		$output = substr($output, 0, $len);
-		$output = addslashes($output);
-		return $output;
-	}
-	
-	static function strFixLen($str, $len, $fillChar = ' ', $fillAfter = FALSE){
-		$str = (string)$str;
-		$len = (int)$len;
-		$fillChar = (string)(strlen($fillChar) ? $fillChar : ' ');
-		$fillAfter = (bool)$fillAfter;
-		
-		if(strlen($str) > $len)
-			return substr($str, 0, $len);
-			
-		while(strlen($str) < $len){
-			$str = $fillAfter ? $str.$fillChar : $fillChar.$str;
-		}
-		return $str;
-	}
-	
 	/* ПОЛУЧИТЬ ЧИСЛО ИЗ ЛЮБОЙ СТРОКИ, ГДЕ ЕСТЬ ЦИФРЫ */
-	
 	static function getint($str){
 		return intval(preg_replace("/[^\d]/", "", $str));
 	}
 	
 	/* УНИФИЦИРОВАННЫЕ РЕГУЛЯРНЫЕ ВЫРАЖЕНИЯ */
-
 	static function getRegExp($param){
 		$rus = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя';
 		switch($param){
@@ -49,7 +19,6 @@ class Tools {
 	}
 	
 	/* ФУНКЦИЯ ОЧИСТКИ ДИРЕКТОРИИ ОТ ВСЕХ ФАЙЛОВ */
-	
 	static function clearDir($dirNam){
 		if(!is_dir($dirNam)){return false;}
 		chdir($dirNam);
@@ -98,57 +67,7 @@ class Tools {
 		}
 	}
 	
-	/* ПРЕОБРАЗОВАНИЕ ЗНАЧЕНИЙ */
-	
-	static function convert_item($input, $convert_rules)
-	{
-		/*
-		$input - одномерный ассоциативный массив входных данных;
-		$convert_rules - одномерный ассоциативный массив ключи которого - имена изменяемых полей, а значения - тип преобразования.
-		*/
-		if(is_array($input) && is_array($convert_rules)){
-			foreach($convert_rules as $field => $operation){
-				switch($operation){
-					case 'unserialize': 
-						$input[$field] = unserialize($input[$field]);
-						if(!is_array($input[$field])){$input[$field] = array();}
-						break;
-					case 'timestamp2date':
-						$input[$field] = YDate::timestamp2date($input[$field]);
-						break;
-				}
-			}
-		}
-		/* $input - строка; $convert_rules - строка: тип преобразования */
-		elseif(!is_array($input) && is_string($convert_rules)){
-			switch($convert_rules){
-				case 'unserialize': 
-					$input = unserialize($input);
-					if(!is_array($input)){$input = array();}
-					break;
-				case 'timestamp2date':
-					$input = YDate::timestamp2date($input);
-					break;
-			}
-		}else{die("Invalid parametr for function 'Tools::convert_item': ".gettype($input).", ".gettype($convert_rules));}
-		return $input;
-	}
-	
-	/**** ПРОВЕРИТЬ ФОРМАТ ПАРАМЕТРА ****/
-	
-	static function check_format($value, $format){
-		switch($format){
-			case 'num':		if(is_numeric($value)){return true;} break;
-			case 'num_n0':	if(is_numeric($value) && $value){return true;} break;
-			case 'str':		if(is_string($value)){return true;} break;
-			case 'str_n0':	if(is_string($value) && $value){return true;} break;
-			default: die("Invalid Format: ".$format." (function check_format)");
-		}
-		return false;
-	}
-	
 	/* ПОЛУЧИТЬ "ФАМИЛИЯ И.О." ИЗ "ФАМИЛИЯ ИМЯ ОТЧЕСТВО" */
-	
 	static function get_short_name($longname, $flags = '')
 	{
 		$output = '';
@@ -182,57 +101,6 @@ class Tools {
 	
 	static function get_ext($filename){
 		return strtolower(substr(strrchr($filename, '.'), 1));
-	}
-	
-	static public function cp1251_to_utf8($txt){
-	
-		$in_arr = array(
-			chr(208), chr(192), chr(193), chr(194),
-			chr(195), chr(196), chr(197), chr(168),
-			chr(198), chr(199), chr(200), chr(201),
-			chr(202), chr(203), chr(204), chr(205),
-			chr(206), chr(207), chr(209), chr(210),
-			chr(211), chr(212), chr(213), chr(214),
-			chr(215), chr(216), chr(217), chr(218),
-			chr(219), chr(220), chr(221), chr(222),
-			chr(223), chr(224), chr(225), chr(226),
-			chr(227), chr(228), chr(229), chr(184),
-			chr(230), chr(231), chr(232), chr(233),
-			chr(234), chr(235), chr(236), chr(237),
-			chr(238), chr(239), chr(240), chr(241),
-			chr(242), chr(243), chr(244), chr(245),
-			chr(246), chr(247), chr(248), chr(249),
-			chr(250), chr(251), chr(252), chr(253),
-			chr(254), chr(255)
-		);
-
-		$out_arr = array (
-			chr(208).chr(160), chr(208).chr(144), chr(208).chr(145),
-			chr(208).chr(146), chr(208).chr(147), chr(208).chr(148),
-			chr(208).chr(149), chr(208).chr(129), chr(208).chr(150),
-			chr(208).chr(151), chr(208).chr(152), chr(208).chr(153),
-			chr(208).chr(154), chr(208).chr(155), chr(208).chr(156),
-			chr(208).chr(157), chr(208).chr(158), chr(208).chr(159),
-			chr(208).chr(161), chr(208).chr(162), chr(208).chr(163),
-			chr(208).chr(164), chr(208).chr(165), chr(208).chr(166),
-			chr(208).chr(167), chr(208).chr(168), chr(208).chr(169),
-			chr(208).chr(170), chr(208).chr(171), chr(208).chr(172),
-			chr(208).chr(173), chr(208).chr(174), chr(208).chr(175),
-			chr(208).chr(176), chr(208).chr(177), chr(208).chr(178),
-			chr(208).chr(179), chr(208).chr(180), chr(208).chr(181),
-			chr(209).chr(145), chr(208).chr(182), chr(208).chr(183),
-			chr(208).chr(184), chr(208).chr(185), chr(208).chr(186),
-			chr(208).chr(187), chr(208).chr(188), chr(208).chr(189),
-			chr(208).chr(190), chr(208).chr(191), chr(209).chr(128),
-			chr(209).chr(129), chr(209).chr(130), chr(209).chr(131),
-			chr(209).chr(132), chr(209).chr(133), chr(209).chr(134),
-			chr(209).chr(135), chr(209).chr(136), chr(209).chr(137),
-			chr(209).chr(138), chr(209).chr(139), chr(209).chr(140),
-			chr(209).chr(141), chr(209).chr(142), chr(209).chr(143)
-		);   
-
-		$txt = str_replace($in_arr,$out_arr,$txt);
-		return $txt;
 	}
 	
 	static public function isWinServer(){
@@ -283,10 +151,18 @@ class Tools {
 	}
 
 	/** УБРАТЬ ЭКРАНИРУЮЩИЕ СЛЕШИ ЕСЛИ НАДО */
-	public static function unescape($string){
-		 return get_magic_quotes_gpc()
-			? stripslashes($string)
-			: $string;
+	public static function unescape($data){
+		
+		if (!get_magic_quotes_gpc())
+			return $data;
+		
+		if (is_array($data))
+			foreach($data as &$v)
+				$v = is_scalar($v) ? stripslashes($v) : self::unescape($v);
+		else
+			$data = stripslashes($data);
+		
+		return $data;
 	}
 
 }

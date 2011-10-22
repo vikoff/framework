@@ -15,6 +15,7 @@ class Page_Model extends ActiveRecord{
 	/** путь к страницам, сохраненным в файлах */
 	const FILE_PAGES_PATH = 'modules/Page/pages/';
 	
+	
 	/** ТОЧКА ВХОДА В КЛАСС (СОЗДАНИЕ НОВОГО ОБЪЕКТА) */
 	public static function create(){
 			
@@ -79,20 +80,20 @@ class Page_Model extends ActiveRecord{
 	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР ВАЛИДАТОРА */
 	public function getValidator(){
 		
-		$validator = new Validator();
-		$validator->rules(array(
-			'required' => array('type', 'title', 'format'),
+		$validator = new Validator(array(
+			'type'				=> array('settype' => 'int', 'in' => array(self::TYPE_FULL, self::TYPE_CHUNK)),
+			'title'				=> array('strip_tags' => TRUE, 'length' => array('max' => '65535')),
+			'alias'				=> array('trim' => TRUE, 'match' => '/^[\w\-]{0,255}$/'),
+			'body'				=> array('length' => array('max' => '65535')),
+			'stored_in_file'	=> array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
+			'published'			=> array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
+			'format'			=> array('in' => array('php', 'html')),
+			'meta_description'	=> array('strip_tags' => TRUE, 'length' => array('max' => '65535')),
+			'meta_keywords'		=> array('strip_tags' => TRUE, 'length' => array('max' => '65535')),
 		), array(
-			'type' => array('in' => array(self::TYPE_FULL, self::TYPE_CHUNK)),
-			'title' => array('strip' => TRUE, 'length' => array('max' => '65535')),
-			'alias' => array('trim' => TRUE, 'match' => '/^[\w\-]{0,255}$/'),
-			'body' => array('length' => array('max' => '65535')),
-			'stored_in_file' => array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
-			'published' => array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
-			'format' => array('in' => array('php', 'html')),
-			'meta_description' => array('strip' => TRUE, 'length' => array('max' => '65535')),
-			'meta_keywords' => array('strip' => TRUE, 'length' => array('max' => '65535')),
+			'required' => array('type', 'title', 'format'),
 		));
+		
 		$validator->setFieldTitles(array(
 			       'id' => 'id',
 			    'title' => 'Заголовок',
@@ -105,11 +106,7 @@ class Page_Model extends ActiveRecord{
 		return $validator;
 	}
 	
-	public function preValidation(&$data){
-		
-		// приведение строки "1" к числу 1 (иначе не проходит валидацию)
-		$data['type'] = getVar($data['type'], 0, 'int');
-	}
+	public function preValidation(&$data){}
 	
 	// ПОДГОТОВКА ДАННЫХ К СОХРАНЕНИЮ
 	public function postValidation(&$data){

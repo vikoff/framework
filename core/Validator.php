@@ -1,18 +1,15 @@
 <?
 
-class Validator{
+class Validator {
 	
 	// Разделитель валидационных сообщений об ошибках
 	const ERRORS_SEPARATOR = "<br />";
-	
-	// контейнер исходных данных
-	private $inputData = null;
 	
 	// контейнер преобразованных значений, прошедших валидацию
 	private $validData = array();
 	
 	// контейнер всех правил
-	private $allRules = array();
+	private $elmsRules = array();
 	
 	// отключенные правила
 	private $disabledRules = array();
@@ -20,46 +17,38 @@ class Validator{
 	// массив названий полей (для сообщений об ошибках)
 	private $_fieldTitles = array();
 	
-	// нужно ли вести лог
-	private $_logEnable = FALSE;
-	
-	// лог работы валидатора
-	private $_log = array();
-	
 	// массив ошибок валидации
 	private $validationErrors = array();
 	
 	// хранение сообщений об ошибках для кодов ошибок
 	static private $_errorMsgs = array(
+		'emptyDataSet'    => 'данные формы не были получены',
 		'invalidDataType' => 'поле {fieldname} имеет недопустимый формат',
-		'required'   => 'поле {fieldname} обязательно для заполнения',
-		'email'      => 'в поле {fieldname} введен некорректный email-адрес',
-		'match'      => 'поле {fieldname} содержит недопустимые символы или имеет недопустимый формат',
-		'in'         => 'поле {fieldname} может принимать только значения {validValues}',
-		'notIn'      => 'в поле {fieldname} введено недопустимое значение',
-		'equal'      => 'в поле {fieldname} введено недопустимое значение',
-		'notEqual'   => 'в поле {fieldname} введено недопустимое значение',
-		'captcha'    => 'антибот тест не пройден',
-		'compare'    => 'поля {fieldname} и {field2name} не совпадают',
-		'length'     => 'поле {fieldname} должно быть длиной {minlength} {maxlength} символов',
-		'dbDate'     => 'поле {fieldname} должно иметь формат ГГГГ-ММ-ДД',
-		'dbTime'     => 'поле {fieldname} должно иметь формат ЧЧ-ММ-СС',
-		'dbDateTime' => 'поле {fieldname} должно иметь формат ГГГГ-ММ-ДД ЧЧ-ММ-СС',
-		'int_type'   => 'поле {fieldname} должно содержать только цифры',
-		'float_type' => 'поле {fieldname} должно содержать число',
+		'required'        => 'поле {fieldname} обязательно для заполнения',
+		'email'           => 'в поле {fieldname} введен некорректный email-адрес',
+		'match'           => 'поле {fieldname} содержит недопустимые символы или имеет недопустимый формат',
+		'in'              => 'поле {fieldname} может принимать только значения {validValues}',
+		'notIn'           => 'в поле {fieldname} введено недопустимое значение',
+		'equal'           => 'в поле {fieldname} введено недопустимое значение',
+		'notEqual'        => 'в поле {fieldname} введено недопустимое значение',
+		'captcha'         => 'антибот тест не пройден',
+		'compare'         => 'поля {fieldname} и {field2name} не совпадают',
+		'length'          => 'поле {fieldname} должно быть длиной {minlength} {maxlength} символов',
+		'dbDate'          => 'поле {fieldname} должно иметь формат ГГГГ-ММ-ДД',
+		'dbTime'          => 'поле {fieldname} должно иметь формат ЧЧ-ММ-СС',
+		'dbDateTime'      => 'поле {fieldname} должно иметь формат ГГГГ-ММ-ДД ЧЧ-ММ-СС',
+		'int_type'        => 'поле {fieldname} должно содержать только цифры',
+		'float_type'      => 'поле {fieldname} должно содержать число',
 		'array'      => 'поле {fieldname} имеет неверный формат',
 	);
 	
-	// порядок вызова правил (заодно и полный их список)
+	/** порядок вызова правил (заодно и полный их список) */
 	static public $rulesOrder = array(
-		'allowed',
-		'array',
 		'trim',
 		'settype',
-		'strip',
-		'truncate',
+		'strip_tags',
 		'htmlspecialchars',
-		'safe',
+		'escape',
 		'required',
 		'email',
 		'match',
@@ -82,10 +71,10 @@ class Validator{
 	// ######### ЗАГРУЗКА ИСХОДНЫХ ДАННЫХ В КЛАСС ############# //
 
 	// КОНСТРУКТОР
-	public function __construct($commonRules = array(), $individualRules = array()){
+	public function __construct($individualRules = array(), $commonRules = array()){
 		
 		if(!empty($commonRules) || !empty($individualRules))
-			$this->rules($commonRules, $individualRules);
+			$this->rules($individualRules, $commonRules);
 	}
 	
 	// ЗАДАТЬ ЗАГОЛОВКИ ДЛЯ ПОЛЕЙ (ДЛЯ ОТОБРАЖЕНИЯ В СООБЩЕНИЯХ ОБ ОШИБКАХ)
@@ -96,119 +85,48 @@ class Validator{
 	}
 	
 	// ЗАДАНИЕ ПРАВИЛ ВАЛИДАЦИИ
-	public function rules($_commonRules, $_individualRules = array()){
+	public function rules($individualRules, $commonRules = array()){
 		
-		$commonRules = array();
-		$individualRules = array();
+		// допустимые индивидуальные правила
+		$allowedIndividualRules = array_flip(self::$rulesOrder);
 		
-		// набор общих правил валидации
-		$allowedCommonRules = array(
-			'allowed',
+		// допустимые общие правила
+		$allowedCommonRules = array_flip(array(
 			'trim',
-			'strip',
+			'strip_tags',
 			'htmlspecialchars',
-			'safe',
+			'escape',
 			'required',
 			'unsetAfter',
 			'email',
-		);
+		));
 		
-		foreach($_commonRules as $name => $elms)
-			if(in_array($name, $allowedCommonRules, TRUE))
-				$commonRules[$name] = $elms;
-			else
-				$this->fatalError('Правило "'.$name.'" не может быть задано в наборе общих правил');
-		
-		
-		// набор индивидуальных правил валидации
-		$allowedIndividualRules = array_unique(array_merge($allowedCommonRules, array(
-			'array',
-			'settype',
-			'truncate',
-			'match',
-			'in',
-			'notIn',
-			'equal',
-			'notEqual',
-			'compare',
-			'captcha',
-			'length',
-			'checkbox',
-			'dbDate',
-			'dbTime',
-			'dbDateTime',
-			'password',
-			'disableOtherRules',
-		)));
-		
-		foreach($_individualRules as $elm => $rules){
-			$individualRules[$elm] = array();
-			foreach($rules as $rule => $params)
-				if(in_array($rule, $allowedIndividualRules, TRUE))
-					$individualRules[$elm][$rule] = $params;
-				else
-					$this->fatalError('Правило "'.$rule.'" не может быть задано в наборе индивидуальных правил');
-		}
-		
-		// СОЕДИНЕНИЕ ВСЕХ ПРАВИЛ ВАЛИДАЦИИ
-		
-		// НАХОЖДЕНИЕ ВСЕХ ДОПУСТИМЫХ ПОЛЕЙ
-		
-		// нахождение допустимых элементов из общих правил - наименьший приоритет
-		if($this->_isRuleEnable($commonRules['allowed'])){
-			if($this->_isRuleApplyToAll($commonRules['allowed'])){
-				if(is_array($this->inputData))
-					foreach($this->inputData as $elm => $val)
-						$this->allRules[$elm] = array();
-			}else{
-				foreach($commonRules['allowed'] as $elm)
-					$this->allRules[$elm] = array();
-			}
-		}
-		unset($commonRules['allowed']);
-
-		// нахождение допустимых элементов из индивидуальных правил - наивысший авторитет
-		foreach($individualRules as $elm => $rule){
-			if(!isset($rule['allowed']) || $rule['allowed'] == TRUE)
-				$this->allRules[$elm] = array();
-			else
-				unset($this->allRules[$elm]);
-			unset($individualRules[$elm]['allowed']);
-		}
-		
-		// ПРИМЕНЕНИЕ ПРАВИЛ К ДОПУСТИМЫМ ПОЛЯМ
-		
-		// общие правила - наименьший приоритет
-		foreach($commonRules as $rule => $elms)
-			if($this -> _isRuleEnable($elms))
-				if($this -> _isRuleApplyToAll($elms))
-					foreach($this->allRules as $elm => $tmp)
-						$this->_addRule($elm, $rule, TRUE);
-				else
-					foreach($elms as $elm)
-						if(isset($this->allRules[$elm]))
-							$this->_addRule($elm, $rule, TRUE);
-		
-		// индивидуальные правила - наивысший авторитет
+		// применение индивидуальных правил
 		foreach($individualRules as $elm => $rules){
-			if(isset($this->allRules[$elm])){
-			
-				if($this->_isRuleEnable($rules['disableOtherRules']))
-					$this->allRules[$elm] = array();
-				unset($rules['disableOtherRules']);
-				
-				if(isset($rules['allowed']) && $rules['allowed'] == FALSE){
-					unset($this->allRules[$elm]);
-					continue;
-				}
-
-				foreach($rules as $rule => $params)
-					$this->_addRule($elm, $rule, $params);
+			$this->elmsRules[$elm] = array();
+			foreach($rules as $rule => $params){
+				if(isset($allowedIndividualRules[$rule]))
+					$this->elmsRules[$elm][$rule] = $params;
+				else
+					$this->fatalError('Правило "'.$rule.'" не существует.');
 			}
 		}
-	
+		
+		// применение общих правил
+		foreach($commonRules as $name => $elms){
+			
+			if (!isset($allowedCommonRules[$name]))
+				$this->fatalError('Правило "'.$name.'" не может быть задано в наборе общих правил');
+				
+			foreach( ($elms === '*' ? $this->elmsRules : $elms) as $elm){
+				if (!isset($this->elmsRules[$elm]))
+					$this->fatalError('Элемент "'.$elm.'", описанный в общих правилах валидации, отсутствует в наборе индивидуальных правил.');
+				if (!isset($this->elmsRules[$elm][$name]))
+					$this->elmsRules[$elm][$name] = TRUE;
+			}
+		}
+
 	}
-	
 	
 	
 	// ####################### ВАЛИДАЦИЯ ####################### //
@@ -222,34 +140,24 @@ class Validator{
 	 *        вида array('field' => array('rule1' => 'params', 'rule2' => 'params') )
 	 * @return array - валидные данные
 	 */
-	public function validate($inputData, $additValidationRules = null){
+	public function validate($inputData){
 		
 		// сброс состояния валидатора
 		$this->reset();
 		
-		// загрузка исходных данных
-		$this->inputData = (array)$inputData;
-		
-		$allRules = $this->allRules;
-		
-		// добавление дополнительных правил валидации
-		if(!empty($additValidationRules)){
-			foreach($additValidationRules as $field => $rules){
-				if(isset($rules['allowed']) && $rules['allowed'] == FALSE)
-					unset($allRules[$field]);
-				else
-					$allRules[$field] = $rules;
-			}
+		// проверка наличия исходных данных
+		if (!is_array($inputData)) {
+			$this->setError($this->getErrorText('', 'emptyDataSet'));
+			return;
 		}
 		
-		
 		// инициализация массива валидных данных (содержит разрешенные и назначенные поля)
-		foreach($allRules as $field => $rules)
-			if(isset($this->inputData[$field]))
-				$this->validData[$field] = $this->inputData[$field];
+		foreach($this->elmsRules as $field => $rules)
+			if(isset($inputData[$field]))
+				$this->validData[$field] = $inputData[$field];
 		
 		// применение правил валидации
-		foreach($allRules as $field => $definedRules){
+		foreach($this->elmsRules as $field => $definedRules){
 			
 			// проверка, имеет ли поле допустимый формат (скаляр)
 			if(isset($this->validData[$field]) && !is_scalar($this->validData[$field])){
@@ -259,9 +167,7 @@ class Validator{
 			
 			// вызов правил валидации
 			foreach(self::$rulesOrder as $regularRule){
-				if($regularRule == 'allowed')
-					continue;
-				if(isset($definedRules[$regularRule])){
+				if(isset($definedRules[$regularRule]) && empty($this->disabledRules[$regularRule])){
 					call_user_func(
 						array($this, 'rule_'.$regularRule), // имя метода			
 						$field,								// имя поля
@@ -277,104 +183,38 @@ class Validator{
 	
 	// ############ УПРАВЛЕНИЕ ПРАВИЛАМИ ВАЛИДАЦИИ ############# //
 	
-	// ПОЗДНЕЕ ИЗМЕНЕНИЕ ПРАВИЛ ВАЛИДАЦИИ
-	public function editRule($elm, $rule, $params){
+	/** ЗАДАТЬ ПРАВИЛО ВАЛИДАЦИИ ЭЛЕМЕНТА */
+	public function setRule($elm, $rule, $params){
 		
-		if(in_array($rule, self::$rulesOrder, TRUE)){
-			
-			if($rule == 'allowed' && $params == FALSE)
-				unset($this->allRules[$elm]);
-			else
-				$this->allRules[$elm][$rule] = $params;
-			
-		}else{
-			$this->fatalError('Правило "'.$rule.'" не найдено');
-		}
+		$this->elmsRules[$elm][$rule] = $params;
 	}
 	
-	// ПОЗДНЕЕ УДАЛЕНИЕ ПРАВИЛА
-	public function delRule($elm, $rule = NULL){
+	/** УДАЛИТЬ ПРАВИЛО ВАЛИДАЦИИ ЭЛЕМЕНТА */
+	public function removeRule($elm, $rule){
 		
-		// выходим если элемент не найден
-		if(!isset($this->allRules[$elm]))
-			return;
-			
-		// если правило не задано, удаляем все правила
-		if(is_null($rule)){
-			$this->allRules[$elm] = array();
-		}else{
-			if(in_array($rule, self::$rulesOrder, TRUE)){
-				unset($this->allRules[$elm][$rule]);
-			}else{
-				$this->fatalError('Правило "'.$rule.'" не найдено');
-			}
-		}
+		unset($this->elmsRules[$elm][$rule]);
 	}
 	
-	// ПОЗДНЕЕ УДАЛЕНИЕ ЭЛЕМЕНТА (ИЛИ НЕСКОЛЬКИХ)
-	public function delElement($elements){
+	/** ДОБАВИТЬ ЭЛЕМЕНТ */
+	public function addElement($elm, $rules){
 		
-		foreach((array)$elements as $elm){
-			unset($this->allRules[$elm]);
-		}
+		$this->elmsRules[$elm] = $rules;
 	}
 	
-	// ОТКЛЮЧИТЬ НЕКОТОРЫЕ ПРАВИЛА
-	public function disableRules(){ // список правил через запятую
+	/** УДАЛИТЬ ЭЛЕМЕНТ */
+	public function removeElement($elm){
 		
-		$rules = func_get_args();
+		unset($this->elmsRules[$elm]);
+	}
+	
+	/** ОТКЛЮЧИТЬ (не выполнять) НЕКОТОРЫЕ ПРАВИЛА */
+	public function disableRules($rules){
+		
 		foreach($rules as $rule)
 			if(in_array($rule, self::$rulesOrder))
 				$this->disabledRules[$rule] = TRUE;
 			else
-				$this->fatalError('Правило "'.$rule.'" не найдено, поэтому не может быть отключено');
-	}
-	
-	// ПОЛУЧИТЬ ВСЕ ОБЪЕДИНЕННЫЕ ПРАВИЛА ВАЛИДНЫМ PHP КОДОМ
-	public function getPhpCodeRules(){
-		
-		//return var_export($this->allRules, TRUE);
-		
-		$lf = "\r\n";
-		$t = "\t";
-		
-		$output = '$individualRules = array('.$lf;
-
-		foreach($this->allRules as $elm => $rules){
-		
-			$output .= $t."'".$elm."' => array(";
-			$rulesArr = array();
-			
-			foreach($rules as $rule => $params){
-
-				$ruleStr = "'".$rule."' => ";
-
-				if(is_array($params)){
-
-					$ruleParamsArr = array();
-					foreach($params as $k => $v)
-						$ruleParamsArr[] = "'".$k."' => '".$v."'";
-					$ruleStr .= "array(".implode(", ", $ruleParamsArr).")";
-				
-				}elseif(is_bool($params)){
-					
-					$ruleStr .= $params ? 'TRUE' : 'FALSE';
-				
-				}elseif(is_numeric($params)){
-					
-					$ruleStr .= $params;
-				
-				}else{
-					
-					$ruleStr .= "'".$params."'";
-				}
-				$rulesArr[] = $ruleStr;
-			}
-			$output .= implode(", ", $rulesArr)."),".$lf;
-		}
-		$output .= ');'.$lf;
-		
-		return $output;
+				$this->fatalError('Правило "'.$rule.'" не найдено');
 	}
 	
 	// ПОЛУЧИТЬ ВСЕ ОБЪЕДИНЕННЫЕ ПРАВИЛА ВАЛИДНЫМ JAVASCRIPT КОДОМ (ДЛЯ JQUERY ПЛАГИНА VALIDATE)
@@ -386,7 +226,7 @@ class Validator{
 		$allRulesArr = array();
 		$allMessagesArr = array();
 		
-		foreach($this->allRules as $field => $rules){
+		foreach($this->elmsRules as $field => $rules){
 		
 			$elmRulesArr = array();
 			$elmMessagesArr = array();
@@ -448,30 +288,6 @@ class Validator{
 		
 		return $output;
 	}
-	
-	// ДОБАВИТЬ ПРАВИЛО (СЛУЖЕБНАЯ)
-	private function _addRule($elm, $rule, $params){
-		
-		if(!isset($this->allRules[$elm]))
-			$this->fatalError('Элемент "'.$elm.'" не найден в массиве "allRules". Разработчик, проверь почему так.');
-		
-		if(!isset($this->disabledRules[$rule]))
-			$this->allRules[$elm][$rule] = $params;
-	}
-	
-	// ЗАДАНО ЛИ ПРАВИЛО ВАЛИДАЦИИ
-	private function _isRuleEnable(&$rule){
-	
-		return (isset($rule) && $rule !== FALSE);
-	}
-	
-	// ЗАДАНО ЛИ ПРАВИЛО ДЛЯ ВСЕХ ЭЛЕМЕНТОВ
-	private function _isRuleApplyToAll(&$rule){
-		
-		$this->_issetFatal($rule, 'Правило валидации не определено');
-		return (count($rule) === 1 && $rule[0] === '*') ? TRUE : FALSE;
-	}
-
 
 	
 	// ################## ПРАВИЛА ВАЛИДАЦИИ #################### //
@@ -479,76 +295,36 @@ class Validator{
 	// ПРАВИЛО TRIM
 	public function rule_trim($field, $execute){
 		
-		if(!isset($this->validData[$field]) || !$execute)
-			return;
-		$this->validData[$field] = trim($this->validData[$field]);
-		if($this -> _logEnable)
-			$this -> _log('Правило "trim" присвоило элементу "'.$field.'" значение "'.$this->validData[$field].'"');
-	}
-	
-	// ПРАВИЛО TRIM
-	public function rule_array($field, $execute){
-		
-		if(!$execute)
-			return;
-			
-		if(!isset($this->validData[$field])){
-			$this->validData[$field] = array();
-			return;
-		}
-		
-		if(!is_array($this->validData[$field]))
-			$this->setError($this->getErrorText($field, 'array'));
+		if(isset($this->validData[$field]) && $execute)
+			$this->validData[$field] = trim($this->validData[$field]);
 	}
 	
 	// ПРАВИЛО SETTYPE
 	public function rule_settype($field, $type){
 		
-		if(!isset($this->validData[$field]))
-			return;
-		settype($this->validData[$field], $type);
-		if($this -> _logEnable)
-			$this -> _log('Правило "settype" присвоило элементу "'.$field.'" значение "'.$this->validData[$field].'"');
+		if(isset($this->validData[$field]))
+			settype($this->validData[$field], $type);
 	}
 	
-	// ПРАВИЛО STRIP
-	public function rule_strip($field, $execute){
+	// ПРАВИЛО STRIP_TAGS
+	public function rule_strip_tags($field, $execute){
 	
-		if(!isset($this->validData[$field]) || !$execute)
-			return;
-		$this->validData[$field] = strip_tags($this->validData[$field]);
-		if($this -> _logEnable)
-			$this -> _log('Правило "strip" присвоило элементу "'.$field.'" значение "'.$this->validData[$field].'"');
-	}
-	
-	// ПРАВИЛО TRUNCATE
-	public function rule_truncate($field, $len){
-	
-		if(!isset($this->validData[$field]))
-			return;
-		$this->validData[$field] = substr($this->validData[$field], 0, $len);
-		if($this -> _logEnable)
-			$this -> _log('Правило "truncate" присвоило элементу "'.$field.'" значение "'.$this->validData[$field].'"');
+		if(isset($this->validData[$field]) && $execute)
+			$this->validData[$field] = strip_tags($this->validData[$field]);
 	}
 	
 	// ПРАВИЛО HTMLSPECIALCHARS
 	public function rule_htmlspecialchars($field, $execute){
 	
-		if(!isset($this->validData[$field]) || !$execute)
-			return;
-		$this->validData[$field] = htmlspecialchars($this->validData[$field], ENT_QUOTES);
-		if($this -> _logEnable)
-			$this -> _log('Правило "htmlspecialchars" присвоило элементу "'.$field.'" значение "'.$this->validData[$field].'"');
+		if(isset($this->validData[$field]) && $execute)
+			$this->validData[$field] = htmlspecialchars($this->validData[$field], ENT_QUOTES);
 	}
 	
-	// ПРАВИЛО SAFE
-	public function rule_safe($field, $execute){
+	// ПРАВИЛО ESCAPE
+	public function rule_escape($field, $execute){
 	
-		if(!isset($this->validData[$field]) || !$execute)
-			return;
-		$this->validData[$field] = db::get()->escape($this->validData[$field]);
-		if($this -> _logEnable)
-			$this -> _log('Правило "safe" присвоило элементу "'.$field.'" значение "'.$this->validData[$field].'"');
+		if(isset($this->validData[$field]) && $execute)
+			$this->validData[$field] = db::get()->escape($this->validData[$field]);
 	}
 	
 	// ПРАВИЛО CHECKBOX
@@ -561,20 +337,13 @@ class Validator{
 			$this->validData[$field] = isset($values['off']) ? $values['off'] : '';
 		else
 			$this->validData[$field] = isset($values['on']) ? $values['on'] : $this->validData[$field];
-		if($this -> _logEnable)
-			$this -> _log('Правило "checkbox" присвоило элементу "'.$field.'" значение "'.$this->validData[$field].'"');
 	}
 	
 	// ПРАВИЛО REQUIRE
 	public function rule_required($field, $execute){
 		
-		if(!$execute)
-			return;
-		$result = isset($this->validData[$field]) && strlen($this->validData[$field]) ? TRUE : FALSE;
-		if(!$result)
+		if(empty($this->validData[$field]) && $execute)
 			$this->setError($this->getErrorText($field, 'required'));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" ('.$this->validData[$field].') '.($result ? 'прошел' : 'не прошел').' проверку "require"');
 	}
 	
 	// ПРАВИЛО EMAIL
@@ -590,8 +359,6 @@ class Validator{
 		$result = preg_match('/^[\w._%+-]+@[\w.-]+\.\w{2,4}$/', $this->validData[$field]);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'email'));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "email"');
 	}
 	
 	// ПРАВИЛО MATCH
@@ -600,8 +367,6 @@ class Validator{
 		$result = isset($this->validData[$field]) ? preg_match($pattern, $this->validData[$field]) : FALSE;
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'match'));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "match"');
 	}
 	
 	/**
@@ -616,8 +381,6 @@ class Validator{
 		$result = (isset($this->validData[$field]) && in_array($this->validData[$field], $validValues, TRUE)) ? TRUE : FALSE;
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'in', $validValues));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "in"');
 	}
 	
 	// ПРАВИЛО NOT-IN
@@ -628,18 +391,14 @@ class Validator{
 		$result = (isset($this->validData[$field]) && !in_array($this->validData[$field], $validValues, TRUE)) ? TRUE : FALSE;
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'notIn', $validValues));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "notIn"');
 	}
 	
 	// ПРАВИЛО COMPARE
 	public function rule_compare($field, $field2){
 		
-		$result = isset($this->validData[$field]) && isset($this->inputData[$field2]) ? ($this->validData[$field] == $this->inputData[$field2] ? TRUE : FALSE) : FALSE;
+		$result = isset($this->validData[$field]) && isset($this->validData[$field2]) ? ($this->validData[$field] === $this->validData[$field2] ? TRUE : FALSE) : FALSE;
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'compare', $field2));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "compare"');
 	}
 	
 	// ПРАВИЛО EQUAL
@@ -648,8 +407,6 @@ class Validator{
 		$result = isset($this->validData[$field]) ? ($this->validData[$field] == $val ? TRUE : FALSE) : FALSE;
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'equal', $val));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "equal"');
 	}
  	
 	// ПРАВИЛО NOT-EQUAL
@@ -658,8 +415,6 @@ class Validator{
 		$result = isset($this->validData[$field]) ? ($this->validData[$field] != $val ? TRUE : FALSE) : FALSE;
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'notEqual', $val));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "notEqual"');
 	}
 
 	// ПРАВИЛО CAPCHA (удаляет поле после проверки)
@@ -669,8 +424,6 @@ class Validator{
 		unset($this->validData[$field]);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'captcha', $val));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "captcha"');
 	}
 	
 	// ПРАВИЛО LENGTH
@@ -685,7 +438,7 @@ class Validator{
 			return;
 		}
 
-		$actualLen = strlen($this->validData[$field]);
+		$actualLen = mb_strlen($this->validData[$field], 'UTF-8');
 		$result = TRUE;
 		if(isset($len['min']) && $actualLen < (int)$len['min'])
 			$result = FALSE;
@@ -693,8 +446,6 @@ class Validator{
 			$result = FALSE;
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'length', $len));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "length"');
 	}
 	
 	// ПРАВИЛО DB DATE
@@ -706,8 +457,6 @@ class Validator{
 		$result = preg_match('/^\d{4}\-\d{2}\-\d{2}$/', $this->validData[$field]);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'dbDate'));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" ['.$this->validData[$field].'] '.($result ? 'прошел' : 'не прошел').' проверку "DBDate"');
 	}
 	
 	// ПРАВИЛО DB TIME
@@ -718,8 +467,6 @@ class Validator{
 		$result = preg_match('/^\d{2}\-\d{2}\-\d{2}$/', $this->validData[$field]);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'dbTime'));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "DBTime"');
 	}
 	
 	// ПРАВИЛО DB DATETIME
@@ -730,8 +477,6 @@ class Validator{
 		$result = preg_match('/^\d{4}\-\d{2}\-\d{2} \d{2}\-\d{2}\-\d{2}$/', $this->validData[$field]);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'dbDateTime'));
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" '.($result ? 'прошел' : 'не прошел').' проверку "DBDateTime"');
 	}
 	
 	// ПРАВИЛО UNSET AFTER
@@ -740,8 +485,6 @@ class Validator{
 		if(!isset($this->validData[$field]) || !$execute)
 			return;
 		unset($this->validData[$field]);
-		if($this -> _logEnable)
-			$this -> _log('Элемент "'.$field.'" был удален правилом "unsetAfter"');
 	}
 	
 	public function rule_password($field, $params){
@@ -760,11 +503,7 @@ class Validator{
 		}else{
 			$this->fatalError('Параметр hash правила "password" может принимать значения: no, base64, md5, sha1, или быть не переданым совсем. Получено значение "'.$hash.'"');
 		}
-		
-		if($this -> _logEnable)
-			$this -> _log('Правило "htmlspecialchars" присвоило элементу "'.$field.'" значение "'.$this->validData[$field].'"');
 	}
-	
 	
 	
 	// ####################### ОБРАБОТКА ОШИБОК ####################### //
@@ -852,34 +591,12 @@ class Validator{
 	}
 	
 	
-	
-	// ####################### ВЕДЕНИЕ ЛОГОВ ####################### //
-	
-	// ВКЛЮЧИТЬ / ВЫКЛЮЧИТЬ ВЕДЕНИЕ ЛОГА
-	public function logEnable($enable = TRUE){
-		$this -> _logEnable = (bool)$enable;
-	}
-	
-	// ДОБАВИТЬ ЛОГ
-	private function _log($msg){
-	
-		$this->_log[] = $msg;
-	}
-	
-	// ПОЛУЧИТЬ ЛОГ
-	public function showLog(){
-	
-		return implode("\n", $this->_log);
-	}
-	
-	
-	
 	// ####################### СЛУЖЕБНЫЕ ####################### //
 	
 	// СБРОС СОСТОЯНИЯ ВАЛИДАТОРА
 	public function reset(){
 		
-		$this->inputData = $this->validData = $this->validationErrors = array();
+		$this->validData = $this->validationErrors = array();
 	}
 	
 	// ПОЛУЧИТЬ ЗАГОЛОВОК ПОЛЯ

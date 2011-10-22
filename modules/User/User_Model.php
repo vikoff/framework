@@ -37,49 +37,44 @@ class User_Model extends ActiveRecord{
 	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР ВАЛИДАТОРА */
 	public function getValidator(){
 		
-		// инициализация экземпляра валидатора
-		if(is_null($this->validator)){
+		$validator = new Validator(array(
+			'login' 			=> array('length' => array('max' => '255')),
+			'email' 			=> array('length' => array('max' => '100'), 'email' => true),
+			'password' 			=> array('length' => array('min' => '5', 'max' => '100'), 'password' => array('hash' => 'sha1')),
+			'password_confirm'	=> array('compare' => 'password', 'unsetAfter' => TRUE),
+			'surname' 			=> array('length' => array('max' => '255')),
+			'name' 				=> array('length' => array('max' => '255')),
+			'patronymic' 		=> array('length' => array('max' => '255')),
+			'sex' 				=> array('length' => array('max' => '10')),
+			'birthdate' 		=> array('dbDate' => TRUE),
+			'country' 			=> array('length' => array('max' => '255')),
+			'city' 				=> array('length' => array('max' => '255')),
+			'captcha' 			=> array('captcha' => isset($_SESSION['captcha']) ? $_SESSION['captcha'] : ''),
+		), array(
+			'required' => array('login', 'email', 'password', 'password_confirm', 'surname', 'name', 'patronymic', 'sex', 'birthdate', 'country', 'region', 'city'),
+			'strip' => '*',
+		));
 		
-			$this->validator = new Validator();
-			$this->validator->rules(array(
-				'required' => array('login', 'email', 'password', 'password_confirm', 'surname', 'name', 'patronymic', 'sex', 'birthdate', 'country', 'region', 'city'),
-				'strip' => '*',
-			),
-			array(
-				'login' 			=> array('length' => array('max' => '255')),
-				'email' 			=> array('length' => array('max' => '100'), 'email' => true),
-				'password' 			=> array('length' => array('min' => '5', 'max' => '100'), 'password' => array('hash' => 'sha1')),
-				'password_confirm'	=> array('compare' => 'password', 'unsetAfter' => TRUE),
-				'surname' 			=> array('length' => array('max' => '255')),
-				'name' 				=> array('length' => array('max' => '255')),
-				'patronymic' 		=> array('length' => array('max' => '255')),
-				'sex' 				=> array('length' => array('max' => '10')),
-				'birthdate' 		=> array('dbDate' => TRUE),
-				'country' 			=> array('length' => array('max' => '255')),
-				'city' 				=> array('length' => array('max' => '255')),
-				'captcha' 			=> array('captcha' => isset($_SESSION['captcha']) ? $_SESSION['captcha'] : ''),
-			));
-			$this->validator->setFieldTitles(array(
-				'login' 			=> 'Логин',
-				'email' 			=> 'email-адрес',
-				'password' 			=> 'пароль',
-				'password_confirm' 	=> 'подтверждение пароля',
-				'surname' 			=> 'фамилия',
-				'name' 				=> 'имя',
-				'patronymic' 		=> 'отчество',
-				'sex' 				=> 'пол',
-				'birthdate' 		=> 'дата рождения',
-				'country' 			=> 'страна',
-				'city' 				=> 'город',
-			));
-		}
+		$validator->setFieldTitles(array(
+			'login' 			=> 'Логин',
+			'email' 			=> 'email-адрес',
+			'password' 			=> 'пароль',
+			'password_confirm' 	=> 'подтверждение пароля',
+			'surname' 			=> 'фамилия',
+			'name' 				=> 'имя',
+			'patronymic' 		=> 'отчество',
+			'sex' 				=> 'пол',
+			'birthdate' 		=> 'дата рождения',
+			'country' 			=> 'страна',
+			'city' 				=> 'город',
+		));
 		
 		// применение специальных правил для редактирования или добавления объекта
 		if($this->isExistsObj){
-			$this->validator->delElement(array('login', 'password', 'password_confirm', 'captcha'));
+			$validator->delElement(array('login', 'password', 'password_confirm', 'captcha'));
 		}
 		
-		return $this->validator;
+		return $validator;
 	}
 	
 	/** ПОДГОТОВКА ДАННЫХ К ОТОБРАЖЕНИЮ */

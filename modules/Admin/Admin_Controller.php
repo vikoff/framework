@@ -57,8 +57,9 @@ class Admin_Controller extends Controller{
 			return parent::action($params, $redirectUrl);
 		
 		// запросы на бэкенд-контроллеры других модулей
-		$module = array_shift($params);
-		return App::get()->getModule($module, TRUE)->action($params, $redirectUrl);
+		$app = App::get();
+		$module = $app->prepareModuleName(array_shift($params));
+		return $app->getModule($module, TRUE)->action($params, $redirectUrl);
 	}
 	
 	/** ПОЛУЧИТЬ ЭКЗЕМЛЯР КОНТРОЛЛЕРА ДЛЯ ПРОКСИРОВАНИЯ */
@@ -90,16 +91,17 @@ class Admin_Controller extends Controller{
 			exit();
 		}
 		
-		$module = array_shift($params);
+		$app = App::get();
+		$module = $app->prepareModuleName(array_shift($params));
 		
-		if(!App::get()->isModule($module, TRUE)){
+		if(!$app->isModule($module, TRUE)){
 			$this->error404handler('модуль <b>'.$module.'</b> не найден');
 			exit();
 		}
 		
 		$viewer->setLeftMenuActiveItem($module);
 		
-		if(!App::get()->getModule($module, TRUE)->display($params))
+		if(!$app->getModule($module, TRUE)->display($params))
 			$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
 	}
 
@@ -191,22 +193,6 @@ class Admin_Controller extends Controller{
 	////////////////////
 	////// ACTION //////
 	////////////////////
-	
-	public function action_smarty_clear_compiled_tpl($params = array()){
-	
-		$instanceId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-		$instance = new RootController($instanceId);
-		
-		if($instance->Save($_POST)){
-			App::addSuccessMessage('Запись сохранена');
-			App::forceDisplay();
-			return TRUE;
-		}else{
-			App::addErrorMessage('Не удалось сохранить запись:<div style="margin-left: 10px; font-size: 13px;">'.$instance->getError().'</div>');
-			self::displayEdit($params);
-			return FALSE;
-		}
-	}
 	
 	// DELETE OLD ERRORS
 	public function action_delete_old_errors($params = array()){

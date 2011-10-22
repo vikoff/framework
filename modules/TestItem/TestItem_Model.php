@@ -1,12 +1,12 @@
 <?php
 
-class Menu_Model extends ActiveRecord {
+class TestItem_Model extends ActiveRecord {
 	
 	/** имя модуля */
-	const MODULE = 'menu';
+	const MODULE = 'testItem';
 	
 	/** таблица БД */
-	const TABLE = 'menus';
+	const TABLE = 'test_items';
 	
 	const NOT_FOUND_MESSAGE = 'Страница не найдена';
 
@@ -14,19 +14,19 @@ class Menu_Model extends ActiveRecord {
 	/** ТОЧКА ВХОДА В КЛАСС (СОЗДАНИЕ НОВОГО ОБЪЕКТА) */
 	public static function create(){
 			
-		return new Menu_Model(0, self::INIT_NEW);
+		return new TestItem_Model(0, self::INIT_NEW);
 	}
 	
 	/** ТОЧКА ВХОДА В КЛАСС (ЗАГРУЗКА СУЩЕСТВУЮЩЕГО ОБЪЕКТА) */
 	public static function load($id){
 		
-		return new Menu_Model($id, self::INIT_EXISTS);
+		return new TestItem_Model($id, self::INIT_EXISTS);
 	}
 	
 	/** ТОЧКА ВХОДА В КЛАСС (ЗАГРУЗКА СУЩЕСТВУЮЩЕГО ОБЪЕКТА) */
 	public static function forceLoad($id, $fieldvalues){
 		
-		return new Menu_Model($id, self::INIT_EXISTS_FORCE, $fieldvalues);
+		return new TestItem_Model($id, self::INIT_EXISTS_FORCE, $fieldvalues);
 	}
 	
 	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
@@ -63,13 +63,21 @@ class Menu_Model extends ActiveRecord {
 		
 		// инициализация экземпляра валидатора
 		$validator = new Validator(array(
-			'name' => array('required' => true, 'length' => array('max' => '255'))
-		));
+                'login' => array('strip_tags' => TRUE, 'length' => array('max' => '255')),
+                'password' => array('strip_tags' => TRUE, 'length' => array('max' => '255')),
+                'text' => array('strip_tags' => TRUE, 'length' => array('max' => '65535')),
+                'type' => array('settype' => 'int'),
+            ),
+			array('required' => array('type'))
+		);
 		
 		$validator->setFieldTitles(array(
 			'id' => 'id',
-			'name' => 'Название',
-			'create_date' => 'Дата создания',
+			'login' => 'login',
+			'password' => 'password',
+			'text' => 'text',
+			'type' => 'type',
+			'is_active' => 'is_active',
 		));
 		
 		return $validator;
@@ -99,7 +107,7 @@ class Menu_Model extends ActiveRecord {
 	
 }
 
-class Menu_Collection extends ARCollection{
+class TestItem_Collection extends ARCollection{
 	
 	/**
 	 * поля, по которым возможна сортировка коллекции
@@ -108,28 +116,30 @@ class Menu_Collection extends ARCollection{
 	 */
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',
-		'name' => 'Название',
-		'create_date' => 'Дата создания',
+		'login' => 'login',
+		'password' => 'password',
+		'text' => 'text',
+		'type' => 'type',
+		'is_active' => 'is_active',
 	);
 	
 	
 	/** ТОЧКА ВХОДА В КЛАСС */
 	public static function load(){
 			
-		$instance = new Menu_Collection();
-		return $instance;
+		return new TestItem_Collection();
 	}
 
 	/** ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ */
 	public function getPaginated(){
 		
 		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
-		$paginator = new Paginator('sql', array('*', 'FROM '.Menu_Model::TABLE.' ORDER BY '.$sorter->getOrderBy()), 50);
+		$paginator = new Paginator('sql', array('*', 'FROM '.TestItem_Model::TABLE.' ORDER BY '.$sorter->getOrderBy()), 50);
 		
 		$data = db::get()->getAll($paginator->getSql(), array());
 		
 		foreach($data as &$row)
-			$row = Menu_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
+			$row = TestItem_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
 		
 		$this->_sortableLinks = $sorter->getSortableLinks();
 		$this->_pagination = $paginator->getButtons();
@@ -141,10 +151,10 @@ class Menu_Collection extends ARCollection{
 	/** ПОЛУЧИТЬ СПИСОК ВСЕХ ЭЛЕМЕНТОВ */
 	public function getAll(){
 		
-		$data = db::get()->getAllIndexed('SELECT * FROM '.Menu_Model::TABLE, 'id', array());
+		$data = db::get()->getAllIndexed('SELECT * FROM '.TestItem_Model::TABLE, 'id', array());
 		
 		foreach($data as &$row)
-			$row = Menu_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
+			$row = TestItem_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
 		
 		return $data;
 	}

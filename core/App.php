@@ -26,13 +26,6 @@ class App{
 	private $_requestModuleName = null;
 	private $_requestModuleParams = array();
 	
-	/** массив данных о конечном вызванном методе отображения */
-	private $_performedDisplay = array(
-		'module' => null,
-		'method' => null,
-		'params' => array()
-	);
-	
 	/** флаг, включен ли режим администратора */
 	private $_adminMode = FALSE;
 	
@@ -54,6 +47,7 @@ class App{
 		
 		// извлечение параметров запроса
 		list($this->_requestModuleName, $this->_requestModuleParams) = Request::get()->getArray();
+		$this->_requestModuleName = $this->prepareModuleName($this->_requestModuleName);
 		
 		// получение конфигурации модулей
 		$this->_modulesConfig = Config::get()->getModulesConfig();
@@ -94,6 +88,12 @@ class App{
 		$this->error404();
 	}
 	
+	public function prepareModuleName($module){
+		
+		$module = str_replace(' ', '', ucwords(str_replace('-', ' ', strtolower($module))));
+		return strtolower(substr($module, 0, 1)).substr($module, 1);
+	}
+	
 	public function isModule($module, $adminMode = FALSE){
 		
 		return isset($this->_modulesConfig[$module][$adminMode ? 'adminController' : 'controller']);
@@ -129,16 +129,7 @@ class App{
 		}
 		
 		$module = array_shift($params);
-		
-		// admin-режим
-		// if($module == 'admin' && count($params) > 1){
-			// $module = array_shift($params);
-			// $this->getModule($module, TRUE)->action($params, $redirect);
-		// }
-		// обычный режим
-		// else{
-			$this->getModule($module)->action($params, $redirect);
-		// }
+		$this->getModule($module)->action($params, $redirect);
 		return TRUE;
 	}
 	
@@ -340,55 +331,5 @@ class App{
 		exit();
 	}
 	
-	// ПОЛУЧИТЬ ЭКЗЕМПЛЯР SMARTY
-	public static function smarty(){
-	
-		if(is_null(self::$_smartyInstance)){
-		
-			require_once(FS_ROOT.'libs/smarty/libs/Smarty.class.php');
-			require_once(FS_ROOT.'libs/smarty/VIKOFF_SmartyPlugins.php');
-			
-			self::$_smartyInstance = new Smarty();
-			
-			$path = FS_ROOT.'libs/smarty/';
-			
-			self::$_smartyInstance->template_dir = FS_ROOT.'templates/';
-			self::$_smartyInstance->compile_dir = $path.'templates_c/';
-			self::$_smartyInstance->config_dir = $path.'configs/';
-			self::$_smartyInstance->cache_dir = $path.'cache/';
-			
-			self::$_smartyInstance->caching = (bool)CFG_USE_SMARTY_CACHING;
-			
-			// использование подстановщиков в JS
-			self::$_smartyInstance->register_prefilter(array('SmartyPlugins', 'escape_script'));
-			
-			// использование тега <a href=""></a> в шаблонах
-			self::$_smartyInstance->register_function('a', array('SmartyPlugins', 'function_a'));
-			
-			// удаление всех лишних пробельных символов
-			if(CFG_SMARTY_TRIMWHITESPACES)
-				self::$_smartyInstance->register_prefilter(array('SmartyPlugins', 'trimwhitespace'));
-			
-			// назначение псевдоконстант
-			self::$_smartyInstance->assign(array(
-				'CFG_SITE_NAME'		=> CFG_SITE_NAME,	
-				'WWW_ROOT' 			=> WWW_ROOT,
-				'WWW_URI' 			=> WWW_URI,
-			));
-			
-			// назначение других переменных
-			self::$_smartyInstance->assign(array(
-				'formcode' => self::getFormCodeInput(),
-				'hasPermModerator' => (USER_AUTH_PERMS >= PERMS_MODERATOR),
-				'hasPermAdmin' => (USER_AUTH_PERMS >= PERMS_ADMIN),
-				'hasPermSuperadmin' => (USER_AUTH_PERMS >= PERMS_SUPERADMIN),
-				'hasPermRoot' => (USER_AUTH_PERMS >= PERMS_ROOT),
-			));
-			
-		}
-		
-		return self::$_smartyInstance;
-	}
-
 }
 ?>
