@@ -184,7 +184,7 @@ input.error{
 	font-size: 12px;
 	color: red;
 }
-form#edit-form .title{
+form#edit-form label.title{
 	display: block;
 	font-weight: bold;
 	margin: 5px 0 0px;
@@ -226,10 +226,10 @@ input.button, button.button, a.button{
 	padding: 2px 8px;
 	border: outset 1px #999;
 	background-color: #E5E5E5;
-	-moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;
+	-moz-border-radius: 8px; -webkit-border-radius: 8px; border-radius: 8px;
 	font-size: 12px;
 	text-decoration: none;
-	color: #000;
+	color: #000 !important;
 }
 input.button:hover, button.button:hover, a.button:hover{
 	background-color: #DDD;

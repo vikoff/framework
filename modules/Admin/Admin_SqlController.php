@@ -35,9 +35,6 @@ class Admin_SqlController extends Controller {
 	public function display_index($params = array()){
 		
 		BackendLayout::get()
-			->setTopMenuActiveItem('sql')
-			->setLeftMenuType('sql')
-			->setBreadcrumbs('auto')
 			->setContentPhpFile(self::TPL_PATH.'index.php')
 			->render();
 	}
@@ -56,10 +53,6 @@ class Admin_SqlController extends Controller {
 		}
 		
 		BackendLayout::get()
-			->setTopMenuActiveItem('sql')
-			->setLeftMenuType('sql')
-			->setLeftMenuActiveItem('console')
-			->setBreadcrumbs('auto')
 			->setContentPhpFile(self::TPL_PATH.'console.php', $variables)
 			->render();
 	}
@@ -75,10 +68,6 @@ class Admin_SqlController extends Controller {
 		);
 		
 		BackendLayout::get()
-			->setTopMenuActiveItem('sql')
-			->setLeftMenuType('sql')
-			->setLeftMenuActiveItem('make-dump')
-			->setBreadcrumbs('auto')
 			->setContentPhpFile(self::TPL_PATH.'make_dump.php', $variables)
 			->render();
 	}
@@ -86,10 +75,6 @@ class Admin_SqlController extends Controller {
 	public function display_load_dump($params = array()){
 		
 		BackendLayout::get()
-			->setTopMenuActiveItem('sql')
-			->setLeftMenuType('sql')
-			->setLeftMenuActiveItem('load-dump')
-			->setBreadcrumbs('auto')
 			->setContentPhpFile(self::TPL_PATH.'load_dump.php')
 			->render();
 	}

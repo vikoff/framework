@@ -48,17 +48,10 @@ class Page_Controller extends Controller{
 	public function display_view($params = array()){
 		
 		$pageAlias = getVar($params[0], self::DEFAULT_VIEW);
-		$topMenuActiveItem = '';
-		
-		switch($pageAlias){
-			case 'main': $topMenuActiveItem = 'main'; break;
-			case 'contacts': $topMenuActiveItem = 'contacts'; break;
-		}
 		
 		$variables = Page_Model::LoadByAlias($pageAlias)->GetAllFieldsPrepared();
 		FrontendLayout::get()
 			->setTitle($variables['title'])
-			->setTopMenuActiveItem($topMenuActiveItem)
 			->setContentPhpFile(self::TPL_PATH.'view.php', $variables)
 			->render();
 	}

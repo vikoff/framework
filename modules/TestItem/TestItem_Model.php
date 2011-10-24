@@ -63,10 +63,11 @@ class TestItem_Model extends ActiveRecord {
 		
 		// инициализация экземпляра валидатора
 		$validator = new Validator(array(
-                'login' => array('strip_tags' => TRUE, 'length' => array('max' => '255')),
-                'password' => array('strip_tags' => TRUE, 'length' => array('max' => '255')),
-                'text' => array('strip_tags' => TRUE, 'length' => array('max' => '65535')),
-                'type' => array('settype' => 'int'),
+				'login' => array('strip_tags' => TRUE, 'length' => array('max' => 255)),
+				'password' => array('strip_tags' => TRUE, 'length' => array('max' => 255)),
+				'text' => array('strip_tags' => TRUE, 'length' => array('max' => 65535)),
+				'type' => array('settype' => 'int'),
+				'is_active' => array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
             ),
 			array('required' => array('type'))
 		);
@@ -84,7 +85,9 @@ class TestItem_Model extends ActiveRecord {
 	}
 		
 	/** ПРЕ-ВАЛИДАЦИЯ ДАННЫХ */
-	public function preValidation(&$data){}
+	public function preValidation(&$data){
+		
+	}
 	
 	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function postValidation(&$data){

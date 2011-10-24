@@ -59,7 +59,7 @@ class Page_AdminController extends Controller{
 		
 		$pageTitle = 'Создание новой страницы';
 		
-		$variables = array_merge($_POST, array(
+		$variables = array_merge(Tools::unescape($_POST), array(
 			'instanceId' => 0,
 			'pageTitle'  => $pageTitle,
 			'validation' => Page_Model::Create()->getValidator()->getJsRules(),
@@ -67,7 +67,7 @@ class Page_AdminController extends Controller{
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->setBreadcrumbs('add', array(null, $pageTitle))
+			->addBreadcrumb(array(null, $pageTitle))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -93,7 +93,7 @@ class Page_AdminController extends Controller{
 		
 		BackendLayout::get()
 			->prependTitle('Редактирование страницы')
-			->setBreadcrumbs('add', array(null, 'Редактирование страницы'))
+			->addBreadcrumb(array(null, 'Редактирование страницы'))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 		
@@ -115,7 +115,7 @@ class Page_AdminController extends Controller{
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->setBreadcrumbs('add', array(null, $pageTitle))
+			->addBreadcrumb(array(null, $pageTitle))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -130,7 +130,7 @@ class Page_AdminController extends Controller{
 		
 		BackendLayout::get()
 			->prependTitle('Удаление записи')
-			->setBreadcrumbs('add', array(null, 'Удаление страницы'))
+			->addBreadcrumb(array(null, 'Удаление страницы'))
 			->setContentPhpFile(self::TPL_PATH.'delete.php', $variables)
 			->render();
 		
@@ -147,7 +147,7 @@ class Page_AdminController extends Controller{
 		
 		$instance = Page_Model::create();
 		
-		if($instance->save($_POST)){
+		if($instance->save(Tools::unescape($_POST))){
 			Messenger::get()->addSuccess('Запись сохранена');
 			return TRUE;
 		}else{
@@ -163,7 +163,7 @@ class Page_AdminController extends Controller{
 		$instanceId = getVar($_POST['id'], 0, 'int');
 		$instance = Page_Model::load($instanceId);
 		
-		if($instance->save($_POST)){
+		if($instance->save(Tools::unescape($_POST))){
 			Messenger::get()->addSuccess('Запись сохранена');
 			return TRUE;
 		}else{

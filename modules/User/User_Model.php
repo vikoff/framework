@@ -51,8 +51,8 @@ class User_Model extends ActiveRecord{
 			'city' 				=> array('length' => array('max' => '255')),
 			'captcha' 			=> array('captcha' => isset($_SESSION['captcha']) ? $_SESSION['captcha'] : ''),
 		), array(
-			'required' => array('login', 'email', 'password', 'password_confirm', 'surname', 'name', 'patronymic', 'sex', 'birthdate', 'country', 'region', 'city'),
-			'strip' => '*',
+			'required' => array('login', 'email', 'password', 'password_confirm', 'surname', 'name', 'patronymic', 'sex', 'birthdate', 'country', 'city'),
+			'strip_tags' => '*',
 		));
 		
 		$validator->setFieldTitles(array(
@@ -237,7 +237,7 @@ class User_Model extends ActiveRecord{
 }
 
 
-class UserCollection extends ARCollection{
+class User_Collection extends ARCollection{
 
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',

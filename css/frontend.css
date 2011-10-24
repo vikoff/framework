@@ -1,84 +1,9 @@
 
 /* ФРЕЙМ */
 
-body{}
-* html #site-container {
-	height: 100%;
-}
-#site-container {
-	position: relative;
-	width: 1000px;
-	margin: 0px auto;
-	min-height: 100%;
-	border-left: solid 1px #E8E8E8;
-	border-right: solid 1px #E8E8E8;
-	background-color: #FFF;
-}
-#top{
-	padding: 5px 5px 0px;
+#top-menu{
 	border-bottom: solid 1px #E8E8E8;
-	margin-bottom: 2px;
-	overflow: hidden;
-}
-#top-logo{
-	float: left;
-	display: block;
-	width: 458px;
-	height: 162px;
-	background: url('images/logo.png') center center no-repeat;
-	margin: 15px 10px 15px;
-}
-#top-right{
-	float: right;
-	margin: 20px 0px 15px;
-	border: solid 1px #E8E8E8;
-}
-#login-block{
-	padding: 0px 10px;
-}
-#login-block h3{
 	text-align: center;
-}
-#login-block td{
-	padding: 1px 4px;
-}
-#login-block input.text{
-	width: 150px;
-	font-size: 12px;
-	border: solid 1px #E8E8E8;
-}
-#login-block input.submit{
-	display: inline-block;
-	margin-top: 8px;
-}
-#login-block .bottom-text{
-	margin: 10px 0px 10px;
-	padding: 0px 10px;
-}
-#login-block .left-text{
-	float: left;
-}
-#login-block .right-text{
-	float: right;
-}
-#logged-block{
-	margin: 10px;
-}
-#top-menu{
-
-}
-#body-left{
-	float: left;
-	width: 220px;
-}
-#body-center{
-	margin-left: 220px;
-	margin-bottom: 5px;
-	border: solid 1px #E8E8E8;
-	border-right-style: none;
-}
-#top-menu{
-	border-bottom: solid 1px #E8E8E8;
 }
 #top-menu a{
 	display: inline-block;
@@ -95,20 +20,6 @@ body{}
 #top-menu a.active{
 	border-bottom: solid 3px #3763fb;
 }
-
-#footer-container {
-	height: 90px;
-}
-#footer {
-	margin: -90px auto 0;
-	position: relative;
-	width: 1000px;
-	height: 90px;
-	text-align: center;
-	font-size: 12px;
-	border-top: solid 1px #E8E8E8;
-}
-
 
 /* ССЫЛКИ НОМЕРОВ СТРАНИЦ */
 

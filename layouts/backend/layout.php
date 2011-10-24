@@ -4,8 +4,8 @@
 <head>
 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title><?=$this->_getHtmlTitle();?></title>
-	<base href="<?=$this->_getHtmlBaseHref();?>" />
+	<title><?=$this->_getTitleHTML();?></title>
+	<base href="<?=$this->_getBaseHrefHTML();?>" />
 	
 	<meta name="robots" content="index, follow" />
 	<meta name="keywords" content="" />
@@ -13,12 +13,15 @@
 	<meta name="description" content="description words" />
 	<meta name="generator" content="vik-off-CMF" />
 
-<?=$this->_getHtmlLinkTags();?>
+<?=$this->_getLinkTagsHTML();?>
 
 	<link rel="stylesheet" href="css/common.css" type="text/css" />
 	<link rel="stylesheet" href="css/backend.css" type="text/css" />
 	<!-- <link rel="icon" type="image/png" href="favicon.ico" /> -->
 	
+	<script type="text/javascript">
+		var WWW_ROOT = '<?= WWW_ROOT; ?>';
+	</script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://scripts.vik-off.net/debug.js"></script>
 	
@@ -27,18 +30,17 @@
 	<script type="text/javascript" src="js/jquery.floatblock.js"></script>
 	<script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
-	<script type="text/javascript">
-		var WWW_ROOT = '<?= WWW_ROOT; ?>';
-	</script>
 </head>
 <body>
 
 <div id="site-container">
 
 	<div id="top">
+	
 		<a href="<?=href('admin');?>" style="display: block; color: black; text-decoration: none; float: left; padding: 10px; background-color: #FFD46D;"><strong><?=CFG_SITE_NAME;?></strong></a>
+		
 		<div style="text-align: right;">
-			<a href="<?App::href('');?>">На сайт</a>
+			<a href="<?= href(''); ?>">На сайт</a>
 			<form action="" method="post" class="inline" onsubmit="return confirm('Уверены?');">
 				<?= FORMCODE; ?>
 				<input type="submit" class="button" name="action[user/profile/logout]" value="Выход" />
@@ -46,7 +48,7 @@
 		</div>
 		
 		<div id="top-menu-list">
-			<?=$this->_getTopMenu();?>
+			<?= $this->_getTopMenuHTML(); ?>
 		</div>
 		
 		<div class="clear"></div>
@@ -59,18 +61,18 @@
 		
 			<div id="left-menu-container">
 				<div id="left-menu-list">
-					<?=$this->_getLeftMenu();?>
+					<?= $this->_getLeftMenuHTML(); ?>
 				</div>
 			</div>
 			
 		</td>
 		<td id="body-right">
 			
-			<?=$this->_getBreadcrumbs(); ?>
+			<?=$this->_getBreadcrumbsHTML(); ?>
 			
-			<?=$this->_getUserMessages();?>
+			<?=$this->_getUserMessagesHTML();?>
 			
-			<?=$this->_getHtmlContent();?>
+			<?=$this->_getContentHTML();?>
 	
 		</td>
 	</tr>

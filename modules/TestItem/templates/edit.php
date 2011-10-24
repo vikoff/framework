@@ -24,8 +24,7 @@
 		<?= Html_Form::select(array('name' => 'type'), array('' => 'Выберите...', '1' => 'первый'), $this->type); ?>
 	</div>
 	<div class="paragraph">
-		<label class="title">is_active</label>
-		<label><?= Html_Form::checkbox(array('name' => 'is_active', 'value' => '1', 'checked' => $this->is_active)); ?></label>
+		<label class="title"><?= Html_Form::checkbox(array('name' => 'is_active', 'value' => '1', 'checked' => $this->is_active)); ?> is_active</label>
 	</div>
 
 	<div class="paragraph" id="submit-box">

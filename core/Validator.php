@@ -118,7 +118,7 @@ class Validator {
 			if (!isset($allowedCommonRules[$name]))
 				$this->fatalError('Правило "'.$name.'" не может быть задано в наборе общих правил');
 				
-			foreach( ($elms === '*' ? $this->elmsRules : $elms) as $elm){
+			foreach( ($elms === '*' ? array_keys($this->elmsRules) : $elms) as $elm){
 				if (!isset($this->elmsRules[$elm]))
 					$this->fatalError('Элемент "'.$elm.'", описанный в общих правилах валидации, отсутствует в наборе индивидуальных правил.');
 				if (!isset($this->elmsRules[$elm][$name]))

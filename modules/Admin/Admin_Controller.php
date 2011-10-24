@@ -26,7 +26,7 @@ class Admin_Controller extends Controller{
 	 */
 	public $_proxy = array(
 		'sql' => 'Admin_SqlController',
-		'menu' => 'menu',
+		'users' => 'user',
 		'modules' => 'Admin_ModulesController',
 	);
 	
@@ -78,10 +78,6 @@ class Admin_Controller extends Controller{
 	public function display_content($params = array()){
 		
 		$viewer = BackendLayout::get();
-		$viewer
-			->setTopMenuActiveItem('content')
-			->setLeftMenuType('content')
-			->setBreadcrumbs('auto');
 		
 		// display index
 		if(empty($params[0])){
@@ -99,8 +95,6 @@ class Admin_Controller extends Controller{
 			exit();
 		}
 		
-		$viewer->setLeftMenuActiveItem($module);
-		
 		if(!$app->getModule($module, TRUE)->display($params))
 			$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
 	}
@@ -109,15 +103,10 @@ class Admin_Controller extends Controller{
 	public function display_users($params = array()){
 			
 		$viewer = BackendLayout::get();
-		$viewer
-			->setTopMenuActiveItem('users')
-			->setLeftMenuType('users');
-			
 		
 		if(empty($params[0])){
 			$viewer
 				->setContentHtmlFile(self::TPL_PATH.'users_index.tpl')
-				->setBreadcrumbs('auto')
 				->render();
 			exit();
 		}
@@ -127,10 +116,7 @@ class Admin_Controller extends Controller{
 		
 		$controllerInstance->performDisplay($displayMethodIdentifier, $params);
 		
-		$viewer
-			->setLeftMenuActiveItem($displayMethodIdentifier)
-			->setBreadcrumbs('auto')
-			->render();
+		$viewer->render();
 	}
 	
 	/** DISPLAY ROOT */
@@ -139,11 +125,6 @@ class Admin_Controller extends Controller{
 		$section = getVar($params[0]);
 		
 		$viewer = BackendLayout::get();
-		$viewer
-			->setTopMenuActiveItem('root')
-			->setLeftMenuType('root')
-			->setLeftMenuActiveItem($section)
-			->setBreadcrumbs('auto');
 
 		if(!$section){
 			$viewer

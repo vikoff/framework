@@ -1,22 +1,17 @@
 <?
 
-class FrontendLayout extends Layout{
+class FrontendLayout extends Layout {
 	
 	protected $_layoutName = 'frontend';
-		
-	private $_topMenuItems = array(
-		'main' => array('href' => '', 'title' => 'Главная'),
-		'contacts' => array('href' => 'page/contacts', 'title' => 'Контакты'),
-		'admin' => array('href' => 'admin', 'title' => 'Админ-панель'),
-	);
-
-	// активный пункт главного меню
-	private $_topMenuActiveItem = null;
+	
+	protected $_useAutoBreadcrumbs = FALSE;
+	
+	protected $_topMenu = null;
 	
 	private static $_instance = null;
 	
 	
-	// ТОЧКА ВХОДА В КЛАСС (ПОЛУЧИТЬ ЭКЗЕМПЛЯР FrontendLayout)
+	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР КЛАССА */
 	public static function get(){
 		
 		if(is_null(self::$_instance))
@@ -25,7 +20,13 @@ class FrontendLayout extends Layout{
 		return self::$_instance;
 	}
 	
-	public function getLoginBlock(){
+	/** ИНИЦИАЛИЗАЦИЯ */
+	protected function init(){
+		
+		$this->_topMenu = new Menu_Model('frontend-top');
+	}
+	
+	public function _getLoginBlockHTML(){
 		
 		if(CurUser::get()->isLogged()){
 			
@@ -39,15 +40,33 @@ class FrontendLayout extends Layout{
 		}
 	}
 	
-	public function setTopMenuActiveItem($active){
+	
+	protected function _getTopMenuHTML(){
 		
-		$this->_topMenuActiveItem = $active;
-		return $this;
+		$html = '';
+		foreach($this->_topMenu->getItems() as $item)
+			$html .= '<a href="'.$item['href'].'" '.(!empty($item['attrs']) ? $item['attrs'] : '').' '.($item['active'] ? 'class="active"' : '').'>'.$item['title'].'</a>';
+		
+		return $html;
 	}
 	
-	public function getTopMenu(){
+	/**
+	 * ВЫВЕСТИ/ВЕРНУТЬ ЭЛЕМЕНТЫ СТРАНИЦЫ В ФОРМАТЕ JSON
+	 * @access protected
+	 * @param bool $boolReturn - флаг, возвращать контент, или выводить
+	 * @param void|string контент в формате json
+	 */
+	protected function _renderJSON($boolReturn){
 		
-		include($this->_tplPath.'top_menu.php');
+		$json = json_encode(array(
+			'content' => $this->_getContentHTML(),
+			'topMenuActiveIndex' => $this->_topMenu->activeIndex,
+		));
+		
+		if($boolReturn)
+			return $json;
+		else
+			echo $json;
 	}
 
 }

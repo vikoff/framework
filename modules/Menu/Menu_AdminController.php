@@ -73,7 +73,7 @@ class Menu_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->setBreadcrumbs('add', array(null, $pageTitle))
+			->addBreadcrumb(array(null, $pageTitle))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -94,7 +94,7 @@ class Menu_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle('Редактирование записи')
-			->setBreadcrumbs('add', array(null, 'Редактирование записи'))
+			->addBreadcrumb(array(null, 'Редактирование записи'))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -115,7 +115,7 @@ class Menu_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->setBreadcrumbs('add', array(null, $pageTitle))
+			->addBreadcrumb(array(null, $pageTitle))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -132,7 +132,7 @@ class Menu_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle('Удаление записи')
-			->setBreadcrumbs('add', array(null, 'Удаление записи'))
+			->addBreadcrumb(array(null, 'Удаление записи'))
 			->setContentPhpFile(self::TPL_PATH.'delete.php', $variables)
 			->render();
 	}

@@ -72,7 +72,7 @@ class TestItem_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->setBreadcrumbs('add', array(null, $pageTitle))
+			->addBreadcrumb(array(null, $pageTitle))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -92,7 +92,7 @@ class TestItem_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle('Редактирование записи')
-			->setBreadcrumbs('add', array(null, 'Редактирование записи'))
+			->addBreadcrumb(array(null, 'Редактирование записи'))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -112,7 +112,7 @@ class TestItem_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->setBreadcrumbs('add', array(null, $pageTitle))
+			->addBreadcrumb(array(null, $pageTitle))
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -129,7 +129,7 @@ class TestItem_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle('Удаление записи')
-			->setBreadcrumbs('add', array(null, 'Удаление записи'))
+			->addBreadcrumb(array(null, 'Удаление записи'))
 			->setContentPhpFile(self::TPL_PATH.'delete.php', $variables)
 			->render();
 	}
@@ -164,7 +164,7 @@ class TestItem_AdminController extends Controller {
 		$instance = TestItem_Model::load($instanceId);
 		
 		// установить редирект на admin-list
-		$this->setRedirectUrl('admin//testItem/list');
+		$this->setRedirectUrl('admin/content/test-item/list');
 	
 		if ($instance->destroy()) {
 			Messenger::get()->addSuccess('Запись удалена');

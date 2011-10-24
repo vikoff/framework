@@ -1,6 +1,6 @@
 <?php
 
-class User_Controller extends Controller{
+class User_AdminController extends Controller{
 	
 	/** имя модуля */
 	const MODULE = 'user';
@@ -8,28 +8,24 @@ class User_Controller extends Controller{
 	const DEFAULT_VIEW = 1;
 	
 	/** путь к шаблонам (относительно FS_ROOT) */
-	const TPL_PATH = 'User/';
+	const TPL_PATH = 'modules/User/templates/';
 	
 	// методы, отображаемые по умолчанию
-	protected $_displayIndex = FALSE;
-	
-	protected $_proxy = array(
-		'profile' => 'User_ProfileController',
-	);
+	protected $_displayIndex = 'list';
 	
 	// права на выполнение методов контроллера
 	public $methodResources = array(
 		
-		'admin_display_list'	=> 'edit',
-		'admin_display_view'	=> 'edit',
-		'admin_display_create'	=> 'edit',
-		'admin_display_edit'	=> 'edit',
-		'admin_display_delete'	=> 'edit',
+		'display_list'		=> 'edit',
+		'display_view'		=> 'edit',
+		'display_create'	=> 'edit',
+		'display_edit'		=> 'edit',
+		'display_delete'	=> 'edit',
 
-		'action_save_perms' 	=> 'edit',
-		'action_delete' 		=> 'edit',
-		'action_admin_create' 	=> 'edit',
-		'action_admin_edit' 	=> 'edit',
+		'action_save_perms' => 'edit',
+		'action_delete' 	=> 'edit',
+		'action_create' 	=> 'edit',
+		'action_edit' 		=> 'edit',
 		
 		'ajax_generate_password' => 'public',
 		'ajax_check_login_unique' => 'public',
@@ -47,28 +43,29 @@ class User_Controller extends Controller{
 	}
 	
 	
-	///////////////////////////
-	////// DISPLAY ADMIN //////
-	///////////////////////////
+	/////////////////////
+	////// DISPLAY //////
+	/////////////////////
 	
-	// DISPLAY LIST (ADMIN)
-	public function admin_display_list($params = array()){
+	// DISPLAY LIST
+	public function display_list($params = array()){
 		
-		$collection = new UserCollection();
+		$collection = new User_Collection();
 		$variables = array(
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
 			'sorters' => $collection->getSortableLinks(),
 		);
 		
-		BackendViewer::get()
+		BackendLayout::get()
 			->prependTitle('Список пользователей')
 			->setLinkTags($collection->getLinkTags())
-			->setContentSmarty(self::TPL_PATH.'admin_list.tpl', $variables);
+			->setContentPhpFile(self::TPL_PATH.'admin_list.php', $variables)
+			->render();
 	}
 	
-	// DISPLAY VIEW (ADMIN)
-	public function admin_display_view($params = array()){
+	// DISPLAY VIEW
+	public function display_view($params = array()){
 		
 		try{
 			$instanceId = getVar($params[0], 0 ,'int');
@@ -87,39 +84,34 @@ class User_Controller extends Controller{
 				'perms' => $perms,
 			));
 			
-			BackendViewer::get()
+			BackendLayout::get()
 				->prependTitle('Данные пользователя')
 				->setContentSmarty(self::TPL_PATH.'view.tpl', $variables);
 		}
 		catch(Exception $e){
-			BackendViewer::get()->error404($e->getMessage());
+			BackendLayout::get()->error404($e->getMessage());
 		}
 		
 	}
 	
-	// DISPLAY CREATE (ADMIN)
-	public function admin_display_create($params = array()){
+	// DISPLAY CREATE
+	public function display_create($params = array()){
 			
-		$user = User::create();
-		
-		$levels = array();
-		foreach(User::getPermsList() as $g)
-			if($g > 0 && $g <= USER_AUTH_PERMS)
-				$levels[$g] = User::getPermName($g);
+		$user = User_Model::create();
 			
 		$variables = array_merge(Tools::unescape($_POST), array(
 			'action' => 'registration',
 			'jsRules' => $user->getValidator()->getJsRules(),
-			'levels' => $levels,
 		));
 		
-		BackendViewer::get()
+		BackendLayout::get()
 			->setTitle('Создание нового пользователя')
-			->setContentSmarty(self::TPL_PATH.'admin_edit.tpl', $variables);
+			->setContentPhpFile(self::TPL_PATH.'admin_create.php', $variables)
+			->render();
 	}
 	
-	// DISPLAY EDIT (ADMIN)
-	public function admin_display_edit($params = array()){
+	// DISPLAY EDIT
+	public function display_edit($params = array()){
 			
 		$instanceId = getVar($params[0], 0 ,'int');
 		$user = User::Load($instanceId);
@@ -138,13 +130,13 @@ class User_Controller extends Controller{
 			'levels' => $levels,
 		));
 		
-		BackendViewer::get()
+		BackendLayout::get()
 			->setTitle('Редактирование данных пользователя')
-			->setContentSmarty(self::TPL_PATH.'admin_edit.tpl', $variables);
+			->setContentSmarty(self::TPL_PATH.'edit.tpl', $variables);
 	}
 	
-	// DISPLAY DELETE (ADMIN)
-	public function admin_display_delete($params = array()){
+	// DISPLAY DELETE
+	public function display_delete($params = array()){
 		
 		try{
 			$instanceId = getVar($params[0], 0 ,'int');
@@ -154,12 +146,12 @@ class User_Controller extends Controller{
 				'instanceId' => $instanceId,
 			));
 			
-			BackendViewer::get()
+			BackendLayout::get()
 				->prependTitle('Удаление пользователя #'.$instanceId)
 				->setContentSmarty(self::TPL_PATH.'delete.tpl', $variables);
 		}
 		catch(Exception $e){
-			BackendViewer::get()->error404($e->getMessage());
+			BackendLayout::get()->error404($e->getMessage());
 		}
 		
 	}
@@ -186,12 +178,12 @@ class User_Controller extends Controller{
 			}
 		}
 		catch(Exception $e){
-			BackendViewer::get()->error404();
+			BackendLayout::get()->error404();
 		}
 
 	}
 	
-	// ACTION DELETE (ADMIN)
+	// ACTION DELETE
 	public function action_delete($params = array()){
 		
 		$instanceId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
@@ -211,17 +203,17 @@ class User_Controller extends Controller{
 			}
 		}
 		catch(Exception $e){
-			BackendViewer::get()->error404();
+			BackendLayout::get()->error404();
 		}
 
 	}
 	
 	// ACTION ADMIN CREATE
-	public function action_admin_create($params = array()){
+	public function action_create($params = array()){
 		
 		$user = new User(0, TRUE);
 		
-		if($user->save(Tools::unescape($_POST))){
+		if($user->Save($_POST)){
 			Messenger::get()->addSuccess('Новый пользователь успешно создан');
 			return TRUE;
 		}else{
@@ -231,7 +223,7 @@ class User_Controller extends Controller{
 	}
 	
 	// ACTION ADMIN SAVE
-	public function action_admin_edit($params = array()){
+	public function action_edit($params = array()){
 		
 		// echo '<pre>'; print_r($_POST); die;
 		try{
@@ -245,7 +237,7 @@ class User_Controller extends Controller{
 				return FALSE;
 			}
 		}
-		catch(Exception $e){BackendViewer::get()->error404($e->getMessage());}
+		catch(Exception $e){BackendLayout::get()->error404($e->getMessage());}
 	}
 	
 	//////////////////

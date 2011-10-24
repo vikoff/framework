@@ -227,19 +227,20 @@ class ActiveRecord {
 	}
 	
 	/** ПОДГОТОВКА ДАННЫХ К СОХРАНЕНИЮ */
-	public function save($data){
+	public function save($data, Validator $customValidator = null){
 		
 		if($this->preValidation($data) === FALSE)
 			return FALSE;
 		
-		$this->validation($data);
-		if($this->hasError())
+		$validator = $customValidator ? $customValidator : $this->getValidator();
+		$data = $validator->validate($data);
+		
+		if($validator->hasError()){
+			$this->setError($validator->getError());
 			return FALSE;
+		}
 		
 		if($this->postValidation($data) === FALSE)
-			return FALSE;
-			
-		if($this->hasError())
 			return FALSE;
 				
 		$this->setFields($data);

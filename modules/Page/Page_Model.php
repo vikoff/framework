@@ -13,7 +13,7 @@ class Page_Model extends ActiveRecord{
 	const TYPE_CHUNK = 2;
 	
 	/** путь к страницам, сохраненным в файлах */
-	const FILE_PAGES_PATH = 'modules/Page/pages/';
+	const FILE_PAGES_PATH = 'elements/pages/';
 	
 	
 	/** ТОЧКА ВХОДА В КЛАСС (СОЗДАНИЕ НОВОГО ОБЪЕКТА) */

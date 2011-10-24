@@ -30,9 +30,6 @@ class Admin_ModulesController extends Controller {
 	public function display_index($params = array()){
 		
 		BackendLayout::get()
-			->setTopMenuActiveItem('modules')
-			->setLeftMenuType('modules')
-			->setBreadcrumbs('auto')
 			->setContentPhpFile(self::TPL_PATH.'index.php')
 			->render();
 	}
@@ -40,10 +37,6 @@ class Admin_ModulesController extends Controller {
 	public function display_read_config($params = array()){
 		
 		BackendLayout::get()
-			->setTopMenuActiveItem('modules')
-			->setLeftMenuType('modules')
-			->setLeftMenuActiveItem('read-config')
-			->setBreadcrumbs('auto')
 			->setContentPhpFile(self::TPL_PATH.'read_config.php')
 			->render();
 	}

@@ -14,8 +14,10 @@ class Layout{
 	
 	protected $_htmlTitle = '';
 	protected $_htmlLinkTags = array();
-	protected $_breadcrumbs = array();
-	protected $_isAutoBreadcrumbsAdded = FALSE;
+	
+	protected $_useAutoBreadcrumbs = FALSE;
+	protected $_manualBreadcrumbs = array();
+	
 	protected $_htmlContent = '';
 	
 	protected $_layoutRender = 'auto';
@@ -36,17 +38,20 @@ class Layout{
 	protected function __construct(){
 		
 		$this->_layoutDir = 'layouts/'.$this->_layoutName.'/';
+		$this->init();
+	}
+	
+	protected function init(){}
+	
+	/** ПОЛУЧИТЬ ДИРЕКТОРИЮ ФАЙЛОВ МАКЕТА */
+	public function getLayoutDir(){
+		return $this->_layoutDir;
 	}
 	
 	public function setTitle($title){
 		
 		$this->_htmlTitle = $title;
 		return $this;
-	}
-	
-	/** ПОЛУЧИТЬ ДИРЕКТОРИЮ ФАЙЛОВ МАКЕТА */
-	public function getLayoutDir(){
-		return $this->_layoutDir;
 	}
 	
 	public function prependTitle($title, $separator = ' » '){
@@ -74,47 +79,16 @@ class Layout{
 		return $this;
 	}
 	
-	public function setBreadcrumbs($mode, $data = array()){
+	public function autoBreadcrumbs($enable = TRUE){
 		
-		$appendData = FALSE;
-		
-		switch($mode){
-			case 'auto':
-				$this->setBreadcrumbsAuto();
-				break;
-			case 'auto-with':
-				$this->setBreadcrumbsAuto();
-				$appendData = TRUE;
-				break;
-			case 'set':
-				$this->setBreadcrumbsAuto();
-				$this->_breadcrumbs = array();
-				$appendData = TRUE;
-				break;
-			case 'add':
-				$appendData = TRUE;
-				break;
-			default: trigger_error('Неверный режим установки breadcrumbs. Допустимые значения: "set", "add", "auto", "auto-with"', E_USER_ERROR);
-		}
-		
-		if($appendData){
-			if(count($data) && !is_array($data[0])){
-				$this->_breadcrumbs[] = $data;
-			}else{
-				foreach($data as $k => $v)
-					$this->_breadcrumbs[] = $v;
-			}
-		}
+		$this->_useAutoBreadcrumbs = (bool)$enable;
 		return $this;
 	}
 	
-	public function setBreadcrumbsAuto(){
+	public function addBreadcrumb($breadcrumb){
 		
-		if($this->_isAutoBreadcrumbsAdded)
-			return;
-			
-		$this->_isAutoBreadcrumbsAdded = TRUE;
-		$this->_breadcrumbs = array();
+		$this->_manualBreadcrumbs[] = $breadcrumb;
+		return $this;
 	}
 	
 	/** ОЧИСТИТЬ КОНТЕНТ */
@@ -145,48 +119,14 @@ class Layout{
 		return $this;
 	}
 	
-	public function setContentSmarty($template, $variables){
-		
-		$smarty = App::smarty();
-		$smarty->assign($variables);
-		$this->_htmlContent = $smarty->fetch($template);
-		$smarty->clear_all_assign();
-		return $this;
-	}
-	
-	/** 
-	 * ТИП ОТОБРАЖЕНИЯ КОНТЕНТА ВЫБИРАЕТСЯ АВТОМАТИЧЕСКИ
-	 * внутри макета для обычных запросов;
-	 * без макета для AJAX-запросов.
-	 */
-	public function autoLayout(){
-		
-		$this->_layoutRender = 'auto';
-		return $this;
-	}
-	
-	/** ВСЕГДА ОТОБРАЖАТЬ КОНТЕНТ ВНУТРИ МАКЕТА */
-	public function enableLayout(){
-		
-		$this->_layoutRender = 'on';
-		return $this;
-	}
-	
-	/** ВСЕГДА ОТОБРАЖАТЬ КОНТЕНТ БЕЗ МАКЕТА */
-	public function disableLayout(){
-		
-		$this->_layoutRender = 'off';
-		return $this;
-	}
-	
-	protected function _getHtmlTitle(){
+	protected function _getTitleHTML(){
 		
 		return !empty($this->_htmlTitle)
 			? $this->_htmlTitle.' - '.CFG_SITE_NAME
 			: CFG_SITE_NAME;
 	}
 	
-	protected function _getHtmlLinkTags(){
+	protected function _getLinkTagsHTML(){
 		
 		$output = '';
 		foreach($this->_htmlLinkTags as $rel => $href)
@@ -196,32 +136,42 @@ class Layout{
 	}
 	
 	/** GET BASE HREF URL */
-	protected function _getHtmlBaseHref(){
+	protected function _getBaseHrefHTML(){
 		
 		return WWW_ROOT;
 	}
 	
-	/** GET BREADCRUMBS HTML */
-	protected function _getBreadcrumbs(){
+	protected function _constructAutoBreadcrumbs(){
 		
+		return array();
+	}
+	
+	/** GET BREADCRUMBS HTML */
+	protected function _getBreadcrumbsHTML(){
+		
+		$all = $this->_useAutoBreadcrumbs
+			? array_merge($this->_constructAutoBreadcrumbs(), $this->_manualBreadcrumbs)
+			: $this->_manualBreadcrumbs;
+			
 		$breadcrumbs = array();
-		$num = count($this->_breadcrumbs);
-		foreach($this->_breadcrumbs as $index => $v)
+		$num = count($all);
+		
+		foreach($all as $index => $v)
 			$breadcrumbs[] = is_null($v[0]) || ($index + 1) == $num
 				? '<span class="item">'.$v[1].'</span>'
-				: '<a class="item" href="'.App::href($v[0]).'">'.$v[1].'</a>';
+				: '<a class="item" href="'.href($v[0]).'">'.$v[1].'</a>';
 		
 		return $num ? '<div class="breadcrumbs">'.implode('<span class="mediator"> » </span>', $breadcrumbs).'</div>' : '';
 	}
 	
 	/** GET USER MESSAGE HTML */
-	protected function _getUserMessages(){
+	protected function _getUserMessagesHTML(){
 	
 		return Messenger::get()->getAll();
 	}
 	
 	/** GET HTML CONTENT */
-	protected function _getHtmlContent(){
+	protected function _getContentHTML(){
 		
 		return $this->_htmlContent;
 	}
@@ -291,16 +241,42 @@ class Layout{
 		exit();
 	}
 	
-	/** RENDER ALL */
-	public function render($boolReturn = FALSE){
+	/**
+	 * RENDER ALL
+	 * @param string $type [auto|all|content|json]
+	 */
+	public function render($type = 'auto', $boolReturn = FALSE){
 		
-		// вывод без макета
-		if($this->_layoutRender == 'off' || ($this->_layoutRender == 'auto' && AJAX_MODE))
-			return $this->_renderNoLayout($boolReturn);
+		// вывод json
+		if ($type === 'json' || (AJAX_MODE && $type === 'auto'))
+			return $this->_renderJSON($boolReturn);
 		
-		// вывод с макетом
+		// вывод html без макета
+		elseif ($type === 'content')
+			return $this->_renderContent($boolReturn);
+			
+		// вывод html с макетом
 		else
-			return $this->_renderWithLayout($boolReturn);
+			return $this->_renderAll($boolReturn);
+	}
+	
+	/**
+	 * ВЫВЕСТИ/ВЕРНУТЬ ЭЛЕМЕНТЫ СТРАНИЦЫ В ФОРМАТЕ JSON
+	 * @access protected
+	 * @param bool $boolReturn - флаг, возвращать контент, или выводить
+	 * @param void|string контент в формате json
+	 */
+	protected function _renderJSON($boolReturn){
+		
+		$data = array();
+		$data['content'] = $this->_getContentHTML();
+		
+		$json = json_encode($data);
+		
+		if($boolReturn)
+			return $json;
+		else
+			echo $json;
 	}
 	
 	/**
@@ -309,12 +285,12 @@ class Layout{
 	 * @param bool $boolReturn - флаг, возвращать контент, или выводить
 	 * @param void|string контент
 	 */
-	protected function _renderNoLayout($boolReturn){
+	protected function _renderContent($boolReturn){
 		
 		if($boolReturn)
-			return $this->_getHtmlContent();
+			return $this->_getContentHTML();
 		else
-			echo $this->_getHtmlContent();
+			echo $this->_getContentHTML();
 	}
 	
 	/**
@@ -323,7 +299,9 @@ class Layout{
 	 * @param bool $boolReturn - флаг, возвращать контент, или выводить
 	 * @param void|string контент
 	 */
-	protected function _renderWithLayout($boolReturn){
+	protected function _renderAll($boolReturn){
+		
+		// $this->beforeRenderWithLayout();
 		
 		if($boolReturn)
 			ob_start();

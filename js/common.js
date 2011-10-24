@@ -1,11 +1,17 @@
 function captcha_reload(){$("#captcha").attr("src",'libs/captcha/captcha.php?rnd='+Math.round(Math.random(0)*1000));}
+		
+function href(href){
+	return WWW_ROOT + 'index.php' + (href ? '?r=' + href.replace('?', '&') : '');
+}
 
 // набор стандартных опций для tinymce
 function getDefaultTinyMceSettings(){
 	
 	return {
 	
-		script_url : WWW_ROOT + 'libs/tiny_mce/tiny_mce.js',
+		document_base_url: WWW_ROOT,
+		script_url: WWW_ROOT + 'libs/tiny_mce/tiny_mce.js',
+		popup_css: WWW_ROOT + 'libs/tiny_mce/themes/advanced/skins/default/dialog.css',
 		
 		language : 'ru',
 		
