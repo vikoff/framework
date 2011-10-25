@@ -28,34 +28,7 @@
 	<script type="text/javascript" src="js/frontend.js"></script>
 	<script type="text/javascript">
 		
-		// инициализация хеша
-		/*
-		if (!location.hash)
-			location.hash = '/' + location.href.replace($('base').attr('href'), '').split('#')[0];
-		*/
-	
-		$(function(){
-			
-			/*
-			$('a').click(function(){
-				var t = $(this);
-				if (t.hasClass('external-link') || t.hasClass('jlink'))
-					return true;
-				var uri = t.attr('href') || '';
-				location.hash = '/' + uri;
-				return false;
-			});
-			
-			$.address.change(function(addr){
-				var uri = addr.value.substr(1);
-				// alert(uri + '|' + location.hash.substr(2));
-				// if (uri != location.hash.substr(2)){
-					// alert('send');
-					$.get(href(uri), function(response){ Layout.fill(response); }, 'json');
-				// }
-			});
-			*/
-		});
+		Layout.asyncEnable();
 	</script>
 </head>
 <body>
