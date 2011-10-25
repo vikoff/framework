@@ -56,6 +56,17 @@ return array(
 		)
 	),
 
+	
+	'alias' => array(
+		'title' => 'Псевдонимы',
+		'adminController' => 'Alias_AdminController',
+		'resources' => array(
+			'public' => 'Общедоступные действия',
+			'view' => 'Просмотр данных пользователя',
+			'edit' => 'Редактирование данных',
+		)
+	),
+
 
 );
 

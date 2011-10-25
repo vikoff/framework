@@ -11,7 +11,7 @@
  *		CFG_SITE_NAME,
  *		WWW_URI,
  */
-class App{
+class App {
 	
 	const ERROR_403 = 403;
 	const ERROR_404 = 404;

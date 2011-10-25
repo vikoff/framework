@@ -132,3 +132,11 @@ CREATE TABLE `test_items` (
   `type`			SMALLINT UNSIGNED,
   `is_active`		BOOLEAN
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+/* ТЕСТОВЫЕ СУЩНОСТИ */
+DROP TABLE IF EXISTS `aliases`;
+CREATE TABLE `aliases` (
+  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `alias`			VARCHAR(255),
+  `path`			VARCHAR(255)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

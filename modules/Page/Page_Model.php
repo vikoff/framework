@@ -157,6 +157,7 @@ class Page_Model extends ActiveRecord{
 		
 		// сохранение псевдонима
 		if(!strlen($data['alias'])){
+			
 			$this->setField('alias', $this->id);
 			$this->_save();
 		}

@@ -59,6 +59,7 @@ class FrontendLayout extends Layout {
 	protected function _renderJSON($boolReturn){
 		
 		$json = json_encode(array(
+			'title' => $this->_getTitleHTML(),
 			'content' => $this->_getContentHTML(),
 			'topMenuActiveIndex' => $this->_topMenu->activeIndex,
 		));

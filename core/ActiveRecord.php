@@ -10,6 +10,7 @@ class ActiveRecord {
 	public $id = null;
 	public $pkField = 'id';
 	public $tableName = null;
+	public $initType = null;
 	
 	public $isNewObj = null;
 	public $isExistsObj = null;
@@ -36,8 +37,9 @@ class ActiveRecord {
 	public function __construct($id = 0, $initType = self::INIT_ANY, $data = array()){
 		
 		$this->tableName = $this->getConst('TABLE');
+		$this->initType = $initType;
 		
-		switch($initType){
+		switch($this->initType){
 			
 			// загрузка нового объекта
 			case self::INIT_NEW:
@@ -285,22 +287,6 @@ class ActiveRecord {
 	
 	/** ПРЕ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function preValidation(&$data){}
-	
-	/**
-	 * ВАЛИДАЦИЯ ДАННЫХ
-	 * Производит некоторые валидационные преобразования.
-	 * Если данные не прошли валидацию, сохраняет ошибки в стандартный контейнер
-	 * @param &$data - массив данных для валидации
-	 * @return void
-	 */
-	public function validation(&$data){
-		
-		$validator = $this->getValidator();
-		$data = $validator->validate($data);
-		
-		if($validator->hasError())
-			$this->setError($validator->getError());
-	}
 	
 	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function postValidation(&$data){}

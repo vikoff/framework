@@ -31,8 +31,10 @@ class Request {
 		$this->parseRequest();
 	}
 	
-	// РАЗБОР URL ЗАПРОСА
+	/** РАЗБОР URL ЗАПРОСА */
 	public function parseRequest(){
+		
+		$this->checkAlias();
 		
 		$_rArr = array();
 		foreach(explode('/', $this->_requestString) as $item){
@@ -48,16 +50,30 @@ class Request {
 		
 	}
 	
+	/** ПРОВЕРИТЬ НАЛИЧИЕ ПСЕВДОНИМА */
+	public function checkAlias(){
+		
+		if (empty($this->_requestString))
+			return;
+		
+		$realpath = Alias_Manager::getPath($this->_requestString);
+		if ($realpath)
+			$this->_requestString = $realpath;
+	}
+	
+	/** ПОЛУЧИТЬ ПАРАМЕТРЫ ЗАПРОСА В ВИДЕ МАССИВА */
 	public function getArray(){
 	
 		return array($this->_controller, $this->_params);
 	}
 	
+	/** ПОЛУЧИТЬ ПАРАМЕТРЫ ЗАПРОСА В ВИДЕ МАССИВА-СПИСКА */
 	public function getRawArray(){
 		
 		return $this->_requestArr;
 	}
 	
+	/** ПОЛУЧИТЬ ПАРАМЕТРЫ ЗАПРОСА В ВИДЕ СТРОКИ */
 	public function getString(){
 		
 		return $this->_requestString;

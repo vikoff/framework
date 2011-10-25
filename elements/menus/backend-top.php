@@ -17,6 +17,14 @@ return array (
 		),
 	
 		array(
+			'title' => 'Конфигурация',
+			'href' => 'admin/config',
+			'allowedRoles' => null,
+			'deniedRoles' => null,
+			'active' => $r->getParts(array(0, 1)) == 'admin/config',
+		),
+	
+		array(
 			'title' => 'Пользователи',
 			'href' => 'admin/users',
 			'allowedRoles' => null,

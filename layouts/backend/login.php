@@ -2,8 +2,8 @@
      "http://www.w3.org/TR/html4/strict.dtd"><html>
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title><?=$this->_getHtmlTitle();?></title>
-	<base href="<?=$this->_getHtmlBaseHref();?>" />
+	<title><?=$this->_getTitleHTML();?></title>
+	<base href="<?=$this->_getBaseHrefHTML();?>" />
 	<style type="text/css">
 		html, body{
 			padding: 0;
@@ -83,7 +83,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2" style="text-align: center; padding: 0;"><a href="<?= App::href('registration'); ?>">Регистрация</a></td>
+			<td colspan="2" style="text-align: center; padding: 0;"><a href="<?= href('registration'); ?>">Регистрация</a></td>
 		</tr>
 		</table>
 	</form>

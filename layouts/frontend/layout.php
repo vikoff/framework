@@ -23,15 +23,20 @@
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://scripts.vik-off.net/debug.js"></script>
 	<script type="text/javascript" src="js/jquery.address-1.4.min.js"></script>
+	<script type="text/javascript" src="js/jquery.ctrlentersend.min.js"></script>
+	<script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/frontend.js"></script>
 	<script type="text/javascript">
 		
 		// инициализация хеша
+		/*
 		if (!location.hash)
 			location.hash = '/' + location.href.replace($('base').attr('href'), '').split('#')[0];
-			
+		*/
+	
 		$(function(){
 			
+			/*
 			$('a').click(function(){
 				var t = $(this);
 				if (t.hasClass('external-link') || t.hasClass('jlink'))
@@ -42,11 +47,14 @@
 			});
 			
 			$.address.change(function(addr){
-				
 				var uri = addr.value.substr(1);
-				if (uri != location.hash.substr(2));
+				// alert(uri + '|' + location.hash.substr(2));
+				// if (uri != location.hash.substr(2)){
+					// alert('send');
 					$.get(href(uri), function(response){ Layout.fill(response); }, 'json');
+				// }
 			});
+			*/
 		});
 	</script>
 </head>

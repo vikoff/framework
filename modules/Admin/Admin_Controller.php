@@ -14,6 +14,7 @@ class Admin_Controller extends Controller{
 	public $methodResources = array(
 	
 		'display_content'   => 'content',
+		'display_config'    => 'content',
 		'display_users'     => 'content',
 		'display_modules'   => 'content',
 		'display_root'      => 'content',
@@ -76,6 +77,31 @@ class Admin_Controller extends Controller{
 	
 	/** DISPLAY CONTENT */
 	public function display_content($params = array()){
+		
+		$viewer = BackendLayout::get();
+		
+		// display index
+		if(empty($params[0])){
+			$viewer
+				->setContentHtmlFile(self::TPL_PATH.'content_index.tpl')
+				->render();
+			exit();
+		}
+		
+		$app = App::get();
+		$module = $app->prepareModuleName(array_shift($params));
+		
+		if(!$app->isModule($module, TRUE)){
+			$this->error404handler('модуль <b>'.$module.'</b> не найден');
+			exit();
+		}
+		
+		if(!$app->getModule($module, TRUE)->display($params))
+			$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
+	}
+	
+	/** DISPLAY CONFIG */
+	public function display_config($params = array()){
 		
 		$viewer = BackendLayout::get();
 		

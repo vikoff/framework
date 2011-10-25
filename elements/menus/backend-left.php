@@ -27,6 +27,19 @@ switch($topMenuHref){
 		);
 		break;
 	
+	// CONFIG //
+	case 'admin/config':
+		$items = array(
+			array(
+				'title' => 'Псевдонимы',
+				'href' => $topMenuHref.'/alias',
+				'allowedRoles' => null,
+				'deniedRoles' => null,
+				'active' => $r->getParts(2) == 'alias',
+			),
+		);
+		break;
+		
 	// USERS //
 	case 'admin/users':
 		$items = array(
