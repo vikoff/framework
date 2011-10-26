@@ -2,6 +2,19 @@
 
 $r = Request::get();
 
+$paths = array(
+	'page/main' => 'page/main',
+	'page/test' => 'page/test',
+	'page/about' => 'page/about',
+	'page/feedback' => 'page/feedback',
+);
+
+$pathsQuoted = array();
+foreach ($paths as $p)
+	$pathsQuoted[] = '"'.$p.'"';
+	
+$paths = array_merge( $paths, db::get()->getColIndexed('SELECT path, alias FROM aliases WHERE path IN('.implode(',', $pathsQuoted).')') );
+
 return array (
 
 	'name' => 'frontend-top',
@@ -10,7 +23,7 @@ return array (
 	
 		array(
 			'title' => 'Главная',
-			'href' => '',
+			'href' => $paths['page/main'],
 			'allowedRoles' => null,
 			'deniedRoles' => null,
 			'active' => in_array($r->getParts(array(0, 1)), array('', 'page', 'page/main')),
@@ -18,7 +31,7 @@ return array (
 	
 		array(
 			'title' => 'Тест',
-			'href' => 'page/test',
+			'href' => $paths['page/test'],
 			'allowedRoles' => null,
 			'deniedRoles' => null,
 			'active' => $r->getParts(array(0, 1)) == 'page/test',
@@ -26,7 +39,7 @@ return array (
 	
 		array(
 			'title' => 'О Сайте',
-			'href' => 'page/about',
+			'href' => $paths['page/about'],
 			'allowedRoles' => null,
 			'deniedRoles' => null,
 			'active' => $r->getParts(array(0, 1)) == 'page/about',
@@ -34,7 +47,7 @@ return array (
 	
 		array(
 			'title' => 'Обратная связь',
-			'href' => 'page/feedback',
+			'href' => $paths['page/feedback'],
 			'allowedRoles' => null,
 			'deniedRoles' => null,
 			'active' => $r->getParts(array(0, 1)) == 'page/feedback',

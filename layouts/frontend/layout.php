@@ -28,7 +28,7 @@
 	<script type="text/javascript" src="js/frontend.js"></script>
 	<script type="text/javascript">
 		
-		Layout.asyncEnable();
+		// Layout.asyncEnable();
 	</script>
 </head>
 <body>

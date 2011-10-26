@@ -6,16 +6,14 @@
 <?= $this->pagination; ?>
 
 <? if($this->collection): ?>
-	<table class="grid wide tr-highlight">
+	<table class="grid tr-highlight">
 	<tr>
-		<th><?= $this->sorters['id']; ?></th>
 		<th><?= $this->sorters['alias']; ?></th>
 		<th><?= $this->sorters['path']; ?></th>
 		<th>Опции</th>
 	</tr>
 	<? foreach($this->collection as $item): ?>	
 	<tr>
-		<td><?= $item['id']; ?></td>
 		<td><?= $item['alias']; ?></td>
 		<td><?= $item['path']; ?></td>
 			
