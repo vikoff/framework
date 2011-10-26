@@ -1,0 +1,63 @@
+
+<ul id="submit-box-floating"></ul>
+
+<h3>Редактирование данных о пользователе #<?= $this->instanceId; ?> <?= $this->login; ?></h3>
+<form id="edit-form" action="" method="post">
+	<?= FORMCODE; ?>	
+	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
+	
+	<table class="grid" style="margin: 1em 0;">
+	<tr>
+		<th>id</th>
+		<td><?= $this->id; ?></td>
+	</tr>
+	<tr>
+		<th>Логин</th>
+		<td><?= $this->login; ?></td>
+	</tr>
+	<tr>
+		<th>Дата регистрации</th>
+		<td><?= $this->regdate; ?></td>
+	</tr>
+	<tr>
+		<th>Email</th>
+		<td><?= Html_Form::inputText(array('name' => 'email', 'value' => $this->email)); ?></td>
+	</tr>
+	<tr>
+		<th>Фамилия</th>
+		<td><?= Html_Form::inputText(array('name' => 'surname', 'value' => $this->surname)); ?></td>
+	</tr>
+	<tr>
+		<th>Имя</th>
+		<td><?= Html_Form::inputText(array('name' => 'name', 'value' => $this->name)); ?></td>
+	</tr>
+	<tr>
+		<th>Роль</th>
+		<td><?= Html_Form::select(array('name' => 'role_id'), $this->rolesList, $this->role_id); ?></td>
+	</tr>
+	<tr>
+		<th>Доп. опции</th>
+		<td>
+			<a href="<?= href('admin/users/ban/'.$this->instanceId); ?>">заблокировать</a>
+			<a href="<?= href('admin/users/delete/'.$this->instanceId); ?>">удалить</a>
+		</td>
+	</tr>
+
+	<tr>
+		<td id="submit-box" class="actions" colspan="2">
+			<input id="submit-save" class="button" type="submit" name="action[admin/user/save][admin/users/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
+			<input id="submit-apply" class="button" type="submit" name="action[admin/user/save][admin/users/edit/<?= $this->instanceId ? $this->instanceId : '(%id%)' ; ?>]" value="Применить" title="Сохранить изменения и продолжить редактирование" />
+			<a id="submit-cancel" class="button" href="<?= href('admin/users/list'); ?>" title="Отменить все изменения и вернуться к списку">отмена</a>
+			<a id="submit-delete" class="button" href="<?= href('admin/users/delete/'.$this->instanceId); ?>" title="Удалить запись">удалить</a>
+		</td>
+	</tr>
+	</table>
+</form>
+
+<script type="text/javascript">
+
+$(function(){
+	enableFloatingSubmits();
+});
+
+</script>

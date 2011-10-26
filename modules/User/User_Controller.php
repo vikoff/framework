@@ -262,7 +262,7 @@ class User_Controller extends Controller{
 	// ПРОВЕРКА ЛОГИНА НА УНИКАЛЬНОСТЬ
 	public function ajax_check_login_unique($params = array()){
 	
-		echo User::isLoginInUse(getVar($_GET['login'])) ? 'false' : 'true';
+		echo User_Model::isLoginInUse(getVar($_GET['login'])) ? 'false' : 'true';
 	}
 	
 }

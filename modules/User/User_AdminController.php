@@ -25,7 +25,7 @@ class User_AdminController extends Controller{
 		'action_save_perms' => 'edit',
 		'action_delete' 	=> 'edit',
 		'action_create' 	=> 'edit',
-		'action_edit' 		=> 'edit',
+		'action_save' 		=> 'edit',
 		
 		'ajax_generate_password' => 'public',
 		'ajax_check_login_unique' => 'public',
@@ -47,7 +47,7 @@ class User_AdminController extends Controller{
 	////// DISPLAY //////
 	/////////////////////
 	
-	// DISPLAY LIST
+	/** DISPLAY LIST */
 	public function display_list($params = array()){
 		
 		$collection = new User_Collection();
@@ -64,7 +64,7 @@ class User_AdminController extends Controller{
 			->render();
 	}
 	
-	// DISPLAY VIEW
+	/** DISPLAY VIEW */
 	public function display_view($params = array()){
 		
 		try{
@@ -94,14 +94,13 @@ class User_AdminController extends Controller{
 		
 	}
 	
-	// DISPLAY CREATE
+	/** DISPLAY CREATE */
 	public function display_create($params = array()){
 			
 		$user = User_Model::create();
 			
 		$variables = array_merge(Tools::unescape($_POST), array(
-			'action' => 'registration',
-			'jsRules' => $user->getValidator()->getJsRules(),
+			'rolesList' => array(1 => 'Пользователь', 2 => 'Модератор', 3 => 'Администратор'),
 		));
 		
 		BackendLayout::get()
@@ -110,50 +109,37 @@ class User_AdminController extends Controller{
 			->render();
 	}
 	
-	// DISPLAY EDIT
+	/** DISPLAY EDIT */
 	public function display_edit($params = array()){
 			
 		$instanceId = getVar($params[0], 0 ,'int');
-		$user = User::Load($instanceId);
-		
-		if($user->getField('level') > USER_AUTH_PERMS)
-			throw new Exception('Недостаточно прав для редактирования данных пользователя '.$user->getName());
-			
-		$levels = array();
-		foreach(User::getPermsList() as $g)
-			if($g > 0 && $g <= USER_AUTH_PERMS)
-				$levels[$g] = User::getPermName($g);
+		$user = User_Model::Load($instanceId);
 			
 		$variables = array_merge($user->GetAllFieldsPrepared(), array(
-			'action' => 'edit',
-			'jsRules' => $user->getValidator()->getJsRules(),
-			'levels' => $levels,
+			'instanceId' => $instanceId,
+			'rolesList' => array(1 => 'Пользователь', 2 => 'Модератор', 3 => 'Администратор'),
 		));
 		
 		BackendLayout::get()
 			->setTitle('Редактирование данных пользователя')
-			->setContentSmarty(self::TPL_PATH.'edit.tpl', $variables);
+			->setContentPhpFile(self::TPL_PATH.'admin_edit.php', $variables)
+			->render();
 	}
 	
-	// DISPLAY DELETE
+	/** DISPLAY DELETE */
 	public function display_delete($params = array()){
 		
-		try{
-			$instanceId = getVar($params[0], 0 ,'int');
-			$instance = User::Load($instanceId);
+		$instanceId = getVar($params[0], 0 ,'int');
+		$instance = User_Model::Load($instanceId);
 
-			$variables = array_merge($instance->GetAllFieldsPrepared(), array(
-				'instanceId' => $instanceId,
-			));
-			
-			BackendLayout::get()
-				->prependTitle('Удаление пользователя #'.$instanceId)
-				->setContentSmarty(self::TPL_PATH.'delete.tpl', $variables);
-		}
-		catch(Exception $e){
-			BackendLayout::get()->error404($e->getMessage());
-		}
+		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
+			'instanceId' => $instanceId,
+		));
 		
+		BackendLayout::get()
+			->prependTitle('Удаление пользователя #'.$instanceId)
+			->setContentPhpFile(self::TPL_PATH.'delete.php', $variables)
+			->render();
 	}
 	
 	
@@ -161,7 +147,7 @@ class User_AdminController extends Controller{
 	////// ACTION //////
 	////////////////////
 	
-	// ACTION SAVE PERMS
+	/** ACTION SAVE PERMS */
 	public function action_save_perms($params = array()){
 		
 		$instanceId = getVar($_POST['instance-id'], 0, 'int');
@@ -183,27 +169,21 @@ class User_AdminController extends Controller{
 
 	}
 	
-	// ACTION DELETE
+	/** ACTION DELETE */
 	public function action_delete($params = array()){
 		
 		$instanceId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-		
-		try{
-			$instance = User::Load($instanceId);
-		
-			$this->setRedirectUrl(App::href('admin/users/list'));
-		
-			if($instance->Destroy()){
-				Messenger::get()->addSuccess('Пользователь удален');
-				return TRUE;
-			}else{
-				Messenger::get()->addError('Не удалось удалить пользователя.');
-				$this->forceRedirect();
-				return FALSE;
-			}
-		}
-		catch(Exception $e){
-			BackendLayout::get()->error404();
+		$instance = User_Model::Load($instanceId);
+	
+		$this->setRedirectUrl('admin/users/list');
+	
+		if($instance->destroy()){
+			Messenger::get()->addSuccess('Пользователь удален');
+			return TRUE;
+		}else{
+			Messenger::get()->addError('Не удалось удалить пользователя:', $instance->getError());
+			$this->forceRedirect();
+			return FALSE;
 		}
 
 	}
@@ -211,9 +191,9 @@ class User_AdminController extends Controller{
 	// ACTION ADMIN CREATE
 	public function action_create($params = array()){
 		
-		$user = new User(0, TRUE);
+		$user = User_Model::create();
 		
-		if($user->Save($_POST)){
+		if($user->save($_POST, $user->getValidator(User_Model::VALIDATION_ADMIN_CREATE))){
 			Messenger::get()->addSuccess('Новый пользователь успешно создан');
 			return TRUE;
 		}else{
@@ -223,21 +203,17 @@ class User_AdminController extends Controller{
 	}
 	
 	// ACTION ADMIN SAVE
-	public function action_edit($params = array()){
+	public function action_save($params = array()){
 		
-		// echo '<pre>'; print_r($_POST); die;
-		try{
-			$user = User::load(getVar($_POST['id']), TRUE);
-			
-			if($user->Save($_POST)){
-				Messenger::get()->addSuccess('Данные пользователя сохранены');
-				return TRUE;
-			}else{
-				Messenger::get()->addError('При сохранении данных пользователя возникли ошибки:', $user->getError());
-				return FALSE;
-			}
+		$user = User_Model::load(getVar($_POST['id']));
+		
+		if($user->save($_POST, $user->getValidator(User_Model::VALIDATION_ADMIN_EDIT))){
+			Messenger::get()->addSuccess('Данные пользователя сохранены');
+			return TRUE;
+		}else{
+			Messenger::get()->addError('При сохранении данных пользователя возникли ошибки:', $user->getError());
+			return FALSE;
 		}
-		catch(Exception $e){BackendLayout::get()->error404($e->getMessage());}
 	}
 	
 	//////////////////

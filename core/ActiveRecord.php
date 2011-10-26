@@ -291,14 +291,14 @@ class ActiveRecord {
 	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function postValidation(&$data){}
 	
+	/** ДЕЙСТВИЕ ПОСЛЕ СОХРАНЕНИЯ */
+	public function afterSave($data){}
+	
 	/** ПОДГОТОВКА ДАННЫХ К ОТОБРАЖЕНИЮ */
 	public function beforeDisplay($data){
 		
 		return $data;
 	}
-	
-	/** ДЕЙСТВИЕ ПОСЛЕ СОХРАНЕНИЯ */
-	public function afterSave($data){}
 	
 	/** ПОДГОТОВКА К УДАЛЕНИЮ ОБЪЕКТА */
 	public function beforeDestroy(){}

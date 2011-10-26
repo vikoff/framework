@@ -2,6 +2,10 @@
 
 class User_Model extends ActiveRecord{
 	
+	const VALIDATION_ADMIN_CREATE = 'adm-create';
+	const VALIDATION_ADMIN_EDIT   = 'adm-edit';
+	const VALIDATION_REGISTER     = 'reg';
+	
 	// пол
 	const GENDER_FEMALE 	= 'f';
 	const GENDER_MALE		= 'm';
@@ -33,27 +37,52 @@ class User_Model extends ActiveRecord{
 	public function getConst($name){
 		return constant(__CLASS__.'::'.$name);
 	}
+	
+	/** ПОДГОТОВКА ДАННЫХ К ОТОБРАЖЕНИЮ */
+	public function beforeDisplay($data){
+		
+		$data['fio'] = $this->getName();
+		$data['role_str'] = '';
+		$data['regdate'] = YDate::loadTimestamp(getVar($data['regdate']))->getStrDateShortTime();
+		
+		return $data;
+	}
 
 	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР ВАЛИДАТОРА */
-	public function getValidator(){
+	public function getValidator($mode = self::VALIDATION_REGISTER){
 		
-		$validator = new Validator(array(
-			'login' 			=> array('length' => array('max' => '255')),
-			'email' 			=> array('length' => array('max' => '100'), 'email' => true),
-			'password' 			=> array('length' => array('min' => '5', 'max' => '100'), 'password' => array('hash' => 'sha1')),
-			'password_confirm'	=> array('compare' => 'password', 'unsetAfter' => TRUE),
-			'surname' 			=> array('length' => array('max' => '255')),
-			'name' 				=> array('length' => array('max' => '255')),
-			'patronymic' 		=> array('length' => array('max' => '255')),
-			'sex' 				=> array('length' => array('max' => '10')),
-			'birthdate' 		=> array('dbDate' => TRUE),
-			'country' 			=> array('length' => array('max' => '255')),
-			'city' 				=> array('length' => array('max' => '255')),
-			'captcha' 			=> array('captcha' => isset($_SESSION['captcha']) ? $_SESSION['captcha'] : ''),
-		), array(
-			'required' => array('login', 'email', 'password', 'password_confirm', 'surname', 'name', 'patronymic', 'sex', 'birthdate', 'country', 'city'),
-			'strip_tags' => '*',
-		));
+		$rules = array(
+			'login' 	 => array('required' => TRUE, 'length' => array('min' => '2', 'max' => '255')),
+			'email' 	 => array('required' => TRUE, 'length' => array('max' => '100'), 'email' => true),
+			'password' 	 => array('required' => TRUE, 'length' => array('min' => '5', 'max' => '100'), 'hash' => 'sha1'),
+			'password_confirm'	=> array('compare' => 'password', 'hash' => 'sha1', 'unsetAfter' => TRUE),
+			'surname' 	 => array('required' => TRUE, 'length' => array('max' => '255')),
+			'name' 		 => array('required' => TRUE, 'length' => array('max' => '255')),
+			'role_id' 	 => array('required' => TRUE, 'settype' => 'int'),
+			'captcha' 	 => array('captcha' => isset($_SESSION['captcha']) ? $_SESSION['captcha'] : ''),
+		);
+		
+		$fields = array();
+		switch($mode) {
+			
+			case self::VALIDATION_ADMIN_CREATE:
+				$fields = array('login', 'password', 'password_confirm', 'email', 'surname', 'name', 'role_id');
+				break;
+			
+			case self::VALIDATION_ADMIN_EDIT:
+				$fields = array('email', 'surname', 'name', 'role_id');
+				break;
+				
+			case self::VALIDATION_REGISTER:
+				$fields = array();
+				break;
+		}
+		
+		$fieldsRules = array();
+		foreach($fields as $f)
+			$fieldsRules[$f] = $rules[$f];
+			
+		$validator = new Validator($fieldsRules, array('strip_tags' => '*'));
 		
 		$validator->setFieldTitles(array(
 			'login' 			=> 'Логин',
@@ -62,52 +91,29 @@ class User_Model extends ActiveRecord{
 			'password_confirm' 	=> 'подтверждение пароля',
 			'surname' 			=> 'фамилия',
 			'name' 				=> 'имя',
-			'patronymic' 		=> 'отчество',
-			'sex' 				=> 'пол',
-			'birthdate' 		=> 'дата рождения',
-			'country' 			=> 'страна',
-			'city' 				=> 'город',
+			'role_id' 			=> 'роль',
 		));
-		
-		// применение специальных правил для редактирования или добавления объекта
-		if($this->isExistsObj){
-			$validator->delElement(array('login', 'password', 'password_confirm', 'captcha'));
-		}
 		
 		return $validator;
 	}
 	
-	/** ПОДГОТОВКА ДАННЫХ К ОТОБРАЖЕНИЮ */
-	public function beforeDisplay($data){
-		
-		switch(getVar($data['sex'])){
-			case 'man': $data['sex'] = 'М'; break;
-			case 'woman': $data['sex'] = 'Ж'; break;
-			default: $data['sex'] = ' - ';
-		}
-		
-		$level = getVar($data['level']);
-		$data['level'] = in_array($level, self::getPermsList()) ? self::getPermName($level) : '<span class="red">Некорректное значение: "'.$level.'"</span>';
-		$data['fio'] = $this->getName();
-		$data['birthdate'] = YDate::loadDbDate(getVar($data['birthdate']))->getStrDate();
-		$data['regdate'] = YDate::loadTimestamp(getVar($data['regdate']))->getStrDateShortTime();
-		
-		return $data;
-	}
-	
 	public function preValidation(&$data){
 		
-		$data['birthdate'] = YDate::loadArray($data['birth'])->getDbDate();
+		$data['birthdate'] = !empty($data['birth']) ? YDate::loadArray($data['birth'])->getDbDate() : '0000-00-00';
 	}
 	
 	public function postValidation(&$data){
 		
-		if($this->isNewObj && self::isEmailInUse($data['email'])){
-			$this->setError('Данные email-адрес уже используется, возможно Вам следует воспользатся функцией <a href="'.App::href('profile/forget-password').'">восстановления учетной записи</a>');
-			return FALSE;
-		}
 		if($this->isNewObj){
-			$data['level'] = PERMS_REG;
+			
+			if(!empty($data['email']) && self::isEmailInUse($data['email'])){
+				$this->setError('Данные email-адрес уже используется, возможно Вам следует воспользатся функцией <a href="'.href('profile/forget-password').'">восстановления учетной записи</a>');
+				return FALSE;
+			}
+			
+			if (empty($data['role_id']))
+				$data['role_id'] = 1;
+				
 			$data['active'] = '1';
 			$data['regdate'] = time();
 		}
@@ -131,7 +137,7 @@ class User_Model extends ActiveRecord{
 			elseif($name{$i} == 'i')
 				$outputArr[] = $this->getField('name');
 			elseif($name{$i} == 'o')
-				$outputArr[] = $this->getField('patronymic');
+				$outputArr[] = ''; //$this->getField('patronymic');
 			else
 				trigger_error('Неизвестный код имени: "'.$name{$i}.'"', E_USER_ERROR);
 		}
@@ -184,13 +190,15 @@ class User_Model extends ActiveRecord{
 	/** ЗАНЯТ ЛИ EMAIL */
 	static public function isEmailInUse($email){
 	
-		return (bool)db::get()->getOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE email='.db::get()->qe($email), FALSE);
+		$db = db::get();
+		return $db->getOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE email='.$db->qe($email));
 	}
 	
 	/** ЗАНЯТ ЛИ ЛОГИН */
 	static public function isLoginInUse($login){
 		
-		return (bool)db::get()->getOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE login='.db::get()->qe($login), FALSE);
+		$db = db::get();
+		return $db->getOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE login='.$db->qe($login));
 	}
 	
 	/** ПРОВЕРИТЬ, ИМЕЕТ ЛИ ПОЛЬЗОВАТЕЛЬ УКАЗАННЫЕ ПРАВА */
@@ -241,11 +249,10 @@ class User_Collection extends ARCollection{
 
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',
+		'login' => 'login',
 		'email' => 'email',
-		'surname' => array('surname _DIR_, name _DIR_, patronymic _DIR_', 'ФИО, пол'),
-		'birthdate' => 'Дата рождения',
-		'address' => array('country _DIR_, city _DIR_', 'Адрес'),
-		'level' => 'Права',
+		'fio' => array('surname _DIR_, name _DIR_', 'ФИО, пол'),
+		'role_str' => array('role_id', 'Роль'),
 		'regdate' => 'Дата регистрации',
 	);
 	

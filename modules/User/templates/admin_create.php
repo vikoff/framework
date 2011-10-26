@@ -15,10 +15,6 @@
 	</tr>
 	<tr>
 		<th>Пароль</th>
-		<td><?= Html_Form::input(array('type' => 'password', 'name' => 'password', 'value' => $this->password)); ?></td>
-	</tr>
-	<tr>
-		<th>Пароль</th>
 		<td>
 			<label><input type="radio" name="pass_type" value="input"> Ввести</label><br />
 			<label><input type="radio" name="pass_type" value="generate"> Сгенерировать автоматически</label><br />
@@ -45,6 +41,10 @@
 		</td>
 	</tr>
 	<tr>
+		<th>email</th>
+		<td><?= Html_Form::input(array('type' => 'text', 'name' => 'email', 'value' => $this->email)); ?></td>
+	</tr>
+	<tr>
 		<th>Фамилия</th>
 		<td><?= Html_Form::inputText(array('name' => 'surname', 'value' => $this->surname)); ?></td>
 	</tr>
@@ -52,10 +52,14 @@
 		<th>Имя</th>
 		<td><?= Html_Form::inputText(array('name' => 'name', 'value' => $this->name)); ?></td>
 	</tr>
+	<tr>
+		<th>Роль</th>
+		<td><?= Html_Form::select(array('name' => 'role_id'), $this->rolesList, $this->role_id); ?></td>
+	</tr>
 
 	<tr>
 		<td id="submit-box" class="actions" colspan="2">
-			<input id="submit-save" class="button" type="submit" name="action[admin/user/save][admin/users/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
+			<input id="submit-save" class="button" type="submit" name="action[admin/user/create][admin/users/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
 			<a id="submit-cancel" class="button" href="<?= href('admin/users/list'); ?>" title="Отменить все изменения и вернуться к списку">отмена</a>
 		</td>
 	</tr>
@@ -67,6 +71,14 @@
 $(function(){
 	
 	$("#edit-form").validate( { <?= $this->validation; ?> } );
+	
+	// login check
+	$('#input-login').rules("add", {
+		remote: "user/check-login-unique",
+		messages: {
+			remote: 'Данный логин уже занят'
+		}
+	});
 	
 	enableFloatingSubmits();
 	

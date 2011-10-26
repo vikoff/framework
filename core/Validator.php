@@ -52,18 +52,18 @@ class Validator {
 		'required',
 		'email',
 		'match',
+		'length',
 		'in',
 		'notIn',
 		'equal',
 		'notEqual',
+		'hash',
 		'captcha',
 		'compare',
-		'length',
 		'checkbox',
 		'dbDate',
 		'dbTime',
 		'dbDateTime',
-		'password',
 		'unsetAfter',
 	);
 
@@ -356,7 +356,7 @@ class Validator {
 			$this->validData[$field] = '';
 			return;
 		}
-		$result = preg_match('/^[\w._%+-]+@[\w.-]+\.\w{2,4}$/', $this->validData[$field]);
+		$result = preg_match('/^[\w._%+-]+@[\w.-]+\.\w{2,10}$/', $this->validData[$field]);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'email'));
 	}
@@ -487,21 +487,17 @@ class Validator {
 		unset($this->validData[$field]);
 	}
 	
-	public function rule_password($field, $params){
+	// ПРАВИЛО HASH
+	public function rule_hash($field, $type){
 	
 		if(!isset($this->validData[$field]))
 			return;
-		$hash  = (isset($params['hash'])) ? $params['hash'] : 'no';
-		if($hash == 'no'){
-			$this->validData[$field] = $this->validData[$field];
-		}elseif($hash == 'base64'){
-			$this->validData[$field] = base64_encode($this->validData[$field]);
-		}elseif($hash == 'md5'){
-			$this->validData[$field] = md5($this->validData[$field]);
-		}elseif($hash == 'sha1'){
-			$this->validData[$field] = sha1($this->validData[$field]);
-		}else{
-			$this->fatalError('Параметр hash правила "password" может принимать значения: no, base64, md5, sha1, или быть не переданым совсем. Получено значение "'.$hash.'"');
+			
+		switch($type) {
+			case 'base64': $this->validData[$field] = base64_encode($this->validData[$field]); break;
+			case 'md5':    $this->validData[$field] = md5($this->validData[$field]); break;
+			case 'sha1':   $this->validData[$field] = sha1($this->validData[$field]); break;
+			default: $this->fatalError('Правило hash может принимать значения: base64, md5, sha1. Получено значение "'.$type.'"');
 		}
 	}
 	

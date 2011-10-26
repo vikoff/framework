@@ -61,10 +61,10 @@ switch($topMenuHref){
 		
 			array(
 				'title' => 'Блокировки',
-				'href' => $topMenuHref.'/ban-list',
+				'href' => $topMenuHref.'/ban',
 				'allowedRoles' => null,
 				'deniedRoles' => null,
-				'active' => $r->getParts(2) == 'ban-list',
+				'active' => $r->getParts(2) == 'ban',
 			),
 		);
 		break;

@@ -23,7 +23,7 @@ return array (
 	
 		array(
 			'title' => 'Главная',
-			'href' => $paths['page/main'],
+			'href' => href($paths['page/main']),
 			'allowedRoles' => null,
 			'deniedRoles' => null,
 			'active' => in_array($r->getParts(array(0, 1)), array('', 'page', 'page/main')),
@@ -31,7 +31,7 @@ return array (
 	
 		array(
 			'title' => 'Тест',
-			'href' => $paths['page/test'],
+			'href' => href($paths['page/test']),
 			'allowedRoles' => null,
 			'deniedRoles' => null,
 			'active' => $r->getParts(array(0, 1)) == 'page/test',
@@ -39,7 +39,7 @@ return array (
 	
 		array(
 			'title' => 'О Сайте',
-			'href' => $paths['page/about'],
+			'href' => href($paths['page/about']),
 			'allowedRoles' => null,
 			'deniedRoles' => null,
 			'active' => $r->getParts(array(0, 1)) == 'page/about',
@@ -47,7 +47,7 @@ return array (
 	
 		array(
 			'title' => 'Обратная связь',
-			'href' => $paths['page/feedback'],
+			'href' => href($paths['page/feedback']),
 			'allowedRoles' => null,
 			'deniedRoles' => null,
 			'active' => $r->getParts(array(0, 1)) == 'page/feedback',
@@ -55,7 +55,7 @@ return array (
 	
 		array(
 			'title' => 'Адм. панель',
-			'href' => 'admin',
+			'href' => href('admin'),
 			'attrs' => 'class="external-link"',
 			'allowedRoles' => null,
 			'deniedRoles' => null,
