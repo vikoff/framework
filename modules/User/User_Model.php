@@ -249,9 +249,9 @@ class User_Collection extends ARCollection{
 
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',
-		'login' => 'login',
+		'login' => 'Логин',
 		'email' => 'email',
-		'fio' => array('surname _DIR_, name _DIR_', 'ФИО, пол'),
+		'fio' => array('surname _DIR_, name _DIR_', 'ФИО'),
 		'role_str' => array('role_id', 'Роль'),
 		'regdate' => 'Дата регистрации',
 	);

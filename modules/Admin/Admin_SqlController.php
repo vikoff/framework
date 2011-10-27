@@ -27,6 +27,10 @@ class Admin_SqlController extends Controller {
 		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
+	public function getClass(){
+		return __CLASS__;
+	}
+	
 	
 	/////////////////////
 	////// DISPLAY //////
@@ -49,6 +53,7 @@ class Admin_SqlController extends Controller {
 			
 			$model = new Admin_Model();
 			$variables['data'] = $model->execSql($query);
+			// echo '<pre>'; print_r($variables); die;
 			$variables['sql_error'] = db::get()->hasError() ? db::get()->getError() : '';
 		}
 		
@@ -77,22 +82,6 @@ class Admin_SqlController extends Controller {
 		BackendLayout::get()
 			->setContentPhpFile(self::TPL_PATH.'load_dump.php')
 			->render();
-	}
-	
-	////////////////////
-	////// AJAX   //////
-	////////////////////
-	
-	// AJAX GET TABLES BY DB
-	public function ajax_get_tables($params = array()){
-		
-		$dbName = getVar($_POST['db']);
-		if(empty($dbName))
-			return '';
-		
-		$db = db::get();
-		$db->selectDb($dbName);
-		echo json_encode($db->showTables());
 	}
 	
 	////////////////////
@@ -143,13 +132,20 @@ class Admin_SqlController extends Controller {
 		}
 	}
 	
-	
 	////////////////////
-	////// OTHER  //////
+	////// AJAX   //////
 	////////////////////
 	
-	public function getClass(){
-		return __CLASS__;
+	// AJAX GET TABLES BY DB
+	public function ajax_get_tables($params = array()){
+		
+		$dbName = getVar($_POST['db']);
+		if(empty($dbName))
+			return '';
+		
+		$db = db::get();
+		$db->selectDb($dbName);
+		echo json_encode($db->showTables());
 	}
 	
 }

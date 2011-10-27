@@ -478,6 +478,15 @@ abstract class DbAdapter{
 		return $output;
 	}
 	
+	/** ПОЛУЧИТЬ ИНФОРМАЦИЮ О ПОСЛЕДНЕМ ЗАПРОСЕ (sql, time) */
+	public function getLastQueryInfo(){
+		
+		return array(
+			'sql' => end($this->_sqls),
+			'time' => end($this->_queriesTime)
+		);
+	}
+	
 	/**
 	 * ПЕРЕХВАТ ОШИБОК ВЫПОЛНЕНИЯ SQL-ЗАПРОСОВ
 	 * Дальнейший путь ошибки зависит от установки _errorHandlingMode

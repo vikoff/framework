@@ -13,7 +13,9 @@
 		class="ctrlentersend"
 		style="width: 98%; height: 150px; font-size: 14px; font-family: monospace;"><?=$this->query;?></textarea>
 		
-	<div style="text-align: right; margin-top: 10px;"><input type="submit" name="" value="Выполнить запрос" /></div>
+	<div style="text-align: right; margin-top: 10px;">
+		<input type="submit" name="" value="Выполнить запрос" />
+	</div>
 </form>
 
 <script type="text/javascript">
@@ -38,25 +40,29 @@
 
 		<div class="paragraph">
 		
-			<? if(count(getVar($result, array()))): ?>
+			<? if($result['numrows']): ?>
 			
-				<div>Запрос #<?= $index; ?></div>
+				<div style="border: solid 1px #EED; background: #FFFFF6; margin: 15px 0 4px;padding: 2px 6px;">
+					<div style="font-size: 11px; color: #777;">Запрос #<?= $index; ?> (<?= round($result['time'], 4); ?> сек.) <?= $result['numrows']; ?> строк</div>
+					<div style="white-space: pre;" ><?= $result['sql']; ?></div>
+				</div>
 				
-				<table class="std-grid narrow" style="margin: 0px;">
+				<table class="grid" style="margin: 0px;">
 				<thead class="thead-floatblock">
 					<tr>
-					<? foreach($result[0] as $field => $val)
+					<? foreach($result['result'][0] as $field => $val)
 						echo '<th>'.$field.'</th>'; ?>
 					</tr>
 				</thead>
 				<tbody>
 				
-				<? foreach($result as $row){
-					echo '<tr>';
-					foreach($row as $val)
-						echo '<td>'.$val.'</td>';
-					echo '</tr>';
-				} ?>
+				<? foreach($result['result'] as $row): ?>
+					<tr>
+					<? foreach($row as $val): ?>
+						<td><?= htmlspecialchars($val); ?></td>
+					<? endforeach; ?>
+					</tr>
+				<? endforeach; ?>
 				</tbody>
 				</table>
 			<? else: ?>

@@ -12,10 +12,13 @@ class Admin_Model {
 		
 		$db->enableErrorHandlingMode();
 		
+		// формируем массив результатов с ключами sql, time, result, numrows
 		foreach($sqlsArr as $sql){
 			$sql = trim($sql);
-			if(!empty($sql))
-				$results[] = $db->getAll($sql, array());
+			if(!empty($sql)){
+				$result = $db->getAll($sql);
+				$results[] = array_merge($db->getLastQueryInfo(), array('result' => $result, 'numrows' => count($result)));
+			}
 		}
 		
 		$db->disableErrorHandlingMode();

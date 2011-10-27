@@ -198,10 +198,8 @@ class DbAdapter_sqlite extends DbAdapter{
 
 		$rs = $this->query($query);
 		$data = sqlite_fetch_all($rs, SQLITE_ASSOC);
-		if(count($data))
-			return $data;
-		else
-			return $default_value;
+		
+		return !empty($data) ? $data : $default_value;
 	}
 	
 	/**
@@ -216,12 +214,12 @@ class DbAdapter_sqlite extends DbAdapter{
 	 */
 	public function getAllIndexed($query, $index, $default_value = 0){
 		
-		// $rs = $this->query($query);
-		// if(mysql_num_rows($rs))
-			// for($data = array(); $row = mysql_fetch_assoc($rs); $data[$row[$index]] = $row);
-		// else
-			// $data = $default_value;
-		// return $data;
+		$rs = $this->query($query);
+		$data = array();
+		foreach(sqlite_fetch_all($rs, SQLITE_ASSOC) as $row)
+			$data[$row[$index]] = $row;
+		
+		return !empty($data) ? $data : $default_value;
 	}
 	
 	/**

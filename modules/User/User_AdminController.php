@@ -18,6 +18,7 @@ class User_AdminController extends Controller{
 		
 		'display_list'		=> 'edit',
 		'display_view'		=> 'edit',
+		'display_ban'		=> 'edit',
 		'display_create'	=> 'edit',
 		'display_edit'		=> 'edit',
 		'display_delete'	=> 'edit',
@@ -69,7 +70,7 @@ class User_AdminController extends Controller{
 		
 		try{
 			$instanceId = getVar($params[0], 0 ,'int');
-			$instance = User::Load($instanceId);
+			$instance = User::load($instanceId);
 			
 			$userPerms = $instance->getField('level');
 			$perms = array('allowEdit' => FALSE, 'list' => '', 'curTitle' => User::getPermName($userPerms));
@@ -94,6 +95,13 @@ class User_AdminController extends Controller{
 		
 	}
 	
+	public function display_ban($params = array()){
+		
+		$instanceId = getVar($params[0], 0 ,'int');
+		$user = User_Model::load($instanceId);
+		
+	}
+	
 	/** DISPLAY CREATE */
 	public function display_create($params = array()){
 			
@@ -113,7 +121,7 @@ class User_AdminController extends Controller{
 	public function display_edit($params = array()){
 			
 		$instanceId = getVar($params[0], 0 ,'int');
-		$user = User_Model::Load($instanceId);
+		$user = User_Model::load($instanceId);
 			
 		$variables = array_merge($user->GetAllFieldsPrepared(), array(
 			'instanceId' => $instanceId,
@@ -130,7 +138,7 @@ class User_AdminController extends Controller{
 	public function display_delete($params = array()){
 		
 		$instanceId = getVar($params[0], 0 ,'int');
-		$instance = User_Model::Load($instanceId);
+		$instance = User_Model::load($instanceId);
 
 		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
 			'instanceId' => $instanceId,
@@ -153,7 +161,7 @@ class User_AdminController extends Controller{
 		$instanceId = getVar($_POST['instance-id'], 0, 'int');
 		
 		try{
-			$instance = User::Load($instanceId);
+			$instance = User::load($instanceId);
 		
 			if($instance->setPerms(getVar($_POST['level'], 0, 'int'))){
 				Messenger::get()->addSuccess('Пользователь получил новые права');
@@ -173,7 +181,7 @@ class User_AdminController extends Controller{
 	public function action_delete($params = array()){
 		
 		$instanceId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-		$instance = User_Model::Load($instanceId);
+		$instance = User_Model::load($instanceId);
 	
 		$this->setRedirectUrl('admin/users/list');
 	
