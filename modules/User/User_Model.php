@@ -53,9 +53,9 @@ class User_Model extends ActiveRecord{
 		
 		$rules = array(
 			'login' 	 => array('required' => TRUE, 'length' => array('min' => '2', 'max' => '255')),
-			'email' 	 => array('required' => TRUE, 'length' => array('max' => '100'), 'email' => true),
 			'password' 	 => array('required' => TRUE, 'length' => array('min' => '5', 'max' => '100'), 'hash' => 'sha1'),
 			'password_confirm'	=> array('compare' => 'password', 'hash' => 'sha1', 'unsetAfter' => TRUE),
+			'email' 	 => array('required' => TRUE, 'length' => array('max' => '100'), 'email' => true),
 			'surname' 	 => array('required' => TRUE, 'length' => array('max' => '255')),
 			'name' 		 => array('required' => TRUE, 'length' => array('max' => '255')),
 			'role_id' 	 => array('required' => TRUE, 'settype' => 'int'),
@@ -74,8 +74,10 @@ class User_Model extends ActiveRecord{
 				break;
 				
 			case self::VALIDATION_REGISTER:
-				$fields = array();
+				$fields = array('login', 'password', 'password_confirm', 'email', 'surname', 'name', 'captcha');
 				break;
+			
+			default: trigger_error('Неверный ключ валидатора', E_USER_ERROR);
 		}
 		
 		$fieldsRules = array();

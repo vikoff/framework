@@ -6,7 +6,7 @@ class User_ProfileController extends Controller{
 	const MODULE = 'user';
 	
 	/** путь к шаблонам (относительно FS_ROOT) */
-	const TPL_PATH = 'User/';
+	const TPL_PATH = 'modules/User/templates/';
 	
 	// методы, отображаемые по умолчанию
 	protected $_displayIndex = 'view';
@@ -14,8 +14,11 @@ class User_ProfileController extends Controller{
 	public $methodResources = array(
 		'display_view' => 'view',
 		'display_registration' => 'public',
+		'display_greeting' => 'view',
+		
 		'action_login' => 'public',
 		'action_logout' => 'public',
+		'action_register' => 'public',
 	);
 	
 	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
@@ -33,6 +36,7 @@ class User_ProfileController extends Controller{
 		echo 'hello';
 	}
 	
+	/** DISPLAY REGISTRATION */
 	public function display_registration($params = array()){
 		
 		$variables = $_POST;
@@ -43,10 +47,36 @@ class User_ProfileController extends Controller{
 			->render();
 	}
 	
+	/** DISPLAY GREETING */
+	public function display_greeting($params = array()){
+	
+		$variables = array();
+		
+		FrontendLayout::get()
+			->setTitle('Добро пожаловать на сайт!')
+			->setContentPhpFile(self::TPL_PATH.'greeting.php', $variables)
+			->render();
+	}
+	
 	
 	////////////////////
 	////// ACTION //////
 	////////////////////
+	
+	/** ACTION REGISTER */
+	public function action_register($params = array()){
+		
+		$user = CurUser::get();
+		
+		if($user->save(Tools::unescape($_POST), $user->getValidator(User_Model::VALIDATION_REGISTER))){
+			$user->login($user->getField(CurUser::LOGIN_FIELD), $_POST['password']);
+			App::redirect('user/profile/greeting');
+			return TRUE;
+		}else{
+			Messenger::get()->addError('При регистрации возникли ошибки:', $user->getError());
+			return FALSE;
+		}
+	}
 	
 	/** ACTION LOGIN */
 	public function action_login(){

@@ -18,21 +18,26 @@ class Menu_Model {
 		$this->_name = $name;
 		$this->_data = $data;
 		$this->_menu = include(FS_ROOT.self::FILES_PATH.$this->_name.'.php');
-		$this->items = $this->_menu['items'];
 		
 		// поиск активного элемента
-		for($i = 0, $len = count($this->items); $i < $len; $i++){
-			if ($this->items[$i]['active']){
-				$this->activeIndex = $i;
-				$this->activeItem = &$this->items[$i];
-				break;
+		foreach($this->_menu['items'] as $item){
+			
+			if (isset($item['display']) && $item['display'] === FALSE)
+				continue;
+				
+			$this->items[] = $item;
+			
+			if ($item['active']){
+				$index = count($this->items) - 1;
+				$this->activeIndex = $index;
+				$this->activeItem = &$this->items[$index];
 			}
 		}
 	}
 	
 	public function getItems(){
 		
-		return $this->_menu['items'];
+		return $this->items;
 	}
 }
 

@@ -18,6 +18,8 @@ class Admin_Controller extends Controller{
 		'display_users'     => 'content',
 		'display_modules'   => 'content',
 		'display_root'      => 'content',
+		
+		'action_make_fs_snapshot' => 'content',
 	);
 	
 	/**
@@ -164,6 +166,10 @@ class Admin_Controller extends Controller{
 			case 'error-log':
 				$this->snippet_error_log();
 				break;
+			
+			case 'fs-snapshot':
+				$this->snippet_fs_snapshot();
+				break;
 				
 			default:
 				$controllerClass = App::getControllerClassName(array_shift($params));
@@ -177,8 +183,6 @@ class Admin_Controller extends Controller{
 				$controllerInstance = new $controllerClass($adminMode = TRUE);
 				$controllerInstance->performDisplay($displayMethodIdentifier, $params);
 		}
-		
-		$viewer->render();
 	}
 	
 	//////////////////////
@@ -197,9 +201,27 @@ class Admin_Controller extends Controller{
 			->setContentPhpFile(self::TPL_PATH.'root_error_log.php', $variables);
 	}
 	
+	public function snippet_fs_snapshot(){
+		
+		BackendLayout::get()
+			->setContentPhpFile(self::TPL_PATH.'root_fs_snapshot.php')
+			->render();
+		
+	}
+	
 	////////////////////
 	////// ACTION //////
 	////////////////////
+	
+	/** ACTION MAKE FS SNAPSHOT */
+	public function action_make_fs_snapshot(){
+		
+		$model = new Admin_Model();
+		
+		Tools::sendDownloadHeaders('fs_snapshot_'.date("Y-m-d_H-i").'.txt');
+		$model->makeFsSnapshot(FS_ROOT, array('.git' => true));
+		exit;
+	}
 	
 	// DELETE OLD ERRORS
 	public function action_delete_old_errors($params = array()){

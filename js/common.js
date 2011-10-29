@@ -1,4 +1,3 @@
-function captcha_reload(){$("#captcha").attr("src",'libs/captcha/captcha.php?rnd='+Math.round(Math.random(0)*1000));}
 		
 function href(href){
 	return WWW_ROOT + 'index.php' + (href ? '?r=' + href.replace('?', '&') : '');

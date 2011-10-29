@@ -12,16 +12,12 @@ switch($topMenuHref){
 			array(
 				'title' => 'Страницы',
 				'href' => $topMenuHref.'/page',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'page',
 			),
 		
 			array(
 				'title' => 'Тестовые сущности',
 				'href' => $topMenuHref.'/test-item',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'test-item',
 			),
 		);
@@ -33,8 +29,6 @@ switch($topMenuHref){
 			array(
 				'title' => 'Псевдонимы',
 				'href' => $topMenuHref.'/alias',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'alias',
 			),
 		);
@@ -46,24 +40,18 @@ switch($topMenuHref){
 			array(
 				'title' => 'Список пользователей',
 				'href' => $topMenuHref.'/list',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => in_array($r->getParts(2), array('', 'list')),
 			),
 		
 			array(
 				'title' => 'Создание пользователя',
 				'href' => $topMenuHref.'/create',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'create',
 			),
 		
 			array(
 				'title' => 'Блокировки',
 				'href' => $topMenuHref.'/ban',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'ban',
 			),
 		);
@@ -75,8 +63,6 @@ switch($topMenuHref){
 			array(
 				'title' => 'Получение данных о&nbsp;модулях',
 				'href' => $topMenuHref.'/read-config',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'read-config',
 			),
 		);
@@ -88,17 +74,19 @@ switch($topMenuHref){
 			array(
 				'title' => 'Статистика посещений',
 				'href' => $topMenuHref.'/user-statistics',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'user-statistics',
 			),
 		
 			array(
 				'title' => 'Лог ошибок',
 				'href' => $topMenuHref.'/error-log',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'error-log',
+			),
+		
+			array(
+				'title' => 'Снимок файловой системы',
+				'href' => $topMenuHref.'/fs-snapshot',
+				'active' => $r->getParts(2) == 'fs-snapshot',
 			),
 		);
 		break;
@@ -109,24 +97,18 @@ switch($topMenuHref){
 			array(
 				'title' => 'Консоль',
 				'href' => $topMenuHref.'/console',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'console',
 			),
 		
 			array(
 				'title' => 'Создание дампа БД',
 				'href' => $topMenuHref.'/make-dump',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'make-dump',
 			),
 		
 			array(
 				'title' => 'Загрузка дампа БД',
 				'href' => $topMenuHref.'/load-dump',
-				'allowedRoles' => null,
-				'deniedRoles' => null,
 				'active' => $r->getParts(2) == 'load-dump',
 			),
 		);

@@ -150,7 +150,7 @@ class Tools {
 		return end($fullNameArr);
 	}
 
-	/** УБРАТЬ ЭКРАНИРУЮЩИЕ СЛЕШИ ЕСЛИ НАДО */
+	/** УБРАТЬ СЛЕШИ MAGIC_QUOTES */
 	public static function unescape($data){
 		
 		if (!get_magic_quotes_gpc())
@@ -163,6 +163,15 @@ class Tools {
 			$data = stripslashes($data);
 		
 		return $data;
+	}
+	
+	public static function sendDownloadHeaders($filename){
+		
+		header('Expires: 0');
+		header('Cache-Control: private');
+		header('Pragma: cache');
+		header('Content-type: application/download');
+		header('Content-Disposition: attachment; filename='.$filename);
 	}
 
 }

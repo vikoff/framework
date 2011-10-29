@@ -37,7 +37,7 @@
 	<?= $this->_getTopMenuHTML(); ?>
 </div>
 
-<div id="page-content">
+<div id="page-content" style="text-align: center;">
 
 	<?=$this->_getContentHTML();?>
 	

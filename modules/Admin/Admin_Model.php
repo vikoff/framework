@@ -25,6 +25,34 @@ class Admin_Model {
 		
 		return $results;
 	}
+	
+	public function makeFsSnapshot($scandir, $collapseDirs, $base = '/'){
+		
+		$dirs = array();
+		$files = array();
+		foreach(scandir($scandir) as $elm){
+			
+			if($elm == '.' || $elm == '..')
+				continue;
+			
+			$mtime = date('Y:m:d H-i-s', filemtime($scandir.$elm));
+			
+			if(is_dir($scandir.$elm))
+				$dirs[] = array('dir' => $elm, 'mtime' => $mtime, 'size' => '');
+			else
+				$files[] = array('file' => $elm, 'mtime' => $mtime, 'size' => filesize($scandir.$elm));
+		}
+		
+		foreach($dirs as $d){
+			$dir = $d['dir'].'/';
+			echo $base.$dir.'|'.$d['mtime']."\n";
+			if (!isset($collapseDirs[$d['dir']]))
+				$this->makeFsSnapshot($scandir.$dir, $collapseDirs, $base.$dir);
+		}
+		
+		foreach($files as $f)
+			echo $base.$f['file'].' |'.$f['mtime'].'|'.$f['size']."\n";
+	}
 }
 
 ?>
