@@ -103,25 +103,6 @@ CREATE TABLE `test_items` (
 
 
 
-/* МЕНЮ */
-DROP TABLE IF EXISTS `menus`;
-CREATE TABLE `menus` (
-  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `name`			VARCHAR(255),
-  `create_date`		INT(10) UNSIGNED
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-/* ЭЛЕМЕНТЫ МЕНЮ */
-DROP TABLE IF EXISTS `menu_items`;
-CREATE TABLE `menu_items` (
-  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `menu_id`			INT(10) UNSIGNED,
-  `name`			VARCHAR(255),
-  `parent_id`		INT(10) UNSIGNED DEFAULT 0,
-  `index`			SMALLINT UNSIGNED,
-  `request_active`	VARCHAR(255)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
 /* ТЕСТОВЫЕ СУЩНОСТИ */
 DROP TABLE IF EXISTS `test_items`;
 CREATE TABLE `test_items` (
@@ -133,10 +114,41 @@ CREATE TABLE `test_items` (
   `is_active`		BOOLEAN
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-/* ТЕСТОВЫЕ СУЩНОСТИ */
+/* ПСЕВДОНИМЫ */
 DROP TABLE IF EXISTS `aliases`;
 CREATE TABLE `aliases` (
   `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `alias`			VARCHAR(255),
   `path`			VARCHAR(255)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+/* FIELDS ПОЛЯ */
+DROP TABLE IF EXISTS `fields_names`;
+CREATE TABLE `fields_names` (
+  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `module`			VARCHAR(100),
+  `name`			VARCHAR(255),
+  `title`			VARCHAR(255),
+  `type`			VARCHAR(100),
+  `description`		TEXT
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+/* FIELDS ЗНАЧЕНИЯ */
+DROP TABLE IF EXISTS `fields_values`;
+CREATE TABLE `fields_values` (
+  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `item_id`			INT(10) UNSIGNED,
+  `field_id`		INT(10) UNSIGNED,
+  `value`			TEXT
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+/* FIELDS ПОЛЯ */
+DROP TABLE IF EXISTS `meta`;
+CREATE TABLE `meta` (
+  `id`					INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `path`				VARCHAR(255),
+  `meta_keywords`		TEXT,
+  `meta_description`	TEXT,
+  `description`			TEXT
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
