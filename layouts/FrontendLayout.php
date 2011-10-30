@@ -31,12 +31,12 @@ class FrontendLayout extends Layout {
 		if(CurUser::get()->isLogged()){
 			
 			$user_io = CurUser::get()->getName('io');
-			$user_perms_string = User::getPermName(USER_AUTH_PERMS);
-			include($this->_tplPath.'Profile/logged_block.php');
+			$user_perms_string = 'ololo'; //User::getPermName(USER_AUTH_PERMS);
+			include($this->_layoutDir.'logged_block.php');
 		}else{
 			
 			$error = Messenger::get()->ns('login')->getAll();
-			include($this->_tplPath.'Profile/login_block.php');
+			include($this->_layoutDir.'login_block.php');
 		}
 	}
 	

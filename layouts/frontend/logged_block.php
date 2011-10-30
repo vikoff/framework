@@ -1,0 +1,1 @@
+<div id="logged-block">	<div style="text-align: center;">		Здравствуйте, <?=$user_io;?>!<br />		Вы вошли как <?=$user_perms_string;?>.	</div>	<div style="text-align: right; margin: 5px 2px;">		<form action="" method="post" class="inline">			<?=FORMCODE;?>			<input class="button" type="submit" name="action[user/profile/logout]" value="Выход" />		</form>	</div></div>

@@ -37,6 +37,10 @@
 	<?= $this->_getTopMenuHTML(); ?>
 </div>
 
+<div class="paragraph">
+	<?= $this->_getLoginBlockHTML(); ?>
+</div>
+
 <div id="page-content" style="text-align: center;">
 
 	<?=$this->_getContentHTML();?>
@@ -47,7 +51,7 @@
 	<?=$this->_getClientStatisticsLoader();?>
 </div>
 
-<?= Debugger::get()->getPageStatisticsHtml();?>
+<?= Debugger::get()->getPageInfoHTML();?>
 
 </body>
 </html>

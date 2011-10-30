@@ -68,7 +68,7 @@ class User_ProfileController extends Controller{
 		
 		$user = CurUser::get();
 		
-		if($user->save(Tools::unescape($_POST), $user->getValidator(User_Model::VALIDATION_REGISTER))){
+		if($user->save(Tools::unescape($_POST), User_Model::SAVE_REGISTER)){
 			$user->login($user->getField(CurUser::LOGIN_FIELD), $_POST['password']);
 			App::redirect('user/profile/greeting');
 			return TRUE;

@@ -2,9 +2,12 @@
 
 class User_Model extends ActiveRecord{
 	
-	const VALIDATION_ADMIN_CREATE = 'adm-create';
-	const VALIDATION_ADMIN_EDIT   = 'adm-edit';
-	const VALIDATION_REGISTER     = 'reg';
+	const SAVE_ADMIN_CREATE = 'adm-create';
+	const SAVE_ADMIN_EDIT   = 'adm-edit';
+	const SAVE_ADMIN_PASS   = 'adm-pass';
+	const SAVE_REGISTER     = 'reg';
+	const SAVE_PASS         = 'pass';
+	
 	
 	// пол
 	const GENDER_FEMALE 	= 'f';
@@ -49,11 +52,11 @@ class User_Model extends ActiveRecord{
 	}
 
 	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР ВАЛИДАТОРА */
-	public function getValidator($mode = self::VALIDATION_REGISTER){
+	public function getValidator($mode = self::SAVE_REGISTER){
 		
 		$rules = array(
-			'login' 	 => array('required' => TRUE, 'length' => array('min' => '2', 'max' => '255')),
-			'password' 	 => array('required' => TRUE, 'length' => array('min' => '5', 'max' => '100'), 'hash' => 'sha1'),
+			'login' 	 => array('required' => TRUE, 'function' => array('User_Model', 'validateLogin'), 'match' => '/^[a-zA-Z][\w-]+$/', 'length' => array('min' => '2', 'max' => '255')),
+			'password' 	 => array('required' => TRUE, 'function' => array('User_Model', 'validatePassword'), 'hash' => 'sha1'),
 			'password_confirm'	=> array('compare' => 'password', 'hash' => 'sha1', 'unsetAfter' => TRUE),
 			'email' 	 => array('required' => TRUE, 'length' => array('max' => '100'), 'email' => true),
 			'surname' 	 => array('required' => TRUE, 'length' => array('max' => '255')),
@@ -65,15 +68,19 @@ class User_Model extends ActiveRecord{
 		$fields = array();
 		switch($mode) {
 			
-			case self::VALIDATION_ADMIN_CREATE:
+			case self::SAVE_ADMIN_CREATE:
 				$fields = array('login', 'password', 'password_confirm', 'email', 'surname', 'name', 'role_id');
 				break;
 			
-			case self::VALIDATION_ADMIN_EDIT:
+			case self::SAVE_ADMIN_EDIT:
 				$fields = array('email', 'surname', 'name', 'role_id');
 				break;
+			
+			case self::SAVE_ADMIN_PASS:
+				$fields = array('password', 'password_confirm');
+				break;
 				
-			case self::VALIDATION_REGISTER:
+			case self::SAVE_REGISTER:
 				$fields = array('login', 'password', 'password_confirm', 'email', 'surname', 'name', 'captcha');
 				break;
 			
@@ -108,7 +115,11 @@ class User_Model extends ActiveRecord{
 		
 		if($this->isNewObj){
 			
-			if(!empty($data['email']) && self::isEmailInUse($data['email'])){
+			if (!empty($data['login']) && self::isLoginInUse($data['login'])){
+				$this->setError('Логин занят');
+				return FALSE;
+			}
+			if (!empty($data['email']) && self::isEmailInUse($data['email'])){
 				$this->setError('Данные email-адрес уже используется, возможно Вам следует воспользатся функцией <a href="'.href('profile/forget-password').'">восстановления учетной записи</a>');
 				return FALSE;
 			}
@@ -244,10 +255,23 @@ class User_Model extends ActiveRecord{
 			return 'не указан';
 	}
 
+	public static function validateLogin($fieldvalue, $fieldname){
+		
+		return 0;
+	}
+	
+	public static function validatePassword($fieldvalue, $fieldname){
+		
+		$len = strlen($fieldvalue);
+		if($len < 4 || $len > 20)
+			return '<b>Пароль</b> должен быть длиной от 4 до 20 символов';
+		
+		return 0;
+	}
 }
 
 
-class User_Collection extends ARCollection{
+class User_Collection extends ARCollection {
 
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',

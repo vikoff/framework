@@ -39,7 +39,7 @@ $(function(){
 	VikDebug.init();
 	
 	$.ajaxSetup({
-		error: function(xhr){VikDebug.print(xhr.responseText, 'ajax-error', {position: 'top'});}
+		error: function(xhr){var_dump(xhr); VikDebug.print(xhr.responseText, 'ajax-error', {position: 'top'});}
 	});
 	
 	$('.ctrlentersend').ctrlentersend();

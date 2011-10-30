@@ -7,6 +7,9 @@ class ActiveRecord {
 	const INIT_EXISTS_FORCE = 3;
 	const INIT_ANY = 4;
 
+	/** режим сохранения объекта */
+	const SAVE_DEFAULT = 'default';
+	
 	public $id = null;
 	public $pkField = 'id';
 	public $tableName = null;
@@ -229,12 +232,12 @@ class ActiveRecord {
 	}
 	
 	/** ПОДГОТОВКА ДАННЫХ К СОХРАНЕНИЮ */
-	public function save($data, Validator $customValidator = null){
+	public function save($data, $saveMode = self::SAVE_DEFAULT){
 		
-		if($this->preValidation($data) === FALSE)
+		if($this->preValidation($data, $saveMode) === FALSE)
 			return FALSE;
 		
-		$validator = $customValidator ? $customValidator : $this->getValidator();
+		$validator = $this->getValidator($saveMode);
 		$data = $validator->validate($data);
 		
 		if($validator->hasError()){
@@ -242,12 +245,12 @@ class ActiveRecord {
 			return FALSE;
 		}
 		
-		if($this->postValidation($data) === FALSE)
+		if($this->postValidation($data, $saveMode) === FALSE)
 			return FALSE;
 				
 		$this->setFields($data);
 		$this->_save();
-		$this->afterSave($data);
+		$this->afterSave($data, $saveMode);
 		return $this->id;
 	}
 	

@@ -54,6 +54,30 @@
 	</table>
 </form>
 
+<br />
+
+<h3>Изменение пароля пользователя #<?= $this->instanceId; ?> <?= $this->login; ?></h3>
+<?= Messenger::get()->ns('password-change')->getAll(); ?>
+<form action="" method="post">
+	<?= FORMCODE; ?>	
+	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
+	
+	<table class="grid" style="margin: 1em 0;">
+		<tr>
+			<th>Новый пароль</th>
+			<td><input type="password" name="password" value="" />
+		</tr>
+		<tr>
+			<th>Подтверждения пароля</th>
+			<td><input type="password" name="password_confirm" value="" />
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				<input type="submit" name="action[admin/user/change-password]" class="button" value="Применить" />
+			</td>
+	</table>
+</form>
+
 <script type="text/javascript">
 
 $(function(){

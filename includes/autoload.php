@@ -26,7 +26,6 @@ function __autoload($className){
 		'Exception403'		=> 'core/Exception.php',
 		'Exception404'		=> 'core/Exception.php',
 		'HtmlForm'			=> 'core/HtmlForm.php',
-		'Debugger'			=> 'core/Debugger.php',
 		
 		'Def'				=> 'components/Def.component.php',
 		
@@ -35,6 +34,7 @@ function __autoload($className){
 		'Config'			=> 'includes/Config.php',
 		'CurUser' 			=> 'includes/CurUser.php',
 		'Request' 			=> 'includes/Request.php',
+		'Debugger'			=> 'includes/Debugger.php',
 		
 		'FrontendLayout' 	=> 'layouts/FrontendLayout.php',
 		'BackendLayout' 	=> 'layouts/BackendLayout.php',

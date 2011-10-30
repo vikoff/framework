@@ -68,6 +68,11 @@ class Admin_Controller extends Controller{
 	/** ПОЛУЧИТЬ ЭКЗЕМЛЯР КОНТРОЛЛЕРА ДЛЯ ПРОКСИРОВАНИЯ */
 	public function getProxyControllerInstance($proxy){
 		
+		if (!CurUser::get()->isLogged()){
+			BackendLayout::get()->showLoginPage();
+			exit;
+		}
+		
 		return App::get()->isModule($proxy, TRUE)
 			? App::get()->getModule($proxy, TRUE)
 			: new $proxy($this->_config);

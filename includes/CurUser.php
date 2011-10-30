@@ -83,10 +83,10 @@ class CurUser extends User_Model{
 		$login = $db->qe($login);
 		$pass = $db->quote(sha1($pass));
 		
-		if($ans = $db->getRow('SELECT id, '.self::LOGIN_FIELD.', password, level FROM '.self::TABLE.' WHERE '.self::LOGIN_FIELD.'='.$login.' AND password='.$pass, FALSE)){
+		if($ans = $db->getRow('SELECT id, '.self::LOGIN_FIELD.', password, role_id FROM '.self::TABLE.' WHERE '.self::LOGIN_FIELD.'='.$login.' AND password='.$pass, FALSE)){
 		
 			// сохранить данные в сессию
-			$this->setLoggedAuthData($ans['id'], $ans['level']);
+			$this->setLoggedAuthData($ans['id'], $ans['role_id']);
 			
 			// запомнить пользователя
 			if($remember)
@@ -107,13 +107,13 @@ class CurUser extends User_Model{
 		$uid = (int)$_COOKIE[$this->_authPrefix.'uid'];
 		$db = db::get();
 		
-		$ans = $db->getRow('SELECT id, '.self::LOGIN_FIELD.', password, level FROM '.self::TABLE.' WHERE id='.$db->qe($uid), 0);
+		$ans = $db->getRow('SELECT id, '.self::LOGIN_FIELD.', password, role_id FROM '.self::TABLE.' WHERE id='.$db->qe($uid), 0);
 		if(!$ans)
 			return false;
 
 		if($_COOKIE[$this->_authPrefix.'access'] == md5('yurijnovikovproject'.$ans['id']."_".$ans[self::LOGIN_FIELD]."_".$ans['password'])){
 		
-			$this->setLoggedAuthData($ans['id'], $ans['level']);
+			$this->setLoggedAuthData($ans['id'], $ans['role_id']);
 			$this->_setLoginCookie($ans['id'], $ans[self::LOGIN_FIELD], $ans['password']);
 			return TRUE;
 			

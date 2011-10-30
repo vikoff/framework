@@ -89,7 +89,7 @@
 	<?=CFG_SITE_NAME;?>
 </div>
 
-<?= Debugger::get()->getPageStatisticsHtml();?>
+<?= Debugger::get()->getPageInfoHTML();?>
 
 </body>
 </html>

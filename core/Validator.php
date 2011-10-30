@@ -49,7 +49,9 @@ class Validator {
 		'strip_tags',
 		'htmlspecialchars',
 		'escape',
+		
 		'required',
+		'function',
 		'email',
 		'match',
 		'length',
@@ -344,6 +346,21 @@ class Validator {
 		
 		if(empty($this->validData[$field]) && $execute)
 			$this->setError($this->getErrorText($field, 'required'));
+	}
+	
+	/**
+	 * ПРАВИЛО FUNCTION
+	 * @param $callback - функция, которая должна произвести валидацию, и вернуть 0 в случае успеха,
+	 *                    или текстовое сообщение, в случае ошибки. В параметры функции передаются
+	 *                    переменные: ($fieldValue, $fieldName)
+	 */
+	public function rule_function($field, $callback){
+		
+		if (!is_callable($callback))
+			$this->fatalError('Правилу function должен быть передан валидный callback');
+		
+		if ($ret = call_user_func($callback, $this->validData[$field], $field))
+			$this->setError($ret);
 	}
 	
 	// ПРАВИЛО EMAIL

@@ -3,7 +3,6 @@
 
 <form id="edit-form" action="" method="post">
 	<?= FORMCODE; ?>	
-	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
 	
 	<table class="grid" style="margin: 1em 0;">
 	<tr>
@@ -45,12 +44,12 @@
 		<td><?= Html_Form::input(array('type' => 'text', 'name' => 'email', 'value' => $this->email)); ?></td>
 	</tr>
 	<tr>
-		<th>Фамилия</th>
-		<td><?= Html_Form::inputText(array('name' => 'surname', 'value' => $this->surname)); ?></td>
-	</tr>
-	<tr>
 		<th>Имя</th>
 		<td><?= Html_Form::inputText(array('name' => 'name', 'value' => $this->name)); ?></td>
+	</tr>
+	<tr>
+		<th>Фамилия</th>
+		<td><?= Html_Form::inputText(array('name' => 'surname', 'value' => $this->surname)); ?></td>
 	</tr>
 	<tr>
 		<th>Роль</th>
@@ -70,20 +69,10 @@
 
 $(function(){
 	
-	$("#edit-form").validate( { <?= $this->validation; ?> } );
-	
-	// login check
-	$('#input-login').rules("add", {
-		remote: "user/check-login-unique",
-		messages: {
-			remote: 'Данный логин уже занят'
-		}
-	});
-	
 	enableFloatingSubmits();
 	
 	function generatePass(){
-		$.get(href('user/generate-password'), function(response){
+		$.get(href('admin/users/generate-password'), function(response){
 			$('#password-generate-box input[name="password"]').val(response);
 			$('#password-generate-box input[name="password_confirm"]').val(response);
 		});

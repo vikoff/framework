@@ -226,7 +226,7 @@ input.button, button.button, a.button{
 	padding: 2px 8px;
 	border: outset 1px #999;
 	background-color: #E5E5E5;
-	-moz-border-radius: 8px; -webkit-border-radius: 8px; border-radius: 8px;
+	-moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;
 	font-size: 12px;
 	text-decoration: none;
 	color: #000 !important;

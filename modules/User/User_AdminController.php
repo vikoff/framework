@@ -23,10 +23,11 @@ class User_AdminController extends Controller{
 		'display_edit'		=> 'edit',
 		'display_delete'	=> 'edit',
 
-		'action_save_perms' => 'edit',
-		'action_delete' 	=> 'edit',
-		'action_create' 	=> 'edit',
-		'action_save' 		=> 'edit',
+		'action_save_perms'			=> 'edit',
+		'action_delete' 			=> 'edit',
+		'action_create' 			=> 'edit',
+		'action_save' 				=> 'edit',
+		'action_change_password' 	=> 'edit',
 		
 		'ajax_generate_password' => 'public',
 		'ajax_check_login_unique' => 'public',
@@ -196,12 +197,12 @@ class User_AdminController extends Controller{
 
 	}
 	
-	// ACTION ADMIN CREATE
+	/** ACTION CREATE */
 	public function action_create($params = array()){
 		
 		$user = User_Model::create();
 		
-		if($user->save($_POST, $user->getValidator(User_Model::VALIDATION_ADMIN_CREATE))){
+		if($user->save(Tools::unescape($_POST), User_Model::SAVE_ADMIN_CREATE)){
 			Messenger::get()->addSuccess('Новый пользователь успешно создан');
 			return TRUE;
 		}else{
@@ -210,16 +211,30 @@ class User_AdminController extends Controller{
 		}
 	}
 	
-	// ACTION ADMIN SAVE
+	/** ACTION SAVE */
 	public function action_save($params = array()){
 		
 		$user = User_Model::load(getVar($_POST['id']));
 		
-		if($user->save($_POST, $user->getValidator(User_Model::VALIDATION_ADMIN_EDIT))){
+		if($user->save(Tools::unescape($_POST), User_Model::SAVE_ADMIN_EDIT)){
 			Messenger::get()->addSuccess('Данные пользователя сохранены');
 			return TRUE;
 		}else{
 			Messenger::get()->addError('При сохранении данных пользователя возникли ошибки:', $user->getError());
+			return FALSE;
+		}
+	}
+	
+	/** ACTION SAVE */
+	public function action_change_password($params = array()){
+		
+		$user = User_Model::load(getVar($_POST['id']));
+		
+		if($user->save(Tools::unescape($_POST), User_Model::SAVE_ADMIN_PASS)){
+			Messenger::get()->ns('password-change')->addSuccess('Пароль обновлен');
+			return TRUE;
+		}else{
+			Messenger::get()->ns('password-change')->addError('Не удалось обновить пароль:', $user->getError());
 			return FALSE;
 		}
 	}
