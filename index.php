@@ -25,6 +25,9 @@ header('Content-Type: text/html; charset=utf-8');
 // подключение файлов CMF
 require_once(FS_ROOT.'setup.php');
 
+// сохранение статистики
+UserStatistics_Model::get()->savePrimaryStatistics();
+
 // выполнение приложения
 if(AJAX_MODE)
 	App::get()->ajax();

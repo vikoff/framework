@@ -35,7 +35,7 @@ class Admin_Model {
 			if($elm == '.' || $elm == '..')
 				continue;
 			
-			$mtime = date('Y:m:d H-i-s', filemtime($scandir.$elm));
+			$mtime = date('Y-m-d H:i:s', filemtime($scandir.$elm));
 			
 			if(is_dir($scandir.$elm))
 				$dirs[] = array('dir' => $elm, 'mtime' => $mtime, 'size' => '');

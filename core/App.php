@@ -85,7 +85,7 @@ class App {
 		if($this->_checkDisplay())
 			exit;
 		
-		$this->error404();
+		$this->error404($this->_requestModuleName);
 	}
 	
 	public function prepareModuleName($module){
@@ -94,11 +94,19 @@ class App {
 		return strtolower(substr($module, 0, 1)).substr($module, 1);
 	}
 	
+	/** ПРОВЕРКА, СУЩЕСТВУЕТ ЛИ УКАЗАННЫЙ МОДУЛЬ */
+	public function issetModule($module){
+		
+		return isset($this->_modulesConfig[$module]);
+	}
+	
+	/** ПРОВЕРКА, СУЩЕСТВУЕТ ЛИ УКАЗАННЫЙ МОДУЛЬ и есть ли у него контроллер */
 	public function isModule($module, $adminMode = FALSE){
 		
 		return isset($this->_modulesConfig[$module][$adminMode ? 'adminController' : 'controller']);
 	}
 	
+	/** ПОЛУЧЕНИЕ ЭКЗЕМПЛЯРА КОНТРОЛЛЕРА МОДУЛЯ */
 	public function getModule($module, $adminMode = FALSE){
 		
 		$key = $adminMode ? 'adminController' : 'controller';

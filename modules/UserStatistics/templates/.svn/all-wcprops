@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/vik-off-cmf/!svn/ver/47/templates/UserStatistics
+END
+admin_list.tpl
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/vik-off-cmf/!svn/ver/46/templates/UserStatistics/admin_list.tpl
+END
+view.tpl
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/vik-off-cmf/!svn/ver/47/templates/UserStatistics/view.tpl
+END
+delete.php
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/vik-off-cmf/!svn/ver/45/templates/UserStatistics/delete.php
+END

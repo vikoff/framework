@@ -84,6 +84,12 @@ class Alias_Model extends ActiveRecord {
 	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function postValidation(&$data){
 		
+		// проверка псевдонима на совпадение с именем модуля
+		if(App::get()->issetModule($data['alias'])){
+			$this->setError('Псевдоним совпадает с именем подуля');
+			return FALSE;
+		}
+		
 		// проверка псевдонима на уникальность
 		if(!$this->_isUnique($data['alias'])){
 			$this->setError('Другая запись с таким псевдонимом уже существует');

@@ -50,12 +50,11 @@ CREATE TABLE `error_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-/* ПОЛНАЯ ПОЛЬЗОВАТЕЛЬСКАЯ СТАТИСТИКА */
-DROP TABLE IF EXISTS `user_statistics`;
-CREATE TABLE `user_statistics` (
-  `id` 				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+/* ПОЛЬЗОВАТЕЛЬСКАЯ СТАТИСТИКА */
+DROP TABLE IF EXISTS `user_stat`;
+CREATE TABLE `user_stat` (
+  `id` 				INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `uid` 			INT(10) UNSIGNED DEFAULT 0,
-  `request_urls`	TEXT,
   `user_ip`			VARCHAR(255),
   `referer`			VARCHAR(255),
   `user_agent_raw`	VARCHAR(255),
@@ -64,10 +63,19 @@ CREATE TABLE `user_statistics` (
   `browser_version`	VARCHAR(50),
   `screen_width`	SMALLINT UNSIGNED,
   `screen_height`	SMALLINT UNSIGNED,
-  `date`			INT(10) UNSIGNED,
-  PRIMARY KEY (`id`)
+  `date`			INT(10) UNSIGNED
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+/* СТРАНИЦЫ, ПОСЕЩЕННЫЕ ПОЛЬЗОВАТЕЛЯМИ */
+DROP TABLE IF EXISTS `user_stat_pages`;
+CREATE TABLE `user_stat_pages` (
+  `id` 				INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `session_id`		INT(10) UNSIGNED,
+  `url`				TEXT,
+  `is_ajax`			BOOLEAN,
+  `post_data`		TEXT,
+  `date`			INT(10) UNSIGNED
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /* ТЕСТОВЫЕ РАЗДЕЛЫ */
 DROP TABLE IF EXISTS `test_sections`;
@@ -100,7 +108,6 @@ CREATE TABLE `test_items` (
   `published`	CHAR(1),
   `date` 		INT(10) UNSIGNED DEFAULT NULL
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
 
 
 /* ТЕСТОВЫЕ СУЩНОСТИ */

@@ -177,12 +177,12 @@ class Layout{
 	}
 	
 	/** GET CLIENT STATISTICS LOADER HTML */
-	protected function _getClientStatisticsLoader(){
+	protected function _getClientStatisticsLoaderHTML(){
 	
-		$uStat = UserStatistics_Model::get();
+		$stat = UserStatistics_Model::get();
 		
-		return $uStat->checkClientSideStatistics()
-			? $uStat->getClientSideStatisticsLoader()
+		return $stat->checkClientSideStatistics()
+			? $stat->getClientSideStatisticsLoader()
 			: '';
 	}
 	

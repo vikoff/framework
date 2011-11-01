@@ -126,7 +126,7 @@ class CurUser extends User_Model{
 	// ВЫХОД ИЗ АККАУНТА
 	public function logout(){
 		
-		// UserStatistics::get()->reset();
+		UserStatistics_Model::get()->reset();
 		$this->setEmptyAuthData();
 		$this->_setEmptyCookie();
 	}
@@ -161,8 +161,7 @@ class CurUser extends User_Model{
 	 private function setLoggedAuthData($id, $perms, $root = FALSE){
 		
 		$_SESSION[$this->_authPrefix.'userAuthData'] = array('id' => $id, 'perms' => $perms, 'root' => $root ? TRUE : FALSE);
-		
-		// UserStatistics::get()->saveAuthStatistics($id);
+		UserStatistics_Model::get()->saveAuthStatistics($id);
 	}
 	
 	// УСТАНОВИТЬ ПУСТЫЕ ПОЛЬЗОВАТЕЛЬСКИЕ ДАННЫЕ

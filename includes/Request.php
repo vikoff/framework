@@ -34,7 +34,9 @@ class Request {
 	/** РАЗБОР URL ЗАПРОСА */
 	public function parseRequest(){
 		
-		$this->checkAlias();
+		$tmpRequestArr = explode('/', $this->_requestString);
+		if ($tmpRequestArr[0] != 'admin')
+			$this->checkAlias();
 		
 		$_rArr = array();
 		foreach(explode('/', $this->_requestString) as $item){

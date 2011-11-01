@@ -1,6 +1,5 @@
 <?
 /**
- * Фронт-контроллер приложения. 
  * 
  * @using constants
  * 		User::TABLE
@@ -9,48 +8,25 @@
  * 		YDate::timestamp2date()
  * 		App::href()
  * 		User::getPermName()
- * 		
- * 		
  */
-class UserStatistics_Model{
+class UserStatistics_Model {
 	
-	private $_statisticsEnabled = null;
+	const TABLE = 'user_stat';
+	const TABLE_PAGES = 'user_stat_pages';
 	
-	// конфигурация класса
-	private static $_config = array(
-		'enable' => FALSE,			// вести статистику
-		'dbTableName' => '',		// имя таблицы в БД
-	);
+	private static $_enabled = FALSE;
 	
 	private static $_instance = null;
 	
 	
-	/**
-	 * Задать конфигурацию класса
-	 * @param array $config - массив директива=>значение
-	 * @return void;
-	 */
-	public static function setConfig($config){
-	
-		foreach($config as $key => $val){
-			if(array_key_exists($key, self::$_config)){
-				self::$_config[$key] = $val;
-			}else{
-				trigger_error('Не удалось установить конфигурацию класса UserStatistics_Model. Неизвестный ключ ['.$key.']', E_USER_ERROR);
-			}
-		}
+	/** ВКЛЮЧИТЬ СБОР СТАТИСТИКИ */
+	public static function enable(){
+		self::$_enabled = TRUE;
 	}
 	
-	/**
-	 * Получить значение конфигурационной директивы, или весь массив конфигурации
-	 * @param null|string $key
-	 * @return array|string
-	 */
-	public static function getConfig($key = null){
-		
-		return is_null($key)
-			? self::$_config
-			: self::$_config[$key];
+	/** ОТКЛЮЧИТЬ СБОР СТАТИСТИКИ */
+	public static function disable(){
+		self::$_enabled = FALSE;
 	}
 	
 	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР КЛАССА */
@@ -65,9 +41,7 @@ class UserStatistics_Model{
 	/** КОНСТРУКТОР */
 	private function __construct(){
 		
-		$this->_statisticsEnabled = self::$_config['enable'];
-		
-		if(!$this->_statisticsEnabled)
+		if(!self::$_enabled)
 			return;
 			
 		if(!$this->_isSessionInited())
@@ -79,7 +53,7 @@ class UserStatistics_Model{
 		
 		$data = db::get()->getRow('
 			SELECT s.*, u.name, u.surname, u.level
-			FROM '.self::$_config['dbTableName'].' AS s
+			FROM '.self::TABLE.' AS s
 			LEFT JOIN '.User::TABLE.' AS u ON u.id=s.uid
 			WHERE s.id='.(int)$id,
 			FALSE);
@@ -114,7 +88,7 @@ class UserStatistics_Model{
 	public function savePrimaryStatistics(){
 		
 		// выход если сохранение статистики отключено
-		if(!$this->_statisticsEnabled)
+		if(!self::$_enabled)
 			return;
 		
 		// определение запришиваемого URL
@@ -124,26 +98,29 @@ class UserStatistics_Model{
 		if($requestUrl == $_SESSION['vik-off-user-statistics']['last-url'])
 			return;
 		
+		$db = db::get();
+		
+		// создание сессии
 		if(!$_SESSION['vik-off-user-statistics']['session-id']){
 		
-			$_SESSION['vik-off-user-statistics']['session-id'] = db::get()->insert(self::$_config['dbTableName'], array(
-				'request_urls' 	 => $requestUrl.' '.time().'\\n',
+			$sid = $db->insert(self::TABLE, array(
 				'user_ip' 		 => getVar($_SERVER['REMOTE_ADDR']),
 				'user_agent_raw' => getVar($_SERVER['HTTP_USER_AGENT']),
 				'referer' 		 => getVar($_SERVER['HTTP_REFERER']),
 				'date'			 => time(),
 			));
+			$_SESSION['vik-off-user-statistics']['session-id'] = $sid;
 			
-		}else{
-		
-			$requestUrlAddit = $requestUrl.' '.time().'\\n';
-			db::get()->query("
-				UPDATE ".self::$_config['dbTableName']." SET
-				request_urls=COALESCE(request_urls,'')||'".$requestUrlAddit."',
-				-- request_urls=IF(request_urls IS NULL, '".$requestUrlAddit."', CONCAT(request_urls,'".$requestUrlAddit."')),
-				date='".time()."'
-				WHERE id=".$_SESSION['vik-off-user-statistics']['session-id']);
 		}
+		
+		// сохранение запрошенной страницы
+		$db->insert(self::TABLE_PAGES, array(
+			'session_id' => $_SESSION['vik-off-user-statistics']['session-id'],
+			'url'        => $requestUrl,
+			'is_ajax'    => AJAX_MODE ? TRUE : FALSE,
+			'post_data'  => null,
+			'date'       => time(),
+		));
 		
 		// сохраняем запрашиваемый URL
 		$_SESSION['vik-off-user-statistics']['last-url'] = $requestUrl;
@@ -153,7 +130,7 @@ class UserStatistics_Model{
 	public function checkClientSideStatistics(){
 		
 		// выход если сохранение статистики отключено
-		if(!$this->_statisticsEnabled)
+		if(!self::$_enabled)
 			return FALSE;
 	
 		return empty($_SESSION['vik-off-user-statistics']['is-client-stat-saved']);
@@ -163,7 +140,7 @@ class UserStatistics_Model{
 	public function getClientSideStatisticsLoader(){
 		
 		// выход если сохранение статистики отключено
-		if(!$this->_statisticsEnabled)
+		if(!self::$_enabled)
 			return '';
 			
 		return '
@@ -175,7 +152,7 @@ class UserStatistics_Model{
 						screen_width: screen.width,
 						screen_height: screen.height
 					};
-					$.post("ajax.php?r=profile/save_user_stat", data, function(r){
+					$.post(href("user-statistics/save-client-side"), data, function(r){
 						if(r != "ok")
 							alert("Ошибка сохранения статистики: \n" + r);
 					});
@@ -188,7 +165,7 @@ class UserStatistics_Model{
 	public function saveClientSideStatistics($bName, $bVer, $sW, $sH){
 		
 		// выход если сохранение статистики отключено
-		if(!$this->_statisticsEnabled)
+		if(!self::$_enabled)
 			return;
 		
 		$this->_dbSave(array(
@@ -205,7 +182,7 @@ class UserStatistics_Model{
 	public function saveAuthStatistics($uid){
 		
 		// выход если сохранение статистики отключено
-		if(!$this->_statisticsEnabled)
+		if(!self::$_enabled)
 			return;
 	
 		$this->_dbSave(array(
@@ -222,9 +199,9 @@ class UserStatistics_Model{
 			$fieldvalues['user_agent_raw'] 	= getVar($_SERVER['HTTP_USER_AGENT']);
 			$fieldvalues['referer'] 		= getVar($_SERVER['HTTP_REFERER']);
 			$fieldvalues['date'] 			= time();
-			$_SESSION['vik-off-user-statistics']['session-id'] = db::get()->insert(self::$_config['dbTableName'], $fieldvalues);
+			$_SESSION['vik-off-user-statistics']['session-id'] = db::get()->insert(self::TABLE, $fieldvalues);
 		}else{
-			db::get()->update(self::$_config['dbTableName'], $fieldvalues, 'id='.$_SESSION['vik-off-user-statistics']['session-id']);
+			db::get()->update(self::TABLE, $fieldvalues, 'id='.$_SESSION['vik-off-user-statistics']['session-id']);
 		}
 	}
 	
@@ -290,7 +267,7 @@ class UserStatistics_Model{
 	public function deleteOldStatistics($expireTime){
 		
 		$minDate = time() - $expireTime;
-		db::get()->delete(self::$_config['dbTableName'], 'date < '.$minDate);
+		db::get()->delete(self::TABLE, 'date < '.$minDate);
 	}
 	
 }
@@ -323,7 +300,7 @@ class UserStatisticsCollection extends ARCollection{
 		
 		$sorter = new Sorter('s.id', 'DESC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array('s.*, u.name, u.surname, u.level',
-			'FROM '.UserStatistics_Model::getConfig('dbTableName').' AS s
+			'FROM '.UserStatistics_Model::TABLE.' AS s
 			LEFT JOIN '.User::TABLE.' AS u ON u.id=s.uid
 			ORDER BY '.$sorter->getOrderBy()), '~50');
 		
