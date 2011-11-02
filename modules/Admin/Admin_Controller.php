@@ -177,17 +177,18 @@ class Admin_Controller extends Controller{
 				break;
 				
 			default:
-				$controllerClass = App::getControllerClassName(array_shift($params));
-				$displayMethodIdentifier = array_shift($params);
+		
+				$app = App::get();
+				$module = $app->prepareModuleName(array_shift($params));
 				
-				if(!$controllerClass){
-					BackendLayout::get()->error404('Контроллер не найден');
+				if(!$app->isModule($module, TRUE)){
+					$this->error404handler('модуль <b>'.$module.'</b> не найден');
 					exit();
 				}
 				
-				$controllerInstance = new $controllerClass($adminMode = TRUE);
-				$controllerInstance->performDisplay($displayMethodIdentifier, $params);
-		}
+				if(!$app->getModule($module, TRUE)->display($params))
+					$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
+				}
 	}
 	
 	//////////////////////

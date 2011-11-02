@@ -51,18 +51,15 @@ class UserStatistics_Model {
 	// ПОЛУЧИТЬ СТРОКУ ДАННЫХ ИЗ ТАБЛИЦЫ
 	public function getRowPrepared($id){
 		
-		$data = db::get()->getRow('
-			SELECT s.*, u.name, u.surname, u.level
-			FROM '.self::TABLE.' AS s
-			LEFT JOIN '.User::TABLE.' AS u ON u.id=s.uid
-			WHERE s.id='.(int)$id,
-			FALSE);
+		$id = (int)$id;
+		$db = db::get();
+		$data = $db->getRow('SELECT * FROM '.self::TABLE.' WHERE id='.$id);
 		
 		if(!$data)
 			throw new Exception('Данные не найдены');
-			
-		return self::beforeDisplay($data, $detail = TRUE);
-
+		
+		$data['pages'] = $db->getAll('SELECT * FROM '.UserStatistics_Model::TABLE_PAGES.' WHERE session_id='.$id);
+		return self::beforeDisplay($data, TRUE);
 	}
 	
 	// ПРОВЕРКА, ИНИЦИАЛИЗИРОВАНА ЛИ СЕССИЯ
@@ -208,57 +205,27 @@ class UserStatistics_Model {
 	// МЕТОД ПРИГОТОВЛЕНИЯ ДАННЫХ ПЕРЕД ОТОБРАЖЕНИЕМ
 	public static function beforeDisplay($data, $detail = FALSE){
 			
-		$urlsArr = !empty($data['request_urls'])
-			? explode("\n", $data['request_urls'])
-			: array();
-		unset($data['request_urls']); // некоторое высвобождение памяти
-		$data['num_pages'] = count($urlsArr);
+		$data['date'] = YDate::loadTimestamp($data['date'])->getStrDateTime();
 		
-		if(count($urlsArr)){
-		
-			$data['has_pages'] = TRUE;
+		if (!empty($data['pages'])) {
 			
-			// данные для детального просмотра
-			if($detail){
-				$data['request_urls'] = array();
-				foreach($urlsArr as $url){
-					if($url){
-						$rowArr = explode(' ', $url);
-						$data['request_urls'][] = array(
-							'url' => $rowArr[0],
-							'date' => YDate::timestamp2date($rowArr[1]));
-					}
-				}
-			}
-			// данные для списка (кратко)
-			else{
-				$firstPage = explode(' ', $urlsArr[0]);
-				$lastPage = explode(' ', $urlsArr[count($urlsArr) - 2]);
-				
-				$data['first_page'] = array(
-					'url' => $firstPage[0],
-					'date' => YDate::timestamp2date($firstPage[1])
-				);
-				$data['last_page'] = array(
-					'url' => $lastPage[0],
-					'date' => YDate::timestamp2date($lastPage[1])
-				);
-			}
+			$num = count($data['pages']);
+			$data['num_pages'] = $num;
 			
+			if ($detail)
+				foreach($data['pages'] as &$p)
+					$p['date'] = YDate::loadTimestamp($p['date'])->getStrDateTime();
+					
+			$data['pages_info'] = array(
+				'first_page' => $data['pages'][0]['url'],
+				'last_page' => $data['pages'][ $num - 1 ]['url'],
+				'first_page_time' => $detail ? $data['pages'][0]['date'] : YDate::loadTimestamp($data['pages'][0]['date'])->getStrDateTime(),
+				'last_page_time' => $detail ? $data['pages'][ $num - 1 ]['date']: YDate::loadTimestamp($data['pages'][ $num - 1 ]['date'])->getStrDateTime(),
+			);
+		} else {
+			$data['pages'] = null;
+			$data['pages_info'] = null;
 		}
-		
-		$data['user'] = $data['uid']
-			? '<a href="'.App::href('admin/users/view/'.$data['uid']).'">'.$data['surname'].' '.$data['name'].'</a><br /><i>'.User::getPermName($data['level']).'</i>'
-			: User::getPermName(0);
-		$data['screen_resolution'] = $data['has_js']
-			? $data['screen_width'].'x'.$data['screen_height']
-			: '-';
-		$data['browser'] = $data['has_js']
-			? $data['browser_name'].' '.$data['browser_version']
-			: '-';
-		$data['has_js_text'] = $data['has_js']
-			? '<span class="green">✔</span>'
-			: '<span class="red">✘</span>';
 			
 		return $data;
 	}
@@ -273,13 +240,13 @@ class UserStatistics_Model {
 }
 
 
-class UserStatisticsCollection extends ARCollection{
+class UserStatistics_Collection extends ARCollection{
 	
 	// поля, по которым возможно сортировка коллекции
 	// каждый ключ должен быть корректным выражением для SQL ORDER BY
 	protected $_sortableFieldsTitles = array(
-		'id' => array('s.id _DIR_', 'id'),
-		'uid' => array('u.surname _DIR_, u.name _DIR_', 'uid'),
+		'id' => array('id _DIR_', 'id'),
+		'uid' => array('uid _DIR_', 'uid'),
 		'user_ip' => 'IP',
 		'referer' => 'referer',
 		'has_js' => 'JS',
@@ -289,7 +256,7 @@ class UserStatisticsCollection extends ARCollection{
 	
 	
 	// ТОЧКА ВХОДА В КЛАСС
-	public static function Load(){
+	public static function load(){
 			
 		$instance = new UserStatisticsCollection();
 		return $instance;
@@ -299,13 +266,19 @@ class UserStatisticsCollection extends ARCollection{
 	public function getPaginated(){
 		
 		$sorter = new Sorter('s.id', 'DESC', $this->_sortableFieldsTitles);
-		$paginator = new Paginator('sql', array('s.*, u.name, u.surname, u.level',
-			'FROM '.UserStatistics_Model::TABLE.' AS s
-			LEFT JOIN '.User::TABLE.' AS u ON u.id=s.uid
-			ORDER BY '.$sorter->getOrderBy()), '~50');
+		$paginator = new Paginator('sql', array('*', 'FROM '.UserStatistics_Model::TABLE.' s ORDER BY '.$sorter->getOrderBy()), '~50');
 		
-		$data = db::get()->getAll($paginator->getSql(), array());
+		$db = db::get();
+		$data = $db->getAllIndexed($paginator->getSql(), 'id', array());
 		
+		// получение посещенных страниц
+		if (!empty($data)){
+			$pages = $db->getAll('SELECT * FROM '.UserStatistics_Model::TABLE_PAGES.' WHERE session_id IN('.implode(',', array_keys($data)).')');
+			foreach($pages as $p)
+				$data[ $p['session_id'] ]['pages'][] = $p;
+		}
+		
+		// получение краткой информации о страницах
 		foreach($data as &$row)
 			$row = UserStatistics_Model::beforeDisplay($row);
 		

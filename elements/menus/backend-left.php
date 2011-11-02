@@ -27,9 +27,19 @@ switch($topMenuHref){
 	case 'admin/config':
 		$items = array(
 			array(
+				'title' => 'Модули',
+				'href' => $topMenuHref.'/modules',
+				'active' => $r->getParts(2) == 'modules',
+			),
+			array(
 				'title' => 'Псевдонимы',
 				'href' => $topMenuHref.'/alias',
 				'active' => $r->getParts(2) == 'alias',
+			),
+			array(
+				'title' => 'Мета-теги',
+				'href' => $topMenuHref.'/meta',
+				'active' => $r->getParts(2) == 'meta',
 			),
 		);
 		break;

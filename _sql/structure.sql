@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS `pages`;
 CREATE TABLE `pages` (
   `id` 				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` 			TEXT NOT NULL,
-  `alias` 			VARCHAR(255) NOT NULL,
+  `alias_id`		INT(10) UNSIGNED,
   `body` 			TEXT,
   `author` 			INT(10) UNSIGNED NOT NULL,
   `published` 		BOOLEAN DEFAULT FALSE,
@@ -126,7 +126,8 @@ DROP TABLE IF EXISTS `aliases`;
 CREATE TABLE `aliases` (
   `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `alias`			VARCHAR(255),
-  `path`			VARCHAR(255)
+  `path`			VARCHAR(255),
+  `is_bound`		BOOLEAN /* флаг о том, что псевдоним связан с элементом по alias.id */
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /* FIELDS ПОЛЯ */

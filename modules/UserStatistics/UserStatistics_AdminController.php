@@ -1,6 +1,6 @@
 <?php
 
-class UserStatisticsController extends Controller{
+class UserStatistics_AdminController extends Controller{
 	
 	const DEFAULT_VIEW = 1;
 	
@@ -8,11 +8,12 @@ class UserStatisticsController extends Controller{
 	const TPL_PATH = 'modules/UserStatistics/templates/';
 	
 	/** метод, отображаемый по умолачанию */
-	protected $_displayIndex = FALSE;
+	protected $_displayIndex = 'list';
 	
 	/** ассоциация методов контроллера с ресурсами */
 	public $methodResources = array(
-		'ajax_save_client_side' => 'public',
+		'display_list' => 'view',
+		'display_view' => 'view',
 	);
 	
 	
@@ -33,32 +34,34 @@ class UserStatisticsController extends Controller{
 	///////////////////////////
 	
 	// DISPLAY LIST (ADMIN)
-	public function admin_display_list($params = array()){
+	public function display_list($params = array()){
 		
-		$collection = new UserStatisticsCollection();
+		$collection = new UserStatistics_Collection();
 		$variables = array(
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
 			'sorters' => $collection->getSortableLinks(),
 		);
 		
-		BackendViewer::get()
+		BackendLayout::get()
 			->setLinkTags($collection->getLinkTags())
-			->setContentSmarty(self::TPL_PATH.'admin_list.tpl', $variables);
+			->setContentPhpFile(self::TPL_PATH.'admin_list.php', $variables)
+			->render();
 	}
 	
-	// DISPLAY VIEW (ADMIN)
-	public function admin_display_view($params = array()){
+	// DISPLAY VIEW
+	public function display_view($params = array()){
 		
 		try{
 			$instanceId = getVar($params[0], 0, 'int');
-			$variables = UserStatistics::get()->getRowPrepared($instanceId);
+			$variables = UserStatistics_Model::get()->getRowPrepared($instanceId);
 			
 			// echo '<pre>'; print_r($variables); die;
 			
-			BackendViewer::get()
+			BackendLayout::get()
 				->prependTitle('Статистика посещений пользователя')
-				->setContentSmarty(self::TPL_PATH.'view.tpl', $variables);
+				->setContentPhpFile(self::TPL_PATH.'admin_view.php', $variables)
+				->render();
 		}
 		catch(Exception $e){
 			BackendViewer::get()->error404($e->getMessage());
@@ -66,7 +69,7 @@ class UserStatisticsController extends Controller{
 	}
 	
 	// DISPLAY DELETE (ADMIN)
-	public function admin_display_delete($params = array()){
+	public function display_delete($params = array()){
 	
 		BackendViewer::get()->setContentPhpFile(self::TPL_PATH.'delete.php');
 	}

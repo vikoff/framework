@@ -209,7 +209,7 @@ class Paginator{
 		return '
 			<form class="inline" action="" method="post">
 				'.FORMCODE.'
-				<input type="hidden" name="action" value="core/paginator-set-items-per-page" />
+				<input type="hidden" name="action" value="user/paginator-set-items-per-page" />
 				<select name="num" onchange="this.form.submit();">'.$options.'</select>
 			</form>';
 	}
