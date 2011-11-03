@@ -131,26 +131,6 @@ class Admin_Controller extends Controller{
 		if(!$app->getModule($module, TRUE)->display($params))
 			$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
 	}
-
-	/** DISPLAY USERS */
-	public function display_users($params = array()){
-			
-		$viewer = BackendLayout::get();
-		
-		if(empty($params[0])){
-			$viewer
-				->setContentHtmlFile(self::TPL_PATH.'users_index.tpl')
-				->render();
-			exit();
-		}
-		
-		$controllerInstance = new UserController($adminMode = TRUE);
-		$displayMethodIdentifier = array_shift($params);
-		
-		$controllerInstance->performDisplay($displayMethodIdentifier, $params);
-		
-		$viewer->render();
-	}
 	
 	/** DISPLAY ROOT */
 	public function display_root($params = array()){
@@ -177,16 +157,17 @@ class Admin_Controller extends Controller{
 				break;
 				
 			default:
-				$controllerClass = App::getControllerClassName(array_shift($params));
-				$displayMethodIdentifier = array_shift($params);
+		
+				$app = App::get();
+				$module = $app->prepareModuleName(array_shift($params));
 				
-				if(!$controllerClass){
-					BackendLayout::get()->error404('Контроллер не найден');
+				if(!$app->isModule($module, TRUE)){
+					$this->error404handler('модуль <b>'.$module.'</b> не найден');
 					exit();
 				}
 				
-				$controllerInstance = new $controllerClass($adminMode = TRUE);
-				$controllerInstance->performDisplay($displayMethodIdentifier, $params);
+				if(!$app->getModule($module, TRUE)->display($params))
+					$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
 		}
 	}
 	

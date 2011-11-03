@@ -33,12 +33,18 @@ class Page_AdminController extends Controller{
 		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
+	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
+	public function getClass(){
+		return __CLASS__;
+	}
+	
+	
 	/////////////////////
 	////// DISPLAY //////
 	/////////////////////
 	
 	/** DISPLAY LIST */
-	public function display_list($params = array()){
+	public function display_list(){
 		
 		$collection = new Page_Collection();
 		$variables = array(
@@ -55,7 +61,7 @@ class Page_AdminController extends Controller{
 	}
 	
 	/** DISPLAY NEW */
-	public function display_new($params = array()){
+	public function display_new(){
 		
 		$pageTitle = 'Создание новой страницы';
 		
@@ -73,12 +79,9 @@ class Page_AdminController extends Controller{
 	}
 	
 	/** DISPLAY EDIT */
-	public function display_edit($params = array()){
+	public function display_edit($instanceId = 0){
 		
-		// header('content-type: text/plain');
-		// echo '<pre>'; print_r($_POST); die;
-		
-		$instanceId = getVar($params[0], 0 ,'int');
+		$instanceId = (int)$instanceId;
 		$instance = Page_Model::Load($instanceId);
 		
 		$pageTitle = '<span style="font-size: 14px;">Редактирование страницы</span> '.$instance->getField('title');
@@ -100,9 +103,9 @@ class Page_AdminController extends Controller{
 	}
 	
 	/** DISPLAY COPY */
-	public function display_copy($params = array()){
+	public function display_copy($instanceId = 0){
 		
-		$instanceId = getVar($params[0], 0 ,'int');
+		$instanceId = (int)$instanceId;
 		$instance = Page_Model::Load($instanceId);
 		
 		$pageTitle = 'Копирование страницы';
@@ -121,9 +124,9 @@ class Page_AdminController extends Controller{
 	}
 	
 	/** DISPLAY DELETE */
-	public function display_delete($params = array()){
+	public function display_delete($instanceId = 0){
 		
-		$instanceId = getVar($params[0], 0 ,'int');
+		$instanceId = (int)$instanceId;
 		$instance = Page_Model::Load($instanceId);
 
 		$variables = array_merge($instance->GetAllFieldsPrepared(), array());
@@ -142,7 +145,7 @@ class Page_AdminController extends Controller{
 	////////////////////
 	
 	/** ACTION SAVE */
-	public function action_create($params = array()){
+	public function action_create(){
 		
 		
 		$instance = Page_Model::create();
@@ -157,7 +160,7 @@ class Page_AdminController extends Controller{
 	}
 	
 	/** ACTION SAVE */
-	public function action_save($params = array()){
+	public function action_save(){
 		
 		
 		$instanceId = getVar($_POST['id'], 0, 'int');
@@ -173,7 +176,7 @@ class Page_AdminController extends Controller{
 	}
 	
 	/** ACTION PUBLISH */
-	public function action_publish($params = array()){
+	public function action_publish(){
 		
 		$instance = Page_Model::Load(getVar($_POST['id'], 0, 'int'));
 		$instance->publish();
@@ -182,7 +185,7 @@ class Page_AdminController extends Controller{
 	}
 	
 	/** ACTION UNPUBLISH */
-	public function action_unpublish($params = array()){
+	public function action_unpublish(){
 		
 		$instance = Page_Model::Load(getVar($_POST['id'], 0, 'int'));
 		$instance->unpublish();
@@ -191,7 +194,7 @@ class Page_AdminController extends Controller{
 	}
 	
 	/** ACTION DELETE */
-	public function action_delete($params = array()){
+	public function action_delete(){
 		
 		$instanceId = getVar($_POST['id'], 0, 'int');
 		$instance = Page_Model::Load($instanceId);
@@ -209,16 +212,6 @@ class Page_AdminController extends Controller{
 			return FALSE;
 		}
 
-	}
-	
-	
-	////////////////////
-	////// OTHER  //////
-	////////////////////
-	
-	
-	public function getClass(){
-		return __CLASS__;
 	}
 	
 }

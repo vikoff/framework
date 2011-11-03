@@ -2,11 +2,11 @@
 /**
  * 
  * @using constants
- * 		User::TABLE
+ * 		User_Model::TABLE
  * 		
  * @using methods
  * 		YDate::timestamp2date()
- * 		App::href()
+ * 		href()
  * 		User::getPermName()
  */
 class UserStatistics_Model {
@@ -226,7 +226,7 @@ class UserStatistics_Model {
 						$rowArr = explode(' ', $url);
 						$data['request_urls'][] = array(
 							'url' => $rowArr[0],
-							'date' => YDate::timestamp2date($rowArr[1]));
+							'date' => YDate::loadTimestamp($rowArr[1])->getStrDateTime());
 					}
 				}
 			}
@@ -247,9 +247,9 @@ class UserStatistics_Model {
 			
 		}
 		
-		$data['user'] = $data['uid']
-			? '<a href="'.App::href('admin/users/view/'.$data['uid']).'">'.$data['surname'].' '.$data['name'].'</a><br /><i>'.User::getPermName($data['level']).'</i>'
-			: User::getPermName(0);
+		$data['user'] = $data['uid'];
+			// ? '<a href="'.href('admin/users/view/'.$data['uid']).'">'.$data['surname'].' '.$data['name'].'</a><br /><i>'.User::getPermName($data['level']).'</i>'
+			// : User::getPermName(0);
 		$data['screen_resolution'] = $data['has_js']
 			? $data['screen_width'].'x'.$data['screen_height']
 			: '-';
@@ -273,7 +273,7 @@ class UserStatistics_Model {
 }
 
 
-class UserStatisticsCollection extends ARCollection{
+class UserStatistics_Collection extends ARCollection {
 	
 	// поля, по которым возможно сортировка коллекции
 	// каждый ключ должен быть корректным выражением для SQL ORDER BY
@@ -289,23 +289,33 @@ class UserStatisticsCollection extends ARCollection{
 	
 	
 	// ТОЧКА ВХОДА В КЛАСС
-	public static function Load(){
+	public static function load(){
 			
-		$instance = new UserStatisticsCollection();
+		$instance = new UserStatistics_Collection();
 		return $instance;
 	}
 
 	// ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ
 	public function getPaginated(){
 		
-		$sorter = new Sorter('s.id', 'DESC', $this->_sortableFieldsTitles);
-		$paginator = new Paginator('sql', array('s.*, u.name, u.surname, u.level',
-			'FROM '.UserStatistics_Model::TABLE.' AS s
-			LEFT JOIN '.User::TABLE.' AS u ON u.id=s.uid
-			ORDER BY '.$sorter->getOrderBy()), '~50');
+		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
+		$paginator = new Paginator('sql', array('*, 0 AS num_pages', 'FROM '.UserStatistics_Model::TABLE.' ORDER BY '.$sorter->getOrderBy()), '~50');
 		
-		$data = db::get()->getAll($paginator->getSql(), array());
+		$db = db::get();
+		$data = $db->getAll($paginator->getSql(), array());
 		
+		if (!empty($data)){
+			$numPages = $db->getColIndexed('
+				SELECT session_id, COUNT(1)
+				FROM '.UserStatistics_Model::TABLE_PAGES.'
+				WHERE session_id IN ('.implode(',', array_keys($data)).')
+				GROUP BY session_id');
+			
+			foreach($data as &$s)
+				$s['num_pages'] = isset($numPages[ $s['id'] ]) ? $numPages[ $s['id'] ] : 0;
+		}
+		
+		echo '<pre>'; print_r($data); die;
 		foreach($data as &$row)
 			$row = UserStatistics_Model::beforeDisplay($row);
 		

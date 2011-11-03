@@ -1,6 +1,6 @@
 <?php
 
-class UserStatisticsController extends Controller{
+class UserStatistics_AdminController extends Controller{
 	
 	const DEFAULT_VIEW = 1;
 	
@@ -8,10 +8,11 @@ class UserStatisticsController extends Controller{
 	const TPL_PATH = 'modules/UserStatistics/templates/';
 	
 	/** метод, отображаемый по умолачанию */
-	protected $_displayIndex = FALSE;
+	protected $_displayIndex = 'list';
 	
 	/** ассоциация методов контроллера с ресурсами */
 	public $methodResources = array(
+		'display_list'          => 'view',
 		'ajax_save_client_side' => 'public',
 	);
 	
@@ -33,22 +34,23 @@ class UserStatisticsController extends Controller{
 	///////////////////////////
 	
 	// DISPLAY LIST (ADMIN)
-	public function admin_display_list($params = array()){
+	public function display_list($params = array()){
 		
-		$collection = new UserStatisticsCollection();
+		$collection = new UserStatistics_Collection();
 		$variables = array(
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
 			'sorters' => $collection->getSortableLinks(),
 		);
 		
-		BackendViewer::get()
+		BackendLayout::get()
 			->setLinkTags($collection->getLinkTags())
-			->setContentSmarty(self::TPL_PATH.'admin_list.tpl', $variables);
+			->setContentPhpFile(self::TPL_PATH.'admin_list.php', $variables)
+			->render();
 	}
 	
 	// DISPLAY VIEW (ADMIN)
-	public function admin_display_view($params = array()){
+	public function display_view($params = array()){
 		
 		try{
 			$instanceId = getVar($params[0], 0, 'int');
@@ -66,7 +68,7 @@ class UserStatisticsController extends Controller{
 	}
 	
 	// DISPLAY DELETE (ADMIN)
-	public function admin_display_delete($params = array()){
+	public function display_delete($params = array()){
 	
 		BackendViewer::get()->setContentPhpFile(self::TPL_PATH.'delete.php');
 	}

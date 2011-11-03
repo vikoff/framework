@@ -1,6 +1,6 @@
 <?
 
-abstract class Controller{
+abstract class Controller {
 	
 	/**
 	 * конфигурация модуля
@@ -118,8 +118,12 @@ abstract class Controller{
 		// проверка метода
 		$this->checkMethod($method, $params);
 		
+		// вызов метода
 		try{
-			$this->$method($params);
+			if (!empty($this->_config['arrayParams']))
+				$this->$method($params);
+			else
+				call_user_func_array(array($this, $method), $params);
 		}
 		catch(Exception404 $e){$this->error404handler($e->getMessage());}
 		catch(Exception403 $e){$this->error403handler($e->getMessage());}
@@ -159,7 +163,12 @@ abstract class Controller{
 		try{
 			
 			// выполнение метода
-			if($this->$method() !== FALSE){
+			if (!empty($this->_config['arrayParams']))
+				$result = $this->$method($params);
+			else
+				$result = call_user_func_array(array($this, $method), $params);
+				
+			if ($result !== FALSE) {
 				
 				// блокирование formcode
 				App::lockFormCode($_POST['formCode']);
@@ -167,7 +176,7 @@ abstract class Controller{
 				// выполнение редиректа (если надо)
 				if(!empty($this->_redirectUrl))
 					App::redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
-			}else{
+			} else {
 				if($this->_forceRedirect && !empty($this->_redirectUrl))
 					App::redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
 			}
@@ -196,9 +205,13 @@ abstract class Controller{
 		
 		// проверка метода
 		$this->checkMethod($method, $params);
-			
+		
+		// вызов метода
 		try{
-			$this->$method($params);
+			if (!empty($this->_config['arrayParams']))
+				$this->$method($params);
+			else
+				call_user_func_array(array($this, $method), $params);
 		}
 		catch(Exception404 $e){$this->error404handler($e->getMessage());}
 		catch(Exception403 $e){$this->error403handler($e->getMessage());}
