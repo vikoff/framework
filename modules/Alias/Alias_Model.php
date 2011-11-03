@@ -117,8 +117,9 @@ class Alias_Collection extends ARCollection{
 	 */
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',
+		'path' => 'Реальный путь',
 		'alias' => 'Псевдоним',
-		'path' => 'Путь',
+		'is_bound' => 'Связан по id',
 	);
 	
 	

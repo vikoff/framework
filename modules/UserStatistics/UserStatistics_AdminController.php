@@ -13,6 +13,7 @@ class UserStatistics_AdminController extends Controller{
 	/** ассоциация методов контроллера с ресурсами */
 	public $methodResources = array(
 		'display_list'          => 'view',
+		'display_view'			=> 'view',
 		'ajax_save_client_side' => 'public',
 	);
 	
@@ -49,18 +50,19 @@ class UserStatistics_AdminController extends Controller{
 			->render();
 	}
 	
-	// DISPLAY VIEW (ADMIN)
+	// DISPLAY VIEW
 	public function display_view($params = array()){
 		
 		try{
 			$instanceId = getVar($params[0], 0, 'int');
-			$variables = UserStatistics::get()->getRowPrepared($instanceId);
+			$variables = UserStatistics_Model::get()->getRowPrepared($instanceId);
 			
 			// echo '<pre>'; print_r($variables); die;
 			
-			BackendViewer::get()
+			BackendLayout::get()
 				->prependTitle('Статистика посещений пользователя')
-				->setContentSmarty(self::TPL_PATH.'view.tpl', $variables);
+				->setContentPhpFile(self::TPL_PATH.'admin_view.php', $variables)
+				->render();
 		}
 		catch(Exception $e){
 			BackendViewer::get()->error404($e->getMessage());

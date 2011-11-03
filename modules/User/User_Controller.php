@@ -21,6 +21,7 @@ class User_Controller extends Controller{
 	public $methodResources = array(
 		'display_view'	=> 'edit',
 		
+		'action_paginator_set_items_per_page' => 'public',
 		'ajax_check_login_unique' => 'public',
 	);
 	
@@ -44,6 +45,21 @@ class User_Controller extends Controller{
 	public function display_view($params = array()){
 		
 		echo 'hello';
+	}
+	
+	
+	////////////////////
+	////// ACTION //////
+	////////////////////
+	
+	// ACTION PAGINATOR_SET_ITEMS_PER_PAGE
+	public function action_paginator_set_items_per_page($params = array()){
+		
+		$num = $_POST['num'];
+		if(isset(Paginator::$itemsPerPageVariants[$num]))
+			$_SESSION['paginator-items-per-page'] = $num;
+		else
+			trigger_error('invalid num: '.$num);
 	}
 	
 	//////////////////

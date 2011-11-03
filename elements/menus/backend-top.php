@@ -27,12 +27,6 @@ return array (
 		),
 	
 		array(
-			'title' => 'Модули',
-			'href' => 'admin/modules',
-			'active' => $r->getParts(array(0, 1)) == 'admin/modules',
-		),
-	
-		array(
 			'title' => 'Администрирование',
 			'href' => 'admin/root',
 			'active' => $r->getParts(array(0, 1)) == 'admin/root',
