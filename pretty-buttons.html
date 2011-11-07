@@ -31,28 +31,25 @@
 		background-image: -moz-linear-gradient(bottom center, #93C900 15%, #63A900 65%);
 	}
 	.elm:active{
-		padding: 6px 9px 4px 11px;
 		border-style: ridge;
 	}
-	
-	.elm1{
+	.elm2{
 		display: inline-block;
-		border: groove 2px #639F1A;
+		border: groove 2px #444;
 		color: white;
 		font-weight: bold;
 		border-radius: 5px;
 		padding: 5px 10px;
 		text-shadow: 0px 1px 0px #444;
 		background-image: -moz-linear-gradient(bottom center, #63A900 15%, #93C900 65%);
-		background-image: -o-linear-gradient(bottom, #63A900 15%, #93C900 65%);
+		background-image: -o-linear-gradient(bottom, #444 15%, #999 65%);
 		cursor: pointer;
 	}
-	.elm1:hover{
-		background-image: -o-linear-gradient(bottom, #93C900 15%, #63A900 65%);
+	.elm2:hover{
+		background-image: -o-linear-gradient(bottom, #999 15%, #444 65%);
 		background-image: -moz-linear-gradient(bottom center, #93C900 15%, #63A900 65%);
 	}
-	.elm1:active{
-		padding: 6px 9px 4px 11px;
+	.elm2:active{
 		border-style: ridge;
 	}
 	</style>
@@ -68,12 +65,11 @@
 
 <div style="margin: 100px;">
 	
-	<input class="elm" type="submit" value="Submit" />
+	<input class="elm2" type="submit" value="Submit" />
 </div>
 
 <div style="border: solid 1px green;">
-	<div class="elm">Submit</div>
-	<div class="elm1">Submit</div>
+	<div class="elm2">Submit</div>
 	asdfasdf
 </div>
 </body>
