@@ -12,8 +12,9 @@ class UserStatistics_AdminController extends Controller{
 	
 	/** ассоциация методов контроллера с ресурсами */
 	public $methodResources = array(
-		'display_list' => 'view',
-		'display_view' => 'view',
+		'display_list'          => 'view',
+		'display_view'			=> 'view',
+		'ajax_save_client_side' => 'public',
 	);
 	
 	

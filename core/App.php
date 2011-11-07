@@ -88,6 +88,10 @@ class App {
 		$this->error404($this->_requestModuleName);
 	}
 	
+	/**
+	 * ПОЛУЧЕНИЕ РЕАЛЬНОГО ИМЕНИ МОДУЛЯ 
+	 * преобразование строки "user-statistics" в "userStatistics"
+	 */
 	public function prepareModuleName($module){
 		
 		$module = str_replace(' ', '', ucwords(str_replace('-', ' ', strtolower($module))));

@@ -13,8 +13,8 @@
 			<th>Псевдоним</th>
 		</tr>
 		<tr>
-			<td><?= WWW_ROOT; ?><?= Html_Form::inputText(array('name' => 'path', 'value' => $this->path)); ?></td>
-			<td><?= WWW_ROOT; ?><?= Html_Form::inputText(array('name' => 'alias', 'value' => $this->alias)); ?></td>
+			<td><?= WWW_ROOT; ?><?= Html_Form::inputText(array('name' => 'path', 'value' => $this->path, 'style' => 'width: 150px;')); ?></td>
+			<td><?= WWW_ROOT; ?><?= Html_Form::inputText(array('name' => 'alias', 'value' => $this->alias, 'style' => 'width: 200px;')); ?></td>
 		</tr>
 	</table>
 
@@ -26,11 +26,3 @@
 		<? endif; ?>		
 	</div>
 </form>
-
-<script type="text/javascript">
-
-$(function(){
-	enableFloatingSubmits();
-});
-
-</script>

@@ -45,9 +45,10 @@ class Page_Controller extends Controller{
 	/////////////////////
 	
 	/** DISPLAY VIEW */
-	public function display_view($params = array()){
+	public function display_view($pageAlias = null){
 		
-		$pageAlias = getVar($params[0], self::DEFAULT_VIEW);
+		if (empty($pageAlias))
+			$pageAlias = self::DEFAULT_VIEW;
 		
 		$variables = Page_Model::LoadByAlias($pageAlias)->GetAllFieldsPrepared();
 		FrontendLayout::get()

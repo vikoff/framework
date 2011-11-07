@@ -1,6 +1,6 @@
 <?
 	
-class CurUser extends User_Model{
+class CurUser extends User_Model {
 	
 	private $_authPrefix = 'v1k0ff';
 	

@@ -2,11 +2,11 @@
 /**
  * 
  * @using constants
- * 		User::TABLE
+ * 		User_Model::TABLE
  * 		
  * @using methods
  * 		YDate::timestamp2date()
- * 		App::href()
+ * 		href()
  * 		User::getPermName()
  */
 class UserStatistics_Model {
@@ -226,6 +226,16 @@ class UserStatistics_Model {
 			$data['pages'] = null;
 			$data['pages_info'] = null;
 		}
+		
+		$data['screen_resolution'] = $data['has_js']
+			? $data['screen_width'].'x'.$data['screen_height']
+			: '-';
+		$data['browser'] = $data['has_js']
+			? $data['browser_name'].' '.$data['browser_version']
+			: '-';
+		$data['has_js_text'] = $data['has_js']
+			? '<span class="green">✔</span>'
+			: '<span class="red">✘</span>';
 			
 		return $data;
 	}
@@ -240,7 +250,7 @@ class UserStatistics_Model {
 }
 
 
-class UserStatistics_Collection extends ARCollection{
+class UserStatistics_Collection extends ARCollection {
 	
 	// поля, по которым возможно сортировка коллекции
 	// каждый ключ должен быть корректным выражением для SQL ORDER BY
@@ -258,7 +268,7 @@ class UserStatistics_Collection extends ARCollection{
 	// ТОЧКА ВХОДА В КЛАСС
 	public static function load(){
 			
-		$instance = new UserStatisticsCollection();
+		$instance = new UserStatistics_Collection();
 		return $instance;
 	}
 

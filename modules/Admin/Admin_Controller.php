@@ -131,26 +131,6 @@ class Admin_Controller extends Controller{
 		if(!$app->getModule($module, TRUE)->display($params))
 			$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
 	}
-
-	/** DISPLAY USERS */
-	public function display_users($params = array()){
-			
-		$viewer = BackendLayout::get();
-		
-		if(empty($params[0])){
-			$viewer
-				->setContentHtmlFile(self::TPL_PATH.'users_index.tpl')
-				->render();
-			exit();
-		}
-		
-		$controllerInstance = new UserController($adminMode = TRUE);
-		$displayMethodIdentifier = array_shift($params);
-		
-		$controllerInstance->performDisplay($displayMethodIdentifier, $params);
-		
-		$viewer->render();
-	}
 	
 	/** DISPLAY ROOT */
 	public function display_root($params = array()){
@@ -188,7 +168,7 @@ class Admin_Controller extends Controller{
 				
 				if(!$app->getModule($module, TRUE)->display($params))
 					$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
-				}
+		}
 	}
 	
 	//////////////////////
