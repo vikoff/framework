@@ -63,30 +63,51 @@
 
 <div id="login-screen">
 	
-	<div class="explain">Пожалуйста, авторизуйтесь.</div>
-	
-	<?=$this->errorMessage;?>
-	
-	<form action="" method="post">
-		<input type="hidden" name="action" value="user/profile/login" />
-		<?=FORMCODE;?>
+	<? if($this->isLogged): ?>
 		
-		<table style="width: 100%;">
-		<tr><td>Логин</td><td><input id="login-inp" type="text" name="login" value="" style="width: 98%;" /></td></tr>
-		<tr><td>Пароль</td><td><input type="password" name="pass" value="" style="width: 98%;" /></td></tr>
-		<tr>
-			<td></td>
-			<td>
-				<input type="checkbox" name="remember" id="rememberme-checkbox" value="1" />
-				<label for="rememberme-checkbox">Запомнить меня</label>
-				<div style="float: right;"><input type="submit" class="submit" value="Войти" style="border: solid 1px #999;"></div>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2" style="text-align: center; padding: 0;"><a href="<?= href('registration'); ?>">Регистрация</a></td>
-		</tr>
-		</table>
-	</form>
+		<div class="explain">
+			У вас недостаточно прав для просмотра данной страницы
+		</div>
+		
+		<div class="paragraph" style="overflow: hidden; margin-top: 1em;">
+		
+			<a href="<?= href(''); ?>">На главную</a>
+			
+			<form action="" method="post" style="float: right;">
+				<input type="hidden" name="action" value="user/profile/logout" />
+				<?=FORMCODE;?>
+				<input type="submit" value="Выход">
+			</form>
+		</div>
+		
+	<? else: ?>
+	
+		<div class="explain">Пожалуйста, авторизуйтесь.</div>
+		
+		<?=$this->errorMessage;?>
+		
+		<form action="" method="post">
+			<input type="hidden" name="action" value="user/profile/login" />
+			<?=FORMCODE;?>
+			
+			<table style="width: 100%;">
+			<tr><td>Логин</td><td><input id="login-inp" type="text" name="login" value="" style="width: 98%;" /></td></tr>
+			<tr><td>Пароль</td><td><input type="password" name="pass" value="" style="width: 98%;" /></td></tr>
+			<tr>
+				<td></td>
+				<td>
+					
+					<label>
+						<input type="checkbox" name="remember" value="1" />
+						Запомнить меня
+					</label>
+					<div style="float: right;"><input type="submit" class="submit" value="Войти" style="border: solid 1px #999;"></div>
+				</td>
+			</tr>
+			</table>
+		</form>
+	
+	<? endif; ?>
 	
 </div>
 

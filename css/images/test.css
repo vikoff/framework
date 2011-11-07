@@ -1,0 +1,403 @@
+
+/* ФРЕЙМ */
+
+* html #site-container {
+	height: 100%;
+}
+#site-container {
+	position: relative;
+	width: 1100px;
+	margin: 0 auto;
+	min-height: 100%;
+	border-left: solid 3px #DCCFA3;
+	border-right: solid 3px #DCCFA3;
+	background-color: #F6F3E1;
+}
+#footer-container {
+	height: 50px;
+}
+#top{
+	background-color: #E7DEC1;
+	padding: 5px 10px 0px;
+}
+#top-menu-list{
+	margin-left: 230px;
+}
+#top-menu-list a{
+	display: inline-block;
+	margin: 0px 1px;
+	border: solid 1px #D6D0A5;
+	background-color: #EEEBD3;
+	padding: 5px 10px;
+	color: #000;
+	text-decoration: none;
+	font-size: 12px;
+}
+#top-menu-list a.active{
+	position: relative;
+	padding-top: -30px;
+	background-color: #FFF;
+	border-bottom-color: #FFF;
+}
+#top-menu-list a:hover{
+	background-color: #FFF;
+}
+table#body-frame{
+	width: 100%;
+}
+td#body-left{
+	vertical-align: top;
+	padding: 30px 0px 20px 10px;
+	width: 180px;
+}
+#left-menu-container{
+	background-color: #ECEBE4;
+	border: solid 5px #D8D5C4;
+	border-right-style: none;
+	padding: 5px;
+	-moz-border-radius-topleft: 5px; -webkit-border-top-left-radius: 5px; border-top-left-radius: 5px; -moz-border-radius-bottomleft: 5px; -webkit-border-bottom-left-radius: 5px; border-bottom-left-radius: 5px;
+}
+#left-menu-list a{
+	display: block;
+	margin: 3px 0px;
+	padding: 3px;
+	border: solid 1px #CFCED6;
+	text-decoration: none;
+	color: #000;
+	font-size: 11px;
+}
+#left-menu-list a.active{
+	position: relative;
+	background-color: #FFF;
+	border-right-style: none;
+	margin-right: -6px;
+}
+#left-menu-list a:hover{
+	background-color: #FFF;
+}
+
+#body-right{
+	text-align: left;
+	vertical-align: top;
+	border-left: solid 1px #D7D0B7;
+	border-bottom: solid 1px #D7D0B7;
+	border-top: solid 1px transparent;
+	background-color: #FFF;
+	padding: 10px;
+	padding-left: 20px;
+}
+#footer {
+	position: relative;
+	background-color: #E7DEC1;
+	width: 1100px;
+	height: 50px;
+	color: #000;
+	margin: -54px auto 0;
+	text-align: center;
+	font-size: 12px;
+	line-height: 50px;
+	border-top: solid 1px #DCCFA3;
+	border-bottom: solid 3px #DCCFA3;
+}
+#footer a{
+	color: #000;
+}
+
+
+/* ССЫЛКИ НОМЕРОВ СТРАНИЦ */
+
+.pagination-num-form{
+	margin-top: 1em;
+	text-align: right;
+	font-size: 11px;
+}
+.pagination-num-form select{
+	font-size: 11px;
+}
+.pagination{
+	margin-bottom: 1em;
+	text-align: center;
+}
+.pagination a{
+	padding: 0px 3px 0px;
+}
+.pagination .prev{}
+.pagination .next{}
+.pagination .page{}
+.pagination .active{
+	font-size: 110%;
+	padding: 0px 3px 0px;
+	background-color: #EEEEEE;
+}
+
+/* КОНТЕНТ */
+
+#login-screen{
+	position: relative;
+	margin: auto;
+	margin-top: -80px;
+	top: 50%;
+	width: 300px;
+	border: solid 5px #AAA;
+	padding: 10px;
+	-moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;
+}
+#login-screen .explain{
+	text-align: center;
+	font-style: italic;
+	margin-top: 5px;
+}
+label.error{
+	color: red;
+	display: block;
+}
+input.error{
+	border: dashed 1px red;
+}
+
+
+.tr-hover{
+	background-color: #FFFFE2;
+}
+.tr-hover-visible{visibility: hidden;}
+.tr-hover-hidden{visibility: visible;}
+.tr-hover-closed{display: block;}
+.tr-hover-opened{display: none;}
+.tr-hover .tr-hover-visible{visibility: visible !important;}
+.tr-hover .tr-hover-hidden{visibility: hidden !important;}
+.tr-hover .tr-hover-closed{display: none !important;}
+.tr-hover .tr-hover-opened{display: block !important;}
+
+#control-buttons-container{
+	position: relative;
+	margin-left: auto;
+	width: 600px;
+	border: solid 1px blue;
+	height: 40px;
+}
+#control-buttons-block{
+	position: fixed;
+	border: solid 1px red;
+}
+
+#edit-form .required{
+	font-size: 12px;
+	color: red;
+}
+form#edit-form label.title{
+	display: block;
+	font-weight: bold;
+	margin: 5px 0 0px;
+}
+#edit-form label.title-inline{
+	font-weight: bold;
+}
+#edit-form .description{
+	display: block;
+	padding: 1px 0px 3px;
+	font-weight: normal;
+	font-style: italic;
+	font-size: 11px;
+}
+#edit-form .description-inline{
+	font-weight: normal;
+	font-style: italic;
+	font-size: 11px;
+}
+#edit-form .info-block{
+	background-color: #FFFFF5;
+	border: solid 1px #F1F1E8;
+	padding: 0 1em;
+	margin: 2em 1em;
+}
+#edit-form .info-block h3{
+	font-size: 14px;
+	margin: 1em 0;
+	padding: 0;
+	font-style: italic;
+	font-weight: bold;
+}
+
+/* СТИЛИЗОВАННЫЕ КНОПКИ */
+
+input.button, button.button, a.button{
+	cursor: pointer;
+	display: inline-block;
+	padding: 2px 8px;
+	border: outset 1px #999;
+	background-color: #E5E5E5;
+	-moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;
+	font-size: 12px;
+	text-decoration: none;
+	color: #000 !important;
+}
+input.button:hover, button.button:hover, a.button:hover{
+	background-color: #DDD;
+}
+input.button:active, button.button:active, a.button:active{
+	border-style: inset;
+	background-color: #EEE;
+}
+
+input.button-small, button.button-small, a.button-small{
+	cursor: pointer;
+	display: inline-block;
+	padding: 0px 4px;
+	border: outset 1px #999;
+	background-color: #E5E5E5;
+	-moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;
+	font-size: 11px;
+	text-decoration: none;
+	color: #000;
+}
+input.button-small:hover, button.button-small:hover, a.button-small:hover{
+	background-color: #DDD;
+}
+input.button-small:active, button.button-small:active, a.button-small:active{
+	border-style: inset;
+	background-color: #EEE;
+}
+
+/* СТАНДАРТНАЯ СЕТКА */
+
+table.grid{
+	margin: 5px auto;
+}
+table.grid tr.unpublished{
+	color: #999;
+}
+table.grid tr.unpublished a{
+	color: #838DAF;
+}
+table.grid th{
+	font-size: 12px;
+	background-color: #EEE;
+	border: solid 1px #DDD;
+}
+table.grid th a{
+	color: inherit;
+}
+table.grid td{
+	font-size: 11px;
+	border: solid 1px #EEE;
+}
+table.grid td.left{
+	text-align: left;
+}
+table.grid td.center{
+	text-align: center;
+}
+table.grid td.right{
+	text-align: right;
+}
+table.grid td a{
+	color: #47E;
+}
+table.grid tr.unpublished{
+	color: #999;
+}
+table.grid tr.unpublished a{
+	color: #99B;
+}
+table.grid td.options{
+	width: 90px;
+	text-align: center;
+}
+table.grid .options a{
+	padding: 0px 3px;
+}
+
+table.grid.wide{
+	width: 100%;
+}
+
+table.form-admin-edit-user th{
+	border: solid 1px #FFF;
+}
+table.form-admin-edit-user td{
+	border: solid 1px #EEE;
+}
+
+table#user-input-data-box th{
+	padding: 1px 5px;
+	border: solid 1px #FFF;
+}
+
+table#user-input-data-box td{
+	text-align: center;
+	padding: 2px 5px 0;
+}
+
+.info-pin{
+	display: inline-block;
+	background: url('../images/backend/icon-info.png') no-repeat center center;
+	width: 13px;
+	height: 13px;
+	position: relative;
+	top: 1px;
+}
+
+/* BREADCRUMBS */
+
+.breadcrumbs{
+	font-size: 11px;
+	margin: 5px 0 10px;
+	padding: 2px 5px;
+	background-color: #F5F5F5;
+}
+
+/* СТРОКА ОПЦИЙ */
+
+.options-row{
+	text-align: right;
+	font-size: 12px;
+}
+
+/* ПЛАВАЮЩИЕ САБМИТЫ ФОРМЫ */
+#submit-box-floating{
+	display: none;
+	overflow: hidden;
+	float: right;
+	margin: 0px;
+	padding: 5px 10px 5px;
+	border: solid 1px #AAA;
+	-moz-border-radius: 10px; -webkit-border-radius: 10px; border-radius: 10px;
+	background-color: #FFF;
+}
+#submit-box-floating li{
+	float: left;
+	font-size: 11px;
+}
+#submit-box-floating a{
+	display: block;
+	padding: 35px 3px 2px;
+	background: no-repeat center 2px;
+	margin: 0 1px;
+	border: solid 1px #FFF;
+	-moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;
+	min-width: 55px;
+	text-align: center;
+}
+#submit-box-floating a:hover{
+	border: outset 1px #BBB;
+	text-decoration: none;
+	background-color: #FAFAFA;
+}
+#submit-box-floating a:active{
+	border: inset 1px #BBB;
+}
+#submit-box-floating .btn-save{
+	background-image: url('../images/backend/submits/icon-save.png');
+}
+#submit-box-floating .btn-apply{
+	background-image: url('../images/backend/submits/icon-apply.png');
+}
+#submit-box-floating .btn-cancel{
+	background-image: url('../images/backend/submits/icon-cancel.png');
+}
+#submit-box-floating .btn-delete{
+	background-image: url('../images/backend/submits/icon-delete.png');
+}
+#submit-box-floating .btn-copy{
+	background-image: url('../images/backend/submits/icon-copy.png');
+}
