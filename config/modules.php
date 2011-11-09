@@ -53,7 +53,7 @@ return array(
 		'title' => 'Пользователи',
 		'controller' => 'User_Controller',
 		'adminController' => 'User_AdminController',
-		'arrayParams' => TRUE,
+		// 'arrayParams' => TRUE,
 		'resources' => array(
 			'public' => 'Общедоступные действия',
 			'view' => 'Просмотр данных пользователя',

@@ -32,7 +32,7 @@ class User_Controller extends Controller{
 		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
-	public function getClass(){
+	public function getClass() {
 		return __CLASS__;
 	}
 	
@@ -42,7 +42,7 @@ class User_Controller extends Controller{
 	/////////////////////
 	
 	// DISPLAY VIEW
-	public function display_view($params = array()){
+	public function display_view($uid = null) {
 		
 		echo 'hello';
 	}
@@ -53,7 +53,7 @@ class User_Controller extends Controller{
 	////////////////////
 	
 	// ACTION PAGINATOR_SET_ITEMS_PER_PAGE
-	public function action_paginator_set_items_per_page($params = array()){
+	public function action_paginator_set_items_per_page() {
 		
 		$num = $_POST['num'];
 		if(isset(Paginator::$itemsPerPageVariants[$num]))
@@ -67,7 +67,7 @@ class User_Controller extends Controller{
 	//////////////////
 	
 	// ПРОВЕРКА ЛОГИНА НА УНИКАЛЬНОСТЬ
-	public function ajax_check_login_unique($params = array()){
+	public function ajax_check_login_unique() {
 	
 		echo User_Model::isLoginInUse(getVar($_GET['login'])) ? 'false' : 'true';
 	}

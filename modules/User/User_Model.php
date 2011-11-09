@@ -113,14 +113,15 @@ class User_Model extends ActiveRecord{
 	
 	public function postValidation(&$data){
 		
+		if (!empty($data['email']) && self::isEmailInUse($data['email'], $this->id)){
+			$this->setError('Данные email-адрес уже используется');
+			return FALSE;
+		}
+		
 		if($this->isNewObj){
 			
 			if (!empty($data['login']) && self::isLoginInUse($data['login'])){
 				$this->setError('Логин занят');
-				return FALSE;
-			}
-			if (!empty($data['email']) && self::isEmailInUse($data['email'])){
-				$this->setError('Данные email-адрес уже используется, возможно Вам следует воспользатся функцией <a href="'.href('profile/forget-password').'">восстановления учетной записи</a>');
 				return FALSE;
 			}
 			
@@ -201,10 +202,14 @@ class User_Model extends ActiveRecord{
 	}
 	
 	/** ЗАНЯТ ЛИ EMAIL */
-	static public function isEmailInUse($email){
+	static public function isEmailInUse($email, $excludeId = 0){
 	
 		$db = db::get();
-		return $db->getOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE email='.$db->qe($email));
+		$sql = 'SELECT COUNT(1) FROM '.self::TABLE.' WHERE email='.$db->qe($email);
+		if (!empty($excludeId))
+			$sql .= ' AND id != '.(int)$excludeId;
+		
+		return $db->getOne($sql);
 	}
 	
 	/** ЗАНЯТ ЛИ ЛОГИН */

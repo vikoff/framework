@@ -13,6 +13,7 @@ class User_ProfileController extends Controller{
 	
 	public $methodResources = array(
 		'display_view' => 'view',
+		'display_edit' => 'view',
 		'display_registration' => 'public',
 		'display_greeting' => 'view',
 		
@@ -31,13 +32,18 @@ class User_ProfileController extends Controller{
 		return __CLASS__;
 	}
 	
-	public function display_view($params = array()){
+	public function display_view($params = array()) {
 		
 		echo 'hello';
 	}
 	
+	public function display_edit() {
+		
+		echo 'edit';
+	}
+	
 	/** DISPLAY REGISTRATION */
-	public function display_registration($params = array()){
+	public function display_registration() {
 		
 		$variables = $_POST;
 		
@@ -48,7 +54,7 @@ class User_ProfileController extends Controller{
 	}
 	
 	/** DISPLAY GREETING */
-	public function display_greeting($params = array()){
+	public function display_greeting() {
 	
 		$variables = array();
 		
@@ -64,7 +70,7 @@ class User_ProfileController extends Controller{
 	////////////////////
 	
 	/** ACTION REGISTER */
-	public function action_register($params = array()){
+	public function action_register(){
 		
 		$user = CurUser::get();
 		
@@ -92,7 +98,7 @@ class User_ProfileController extends Controller{
 	}
 	
 	/** ACTION LOGOUT */
-	public function action_logout($params = array()){
+	public function action_logout(){
 		
 		CurUser::get()->logout();
 		App::reload();

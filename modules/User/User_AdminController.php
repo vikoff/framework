@@ -50,7 +50,7 @@ class User_AdminController extends Controller{
 	/////////////////////
 	
 	/** DISPLAY LIST */
-	public function display_list($params = array()){
+	public function display_list(){
 		
 		$collection = new User_Collection();
 		$variables = array(
@@ -67,44 +67,39 @@ class User_AdminController extends Controller{
 	}
 	
 	/** DISPLAY VIEW */
-	public function display_view($params = array()){
+	public function display_view($uid = null){
 		
-		try{
-			$instanceId = getVar($params[0], 0 ,'int');
-			$instance = User::load($instanceId);
-			
-			$userPerms = $instance->getField('level');
-			$perms = array('allowEdit' => FALSE, 'list' => '', 'curTitle' => User::getPermName($userPerms));
-			if(USER_AUTH_PERMS >= $userPerms){
-				$perms['allowEdit'] = TRUE;
-				foreach(User::getPermsList() as $perm)
-					if($perm > 0 && $perm <= USER_AUTH_PERMS)
-						$perms['list'] .= '<option value="'.$perm.'" '.($perm == $userPerms ? 'selected="selected" style="color: blue;"' : '').'>'.User::getPermName($perm).'</option>';
-			}
-			$variables = array_merge($instance->GetAllFieldsPrepared(), array(
-				'instanceId' => $instanceId,
-				'perms' => $perms,
-			));
-			
-			BackendLayout::get()
-				->prependTitle('Данные пользователя')
-				->setContentSmarty(self::TPL_PATH.'view.tpl', $variables);
+		$instanceId = (int)$uid;
+		$instance = User::load($instanceId);
+		
+		$userPerms = $instance->getField('level');
+		$perms = array('allowEdit' => FALSE, 'list' => '', 'curTitle' => User::getPermName($userPerms));
+		if(USER_AUTH_PERMS >= $userPerms){
+			$perms['allowEdit'] = TRUE;
+			foreach(User::getPermsList() as $perm)
+				if($perm > 0 && $perm <= USER_AUTH_PERMS)
+					$perms['list'] .= '<option value="'.$perm.'" '.($perm == $userPerms ? 'selected="selected" style="color: blue;"' : '').'>'.User::getPermName($perm).'</option>';
 		}
-		catch(Exception $e){
-			BackendLayout::get()->error404($e->getMessage());
-		}
+		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
+			'instanceId' => $instanceId,
+			'perms' => $perms,
+		));
+		
+		BackendLayout::get()
+			->prependTitle('Данные пользователя')
+			->setContentSmarty(self::TPL_PATH.'view.tpl', $variables);
 		
 	}
 	
-	public function display_ban($params = array()){
+	public function display_ban($uid = null){
 		
-		$instanceId = getVar($params[0], 0 ,'int');
+		$instanceId = (int)$uid;
 		$user = User_Model::load($instanceId);
 		
 	}
 	
 	/** DISPLAY CREATE */
-	public function display_create($params = array()){
+	public function display_create(){
 			
 		$user = User_Model::create();
 			
@@ -119,9 +114,9 @@ class User_AdminController extends Controller{
 	}
 	
 	/** DISPLAY EDIT */
-	public function display_edit($params = array()){
+	public function display_edit($uid = null){
 			
-		$instanceId = getVar($params[0], 0 ,'int');
+		$instanceId = (int)$uid;
 		$user = User_Model::load($instanceId);
 			
 		$variables = array_merge($user->GetAllFieldsPrepared(), array(
@@ -136,9 +131,9 @@ class User_AdminController extends Controller{
 	}
 	
 	/** DISPLAY DELETE */
-	public function display_delete($params = array()){
+	public function display_delete($uid = null){
 		
-		$instanceId = getVar($params[0], 0 ,'int');
+		$instanceId = (int)$uid;
 		$instance = User_Model::load($instanceId);
 
 		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
@@ -157,7 +152,7 @@ class User_AdminController extends Controller{
 	////////////////////
 	
 	/** ACTION SAVE PERMS */
-	public function action_save_perms($params = array()){
+	public function action_save_perms() {
 		
 		$instanceId = getVar($_POST['instance-id'], 0, 'int');
 		
@@ -179,7 +174,7 @@ class User_AdminController extends Controller{
 	}
 	
 	/** ACTION DELETE */
-	public function action_delete($params = array()){
+	public function action_delete() {
 		
 		$instanceId = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 		$instance = User_Model::load($instanceId);
@@ -198,7 +193,7 @@ class User_AdminController extends Controller{
 	}
 	
 	/** ACTION CREATE */
-	public function action_create($params = array()){
+	public function action_create() {
 		
 		$user = User_Model::create();
 		
@@ -212,7 +207,7 @@ class User_AdminController extends Controller{
 	}
 	
 	/** ACTION SAVE */
-	public function action_save($params = array()){
+	public function action_save() {
 		
 		$user = User_Model::load(getVar($_POST['id']));
 		
@@ -226,7 +221,7 @@ class User_AdminController extends Controller{
 	}
 	
 	/** ACTION SAVE */
-	public function action_change_password($params = array()){
+	public function action_change_password() {
 		
 		$user = User_Model::load(getVar($_POST['id']));
 		
@@ -244,14 +239,14 @@ class User_AdminController extends Controller{
 	//////////////////
 	
 	// AJAX GENERATE PASSWORD
-	public function ajax_generate_password($params = array()){
+	public function ajax_generate_password() {
 		
 		$len = rand(8, 12);
 		echo substr(md5(md5(microtime().mt_rand())), 2, $len);
 	}
 	
 	// ПРОВЕРКА ЛОГИНА НА УНИКАЛЬНОСТЬ
-	public function ajax_check_login_unique($params = array()){
+	public function ajax_check_login_unique() {
 	
 		echo User::isLoginInUse(getVar($_GET['login'])) ? 'false' : 'true';
 	}

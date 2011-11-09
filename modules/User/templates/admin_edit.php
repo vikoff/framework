@@ -1,7 +1,7 @@
 
-<ul id="submit-box-floating"></ul>
+<h2>Пользователь #<?= $this->instanceId; ?> <?= $this->login; ?></h2>
 
-<h3>Редактирование данных о пользователе #<?= $this->instanceId; ?> <?= $this->login; ?></h3>
+<h3>Редактирование данных</h3>
 <form id="edit-form" action="" method="post">
 	<?= FORMCODE; ?>	
 	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
@@ -44,11 +44,9 @@
 	</tr>
 
 	<tr>
-		<td id="submit-box" class="actions" colspan="2">
-			<input id="submit-save" class="button" type="submit" name="action[admin/user/save][admin/users/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
-			<input id="submit-apply" class="button" type="submit" name="action[admin/user/save][admin/users/edit/<?= $this->instanceId ? $this->instanceId : '(%id%)' ; ?>]" value="Применить" title="Сохранить изменения и продолжить редактирование" />
-			<a id="submit-cancel" class="button" href="<?= href('admin/users/list'); ?>" title="Отменить все изменения и вернуться к списку">отмена</a>
-			<a id="submit-delete" class="button" href="<?= href('admin/users/delete/'.$this->instanceId); ?>" title="Удалить запись">удалить</a>
+		<td colspan="2" style="text-align: center;">
+			<input class="button" type="submit" name="action[admin/user/save]" value="Сохранить" />
+			<a class="button" href="<?= href('admin/users/list'); ?>">назад</a>
 		</td>
 	</tr>
 	</table>
@@ -56,7 +54,7 @@
 
 <br />
 
-<h3>Изменение пароля пользователя #<?= $this->instanceId; ?> <?= $this->login; ?></h3>
+<h3>Изменение пароля пользователя</h3>
 <?= Messenger::get()->ns('password-change')->getAll(); ?>
 <form action="" method="post">
 	<?= FORMCODE; ?>	
@@ -78,10 +76,20 @@
 	</table>
 </form>
 
+
+<br />
+<h3>Блокирование пользователя</h3>
+<div><a class="button" href="<?= href('admin/users/ban/'.$this->instanceId); ?>">Заблокировать</a></div>
+
+
+<br />
+<h3>Удаление пользователя</h3>
+<div><a class="button" href="<?= href('admin/users/delete/'.$this->instanceId); ?>">Удалить</a></div>
+
 <script type="text/javascript">
 
 $(function(){
-	enableFloatingSubmits();
+	// enableFloatingSubmits();
 });
 
 </script>
