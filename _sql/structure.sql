@@ -17,6 +17,15 @@ CREATE TABLE `users` (
 	`regdate`		INT(10) UNSIGNED
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+/* ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ */
+DROP TABLE IF EXISTS `user_roles`;
+CREATE TABLE `user_roles` (
+	`id` 			INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`title`			VARCHAR(255) NOT NULL,
+	`level`			SMALLINT NOT NULL,
+	`description`	TEXT
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 /* СТАТИЧЕСКИЕ СТРАНИЦЫ */
 DROP TABLE IF EXISTS `pages`;
 CREATE TABLE `pages` (

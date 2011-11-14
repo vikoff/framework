@@ -13,6 +13,10 @@ class User_AdminController extends Controller{
 	// методы, отображаемые по умолчанию
 	protected $_displayIndex = 'list';
 	
+	protected $_proxy = array(
+		'roles' => 'User_RoleController',
+	);
+	
 	// права на выполнение методов контроллера
 	public $methodResources = array(
 		
