@@ -60,6 +60,12 @@ switch($topMenuHref){
 			),
 		
 			array(
+				'title' => 'Управление ролями',
+				'href' => $topMenuHref.'/roles',
+				'active' => $r->getParts(2) == 'roles',
+			),
+		
+			array(
 				'title' => 'Блокировки',
 				'href' => $topMenuHref.'/ban',
 				'active' => $r->getParts(2) == 'ban',
