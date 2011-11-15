@@ -8,22 +8,22 @@
 	<?= $this->id; ?>
 </div>
 <div class="paragraph">
-	<h3>login</h3>
-	<?= $this->login; ?>
+	<h3>Категория</h3>
+	<?= $this->category_id; ?>
 </div>
 <div class="paragraph">
-	<h3>password</h3>
-	<?= $this->password; ?>
+	<h3>Имя</h3>
+	<?= $this->item_name; ?>
 </div>
 <div class="paragraph">
-	<h3>text</h3>
-	<?= $this->text; ?>
+	<h3>Описание</h3>
+	<?= $this->item_text; ?>
 </div>
 <div class="paragraph">
-	<h3>type</h3>
-	<?= $this->type; ?>
+	<h3>Публикация</h3>
+	<?= $this->published; ?>
 </div>
 <div class="paragraph">
-	<h3>is_active</h3>
-	<?= $this->is_active; ?>
+	<h3>Дата</h3>
+	<?= $this->date; ?>
 </div>

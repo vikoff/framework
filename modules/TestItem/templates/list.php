@@ -2,24 +2,35 @@
 <?= $this->pagination; ?>
 
 <? if($this->collection): ?>
+	<table>
+	<tr>
+		<th>id</th>
+		<th>Категория</th>
+		<th>Имя</th>
+		<th>Описание</th>
+		<th>Публикация</th>
+		<th>Дата</th>
+		
+		<th>опции</th>
+	</tr>
 	<? foreach($this->collection as $item): ?>	
-	<p>
-		<h3>id</h3>
-		<?= $item['id']; ?>
-		<h3>login</h3>
-		<?= $item['login']; ?>
-		<h3>password</h3>
-		<?= $item['password']; ?>
-		<h3>text</h3>
-		<?= $item['text']; ?>
-		<h3>type</h3>
-		<?= $item['type']; ?>
-		<h3>is_active</h3>
-		<?= $item['is_active']; ?>
-		<div><a href="<?= href('test-item/view/'.$item['id']); ?>">Подробней</a></div>
-	</p>
+	<tr>
+		<td><?= $item['id']; ?></td>
+		<td><?= $item['category_id']; ?></td>
+		<td><?= $item['item_name']; ?></td>
+		<td><?= $item['item_text']; ?></td>
+		<td><?= $item['published']; ?></td>
+		<td><?= $item['date']; ?></td>
+		
+		<td style="font-size: 11px;">
+			<a href="<?= href('test-item/view/'.$item['id']); ?>">Подробней</a>
+		</td>
+	</tr>
 	<? endforeach; ?>	
+	</table>
+	
 <? else: ?>
 	<p>Сохраненных записей пока нет.</p>
 <? endif; ?>
+
 <?= $this->pagination; ?>

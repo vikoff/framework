@@ -17,8 +17,9 @@ class Admin_Controller extends Controller{
 		'display_config'    => 'content',
 		'display_users'     => 'content',
 		'display_modules'   => 'content',
-		'display_root'      => 'content',
+		'display_manage'    => 'content',
 		
+		'action_read_modules_config' => 'content',
 		'action_make_fs_snapshot' => 'content',
 	);
 	
@@ -111,37 +112,46 @@ class Admin_Controller extends Controller{
 	public function display_config($params = array()){
 		
 		$viewer = BackendLayout::get();
+		$section = getVar($params[0]);
 		
 		// display index
-		if(empty($params[0])){
+		if(empty($section)){
 			$viewer
 				->setContentHtmlFile(self::TPL_PATH.'content_index.tpl')
 				->render();
 			exit();
 		}
 		
-		$app = App::get();
-		$module = $app->prepareModuleName(array_shift($params));
-		
-		if(!$app->isModule($module, TRUE)){
-			$this->error404handler('модуль <b>'.$module.'</b> не найден');
-			exit();
+		switch($section){
+			
+			case 'modules':
+				$this->snippet_config_modules();
+				break;
+				
+			default:
+				$app = App::get();
+				$module = $app->prepareModuleName(array_shift($params));
+				
+				if(!$app->isModule($module, TRUE)){
+					$this->error404handler('модуль <b>'.$module.'</b> не найден');
+					exit();
+				}
+				
+				if(!$app->getModule($module, TRUE)->display($params))
+					$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
 		}
-		
-		if(!$app->getModule($module, TRUE)->display($params))
-			$this->error404handler('недопустимое действие <b>'.getVar($params[0]).'</b> модуля <b>'.$module.'</b>');
 	}
 	
-	/** DISPLAY ROOT */
-	public function display_root($params = array()){
+	/** DISPLAY MANAGE */
+	public function display_manage($params = array()){
 		
 		$section = getVar($params[0]);
 		
 		$viewer = BackendLayout::get();
 
-		if(!$section){
+		if(empty($section)){
 			$viewer
-				->setContentHtmlFile(self::TPL_PATH.'root_index.tpl')
+				->setContentHtmlFile(self::TPL_PATH.'manage_index.tpl')
 				->render();
 			exit();
 		}
@@ -175,6 +185,14 @@ class Admin_Controller extends Controller{
 	////// SNIPPETS //////
 	//////////////////////
 	
+	/** SNIPPET CONFIG MODULES */
+	public function snippet_config_modules(){
+		
+		BackendLayout::get()
+			->setContentPhpFile(self::TPL_PATH.'config_modules.php')
+			->render();
+	}
+	
 	/** SNIPPET ERROR LOG */
 	public function snippet_error_log(){
 		
@@ -184,20 +202,29 @@ class Admin_Controller extends Controller{
 			'pagination' => $collection->getPagination(),
 		);
 		BackendLayout::get()
-			->setContentPhpFile(self::TPL_PATH.'root_error_log.php', $variables);
+			->setContentPhpFile(self::TPL_PATH.'manage_error_log.php', $variables);
 	}
 	
 	public function snippet_fs_snapshot(){
 		
 		BackendLayout::get()
-			->setContentPhpFile(self::TPL_PATH.'root_fs_snapshot.php')
+			->setContentPhpFile(self::TPL_PATH.'manage_fs_snapshot.php')
 			->render();
-		
 	}
 	
 	////////////////////
 	////// ACTION //////
 	////////////////////
+	
+	/** ACTION READ MODULES CONFIG */
+	public function action_read_modules_config(){
+		
+		$model = new Admin_Model();
+		$log = $model->readModulesConfig();
+		BackendLayout::get()->setVariables(array('log' => $log));
+		Messenger::get()->addSuccess('Конфигурация модулей перечитана');
+		return TRUE;
+	}
 	
 	/** ACTION MAKE FS SNAPSHOT */
 	public function action_make_fs_snapshot(){

@@ -9,21 +9,21 @@
 	<table class="grid wide tr-highlight">
 	<tr>
 		<th><?= $this->sorters['id']; ?></th>
-		<th><?= $this->sorters['login']; ?></th>
-		<th><?= $this->sorters['password']; ?></th>
-		<th><?= $this->sorters['text']; ?></th>
-		<th><?= $this->sorters['type']; ?></th>
-		<th><?= $this->sorters['is_active']; ?></th>
+		<th><?= $this->sorters['category_id']; ?></th>
+		<th><?= $this->sorters['item_name']; ?></th>
+		<th><?= $this->sorters['item_text']; ?></th>
+		<th><?= $this->sorters['published']; ?></th>
+		<th><?= $this->sorters['date']; ?></th>
 		<th>Опции</th>
 	</tr>
 	<? foreach($this->collection as $item): ?>	
 	<tr>
 		<td><?= $item['id']; ?></td>
-		<td><?= $item['login']; ?></td>
-		<td><?= $item['password']; ?></td>
-		<td><?= $item['text']; ?></td>
-		<td><?= $item['type']; ?></td>
-		<td><?= $item['is_active']; ?></td>
+		<td><?= $item['category_id']; ?></td>
+		<td><?= $item['item_name']; ?></td>
+		<td><?= $item['item_text']; ?></td>
+		<td><?= $item['published']; ?></td>
+		<td><?= $item['date']; ?></td>
 			
 		<td class="center" style="width: 90px;">
 			<div class="tr-hover-visible options">

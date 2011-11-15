@@ -8,6 +8,10 @@ class TestItem_Model extends ActiveRecord {
 	/** таблица БД */
 	const TABLE = 'test_items';
 	
+	/** типы сохранения */
+	const SAVE_CREATE   = 'create';
+	const SAVE_EDIT     = 'edit';
+	
 	const NOT_FOUND_MESSAGE = 'Страница не найдена';
 
 	
@@ -59,35 +63,49 @@ class TestItem_Model extends ActiveRecord {
 	}
 	
 	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР ВАЛИДАТОРА */
-	public function getValidator(){
+	public function getValidator($mode = self::SAVE_CREATE){
 		
-		// инициализация экземпляра валидатора
-		$validator = new Validator(array(
-				'login' => array('strip_tags' => TRUE, 'length' => array('max' => 255)),
-				'password' => array('strip_tags' => TRUE, 'length' => array('max' => 255)),
-				'text' => array('strip_tags' => TRUE, 'length' => array('max' => 65535)),
-				'type' => array('settype' => 'int'),
-				'is_active' => array('checkbox' => array('on' => TRUE, 'off' => FALSE)),
-            ),
-			array('required' => array('type'))
+		$rules = array(
+			'category_id' => array('settype' => 'int'),
+			'item_name' => array('strip_tags' => TRUE, 'length' => array('max' => 255)),
+			'item_text' => array('strip_tags' => TRUE, 'length' => array('max' => 65535)),
+			'published' => array('strip_tags' => TRUE, 'length' => array('max' => 1))
 		);
+		
+		$fields = array();
+		switch($mode) {
+			
+			case self::SAVE_CREATE:
+				$fields = array('category_id', 'item_name', 'item_text', 'published');
+				break;
+			
+			case self::SAVE_EDIT:
+				$fields = array('category_id', 'item_name', 'item_text', 'published');
+				break;
+			
+			default: trigger_error('Неверный ключ валидатора', E_USER_ERROR);
+		}
+		
+		$fieldsRules = array();
+		foreach($fields as $f)
+			$fieldsRules[$f] = $rules[$f];
+			
+		$validator = new Validator($fieldsRules);
 		
 		$validator->setFieldTitles(array(
 			'id' => 'id',
-			'login' => 'login',
-			'password' => 'password',
-			'text' => 'text',
-			'type' => 'type',
-			'is_active' => 'is_active',
+			'category_id' => 'Категория',
+			'item_name' => 'Имя',
+			'item_text' => 'Описание',
+			'published' => 'Публикация',
+			'date' => 'Дата',
 		));
 		
 		return $validator;
 	}
 		
 	/** ПРЕ-ВАЛИДАЦИЯ ДАННЫХ */
-	public function preValidation(&$data){
-		
-	}
+	public function preValidation(&$data){}
 	
 	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function postValidation(&$data){
@@ -119,11 +137,11 @@ class TestItem_Collection extends ARCollection{
 	 */
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',
-		'login' => 'login',
-		'password' => 'password',
-		'text' => 'text',
-		'type' => 'type',
-		'is_active' => 'is_active',
+		'category_id' => 'Категория',
+		'item_name' => 'Имя',
+		'item_text' => 'Описание',
+		'published' => 'Публикация',
+		'date' => 'Дата',
 	);
 	
 	

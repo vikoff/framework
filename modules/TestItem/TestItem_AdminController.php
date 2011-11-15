@@ -43,8 +43,8 @@ class TestItem_AdminController extends Controller {
 	////// DISPLAY //////
 	/////////////////////
 	
-	/** DISPLAY LIST (ADMIN) */
-	public function display_list($params = array()){
+	/** DISPLAY LIST */
+	public function display_list(){
 		
 		$collection = new TestItem_Collection();
 		$variables = array(
@@ -60,14 +60,15 @@ class TestItem_AdminController extends Controller {
 			->render();
 	}
 	
-	/** DISPLAY NEW (ADMIN) */
-	public function display_new($params = array()){
+	/** DISPLAY NEW */
+	public function display_new(){
 		
 		$pageTitle = 'Создание новой страницы';
 		
 		$variables = array_merge(Tools::unescape($_POST), array(
 			'instanceId' => 0,
 			'pageTitle'  => $pageTitle,
+			'validation' => TestItem_Model::create()->getValidator()->getJsRules(),
 		));
 		
 		BackendLayout::get()
@@ -77,10 +78,10 @@ class TestItem_AdminController extends Controller {
 			->render();
 	}
 	
-	/** DISPLAY EDIT (ADMIN) */
-	public function display_edit($params = array()){
+	/** DISPLAY EDIT */
+	public function display_edit($uid = null){
 		
-		$instanceId = getVar($params[0], 0 ,'int');
+		$instanceId = (int)$uid;
 		$instance = TestItem_Model::load($instanceId);
 		
 		$pageTitle = '<span style="font-size: 14px;">Редактирование элемента</span> #'.$instance->getField('id');
@@ -88,6 +89,7 @@ class TestItem_AdminController extends Controller {
 		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
 			'instanceId' => $instanceId,
 			'pageTitle'  => $pageTitle,
+			'validation' => $instance->getValidator()->getJsRules(),
 		));
 		
 		BackendLayout::get()
@@ -97,10 +99,10 @@ class TestItem_AdminController extends Controller {
 			->render();
 	}
 	
-	/** DISPLAY COPY (ADMIN) */
-	public function display_copy($params = array()){
+	/** DISPLAY COPY */
+	public function display_copy($uid = null){
 		
-		$instanceId = getVar($params[0], 0 ,'int');
+		$instanceId = (int)$uid;
 		$instance = TestItem_Model::load($instanceId);
 		
 		$pageTitle = 'Копирование записи';
@@ -108,6 +110,7 @@ class TestItem_AdminController extends Controller {
 		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
 			'instanceId' => 0,
 			'pageTitle'  => $pageTitle,
+			'validation' => $instance->getValidator()->getJsRules(),
 		));
 		
 		BackendLayout::get()
@@ -117,10 +120,10 @@ class TestItem_AdminController extends Controller {
 			->render();
 	}
 	
-	/** DISPLAY DELETE (ADMIN) */
-	public function display_delete($params = array()){
+	/** DISPLAY DELETE */
+	public function display_delete($uid = null){
 		
-		$instanceId = getVar($params[0], 0 ,'int');
+		$instanceId = (int)$uid;
 		$instance = TestItem_Model::load($instanceId);
 
 		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
@@ -139,13 +142,14 @@ class TestItem_AdminController extends Controller {
 	////// ACTION //////
 	////////////////////
 	
-	/** ACTION SAVE (ADMIN) */
-	public function action_save($params = array()){
+	/** ACTION SAVE */
+	public function action_save(){
 		
 		$instanceId = getVar($_POST['id'], 0, 'int');
 		$instance = new TestItem_Model($instanceId);
+		$saveMode = $instance->isNewObj ? TestItem_Model::SAVE_CREATE : TestItem_Model::SAVE_EDIT;
 		
-		if ($instance->save(Tools::unescape($_POST))) {
+		if ($instance->save(Tools::unescape($_POST), $saveMode)) {
 			Messenger::get()->addSuccess('Запись сохранена');
 			$this->_redirectUrl = !empty($this->_redirectUrl)
 				? preg_replace('/\(%([\w\-]+)%\)/e', '$instance->getField("$1")', $this->_redirectUrl)
@@ -157,22 +161,17 @@ class TestItem_AdminController extends Controller {
 		}
 	}
 	
-	/** ACTION DELETE (ADMIN) */
-	public function action_delete($params = array()){
+	/** ACTION DELETE */
+	public function action_delete(){
 		
 		$instanceId = getVar($_POST['id'], 0, 'int');
 		$instance = TestItem_Model::load($instanceId);
-		
-		// установить редирект на admin-list
-		$this->setRedirectUrl('admin/content/test-item/list');
 	
 		if ($instance->destroy()) {
 			Messenger::get()->addSuccess('Запись удалена');
 			return TRUE;
 		} else {
 			Messenger::get()->addError('Не удалось удалить запись:', $instance->getError());
-			// выполнить редирект принудительно
-			$this->forceRedirect();
 			return FALSE;
 		}
 

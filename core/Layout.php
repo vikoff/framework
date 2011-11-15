@@ -119,6 +119,14 @@ class Layout{
 		return $this;
 	}
 	
+	public function setVariables($variables){
+		
+		foreach($variables as $k => $v)
+			$this->$k = $v;
+			
+		return $this;
+	}
+	
 	protected function _getTitleHTML(){
 		
 		return !empty($this->_htmlTitle)

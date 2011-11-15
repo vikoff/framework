@@ -28,8 +28,8 @@ return array (
 	
 		array(
 			'title' => 'Администрирование',
-			'href' => 'admin/root',
-			'active' => $r->getParts(array(0, 1)) == 'admin/root',
+			'href' => 'admin/manage',
+			'active' => $r->getParts(array(0, 1)) == 'admin/manage',
 		),
 	
 		array(

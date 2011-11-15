@@ -8,23 +8,20 @@
 	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
 
 	<div class="paragraph">
-		<label class="title">login</label>
-		<?= Html_Form::inputText(array('name' => 'login', 'value' => $this->login)); ?>
+		<label class="title">Категория</label>
+		<?= Html_Form::select(array('name' => 'category_id'), array('' => 'Выберите...', '1' => '1', '2' => '2'), $this->category_id); ?>
 	</div>
 	<div class="paragraph">
-		<label class="title">password</label>
-		<?= Html_Form::input(array('type' => 'password', 'name' => 'password', 'value' => $this->password)); ?>
+		<label class="title">Имя</label>
+		<?= Html_Form::inputText(array('name' => 'item_name', 'value' => $this->item_name)); ?>
 	</div>
 	<div class="paragraph">
-		<label class="title">text</label>
-		<?= Html_Form::textarea(array('name' => 'text', 'value' => $this->text)); ?>
+		<label class="title">Описание</label>
+		<?= Html_Form::textarea(array('name' => 'item_text', 'value' => $this->item_text)); ?>
 	</div>
 	<div class="paragraph">
-		<label class="title">type</label>
-		<?= Html_Form::select(array('name' => 'type'), array('' => 'Выберите...', '1' => 'первый'), $this->type); ?>
-	</div>
-	<div class="paragraph">
-		<label class="title"><?= Html_Form::checkbox(array('name' => 'is_active', 'value' => '1', 'checked' => $this->is_active)); ?> is_active</label>
+		<label class="title">Публикация</label>
+		<label><?= Html_Form::checkbox(array('name' => 'published', 'value' => '1', 'checked' => $this->published)); ?></label>
 	</div>
 
 	<div class="paragraph" id="submit-box">

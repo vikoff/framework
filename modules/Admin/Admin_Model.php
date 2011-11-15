@@ -53,6 +53,46 @@ class Admin_Model {
 		foreach($files as $f)
 			echo $base.$f['file'].' |'.$f['mtime'].'|'.$f['size']."\n";
 	}
+	
+	public function readModulesConfig(){
+		
+		$modulesDir = FS_ROOT.'modules/';
+		$modulesConfig = array();
+		$log = array('error' => array(), 'success' => array());
+		
+		foreach(scandir($modulesDir) as $elm){
+			
+			if($elm == '.' || $elm == '..' || !is_dir($modulesDir.$elm))
+				continue;
+			
+			if(file_exists($modulesDir.$elm.'/config.php')){
+				$config = include($modulesDir.$elm.'/config.php');
+				if (!isset($config['name'])) {
+					$log['error'][] = '<span style="color: red;">В конфиге модуля <b>'.$elm.'</b> отсутствует ключ <b>name</b></span>';
+					continue;
+				}
+				$modulesConfig[ $config['name'] ] = $config;
+				$log['info'][] = 'Прочитан конфиг модуля <b>'.$config['name'].'</b>';
+			}
+		}
+		
+		$globalConfigFile = FS_ROOT.'config/modules.php';
+		
+		if (!file_exists($globalConfigFile)) {
+			array_unshift($log['error'], '<b>Файл глобальной конфигурации отсутствует</b>');
+			return $log;
+		}
+		
+		if (!is_writeable($globalConfigFile)) {
+			array_unshift($log['error'], '<span style="color: red; font-weight: bold;">Файл глобальной конфигурации не доступен для записи</span>');
+			return $log;
+		}
+		
+		file_put_contents($globalConfigFile, "<?php\n\nreturn ".var_export($modulesConfig, 1).";\n\n?>");
+		return $log;
+		// echo '<pre>'; print_r($modulesConfig); die;
+			
+	}
 }
 
 ?>

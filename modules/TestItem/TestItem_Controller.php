@@ -38,7 +38,7 @@ class TestItem_Controller extends Controller {
 	/////////////////////
 	
 	/** DISPLAY LIST */
-	public function display_list($params = array()){
+	public function display_list(){
 		
 		$collection = new TestItem_Collection();
 		$variables = array(
@@ -55,9 +55,9 @@ class TestItem_Controller extends Controller {
 	}
 	
 	/** DISPLAY VIEW */
-	public function display_view($params = array()){
+	public function display_view($uid = null){
 		
-		$instanceId = getVar($params[0], 0, 'int');
+		$instanceId = (int)$uid;
 		
 		$variables = TestItem_Model::load($instanceId)->GetAllFieldsPrepared();
 		FrontendLayout::get()

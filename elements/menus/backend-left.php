@@ -84,8 +84,8 @@ switch($topMenuHref){
 		);
 		break;
 		
-	// ROOT //
-	case 'admin/root':
+	// MANAGE //
+	case 'admin/manage':
 		$items = array(
 			array(
 				'title' => 'Статистика посещений',

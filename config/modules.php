@@ -1,90 +1,102 @@
-<?
+<?php
 
-return array(
-
-	'admin' => array(
-		'title' => 'Панель управления',
-		'controller' => 'Admin_Controller',
-		'arrayParams' => TRUE,
-		'resources' => array(
-			'content' => 'Редактирование страниц',
-			'edit' => 'Редактирование страниц',
-			'root' => 'Root-привилегии (установка ограничений, запрет удаления)',
-			'modules' => 'Управление модулями',
-			'sql' => 'SQL-утилиты',
-		),
-	),
-	
-	'page' => array(
-		'title' => 'Страницы',
-		'controller' => 'Page_Controller',
-		'adminController' => 'Page_AdminController',
-		'dependencies' => array('alias'),
-		'resources' => array(
-			'view' => 'Просмотр страниц',
-			'edit' => 'Редактирование страниц',
-			'root' => 'Root-привилегии (установка ограничений, запрет удаления)',
-		)
-	),
-	
-	'menu' => array(
-		'title' => 'Меню',
-		'controller' => 'Menu_Controller',
-		'adminController' => 'Menu_AdminController',
-		'arrayParams' => TRUE,
-		'resources' => array(
-			'view' => 'Просмотр страниц',
-			'edit' => 'Редактирование страниц',
-		)
-	),
-	
-	'testItem' => array(
-		'title' => 'Тестовые сущности',
-		'controller' => 'TestItem_Controller',
-		'adminController' => 'TestItem_AdminController',
-		'arrayParams' => TRUE,
-		'resources' => array(
-			'view' => 'Просмотр страниц',
-			'edit' => 'Редактирование страниц',
-		)
-	),
-	
-	'user' => array(
-		'title' => 'Пользователи',
-		'controller' => 'User_Controller',
-		'adminController' => 'User_AdminController',
-		// 'arrayParams' => TRUE,
-		'resources' => array(
-			'public' => 'Общедоступные действия',
-			'view' => 'Просмотр данных пользователя',
-			'edit' => 'Редактирование данных',
-		)
-	),
-
-	'alias' => array(
-		'title' => 'Псевдонимы',
-		'adminController' => 'Alias_AdminController',
-		'arrayParams' => TRUE,
-		'resources' => array(
-			'public' => 'Общедоступные действия',
-			'view' => 'Просмотр данных пользователя',
-			'edit' => 'Редактирование данных',
-		)
-	),
-
-	'userStatistics' => array(
-		'title' => 'Псевдонимы',
-		'controller' => 'UserStatistics_Controller',
-		'adminController' => 'UserStatistics_AdminController',
-		'arrayParams' => TRUE,
-		'resources' => array(
-			'public' => 'Общедоступные действия',
-			'view' => 'Просмотр данных пользователя',
-			'edit' => 'Редактирование данных',
-		)
-	),
-
-
+return array (
+  'admin' => 
+  array (
+    'name' => 'admin',
+    'title' => 'Панель управления',
+    'controller' => 'Admin_Controller',
+    'arrayParams' => true,
+    'resources' => 
+    array (
+      'content' => 'Редактирование страниц',
+      'edit' => 'Редактирование страниц',
+      'root' => 'Root-привилегии (установка ограничений, запрет удаления)',
+      'modules' => 'Управление модулями',
+      'sql' => 'SQL-утилиты',
+    ),
+  ),
+  'alias' => 
+  array (
+    'name' => 'alias',
+    'title' => 'Псевдонимы',
+    'adminController' => 'Alias_AdminController',
+    'arrayParams' => true,
+    'resources' => 
+    array (
+      'public' => 'Общедоступные действия',
+      'view' => 'Просмотр данных пользователя',
+      'edit' => 'Редактирование данных',
+    ),
+  ),
+  'error' => 
+  array (
+    'name' => 'error',
+    'title' => 'Административная панель',
+    'controller' => 'Admin_Controller',
+  ),
+  'menu' => 
+  array (
+    'name' => 'menu',
+    'title' => 'Административная панель',
+    'controller' => 'Admin_Controller',
+  ),
+  'page' => 
+  array (
+    'name' => 'page',
+    'title' => 'Страницы',
+    'controller' => 'Page_Controller',
+    'adminController' => 'Page_AdminController',
+    'dependencies' => 
+    array (
+      0 => 'alias',
+    ),
+    'resources' => 
+    array (
+      'view' => 'Просмотр страниц',
+      'edit' => 'Редактирование страниц',
+      'root' => 'Root-привилегии (установка ограничений, запрет удаления)',
+    ),
+  ),
+  'testItem' => 
+  array (
+    'name' => 'testItem',
+    'title' => 'Тестовые сущности',
+    'controller' => 'TestItem_Controller',
+    'adminController' => 'TestItem_AdminController',
+    'resources' => 
+    array (
+      'view' => 'Просмотр',
+      'edit' => 'Редактирование',
+    ),
+  ),
+  'user' => 
+  array (
+    'name' => 'user',
+    'title' => 'Пользователи',
+    'controller' => 'User_Controller',
+    'adminController' => 'User_AdminController',
+    'resources' => 
+    array (
+      'public' => 'Общедоступные действия',
+      'view' => 'Просмотр данных пользователя',
+      'edit' => 'Редактирование данных',
+    ),
+  ),
+  'userStatistics' => 
+  array (
+    'name' => 'userStatistics',
+    'title' => 'Псевдонимы',
+    'controller' => 'UserStatistics_Controller',
+    'adminController' => 'UserStatistics_AdminController',
+    'arrayParams' => true,
+    'resources' => 
+    array (
+      'public' => 'Общедоступные действия',
+      'view' => 'Просмотр данных пользователя',
+      'edit' => 'Редактирование данных',
+    ),
+  ),
 );
 
 ?>
