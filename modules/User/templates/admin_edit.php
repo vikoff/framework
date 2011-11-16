@@ -35,13 +35,6 @@
 		<th>Роль</th>
 		<td><?= Html_Form::select(array('name' => 'role_id'), $this->rolesList, $this->role_id); ?></td>
 	</tr>
-	<tr>
-		<th>Доп. опции</th>
-		<td>
-			<a href="<?= href('admin/users/ban/'.$this->instanceId); ?>">заблокировать</a>
-			<a href="<?= href('admin/users/delete/'.$this->instanceId); ?>">удалить</a>
-		</td>
-	</tr>
 
 	<tr>
 		<td colspan="2" style="text-align: center;">

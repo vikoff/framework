@@ -66,7 +66,7 @@ class User_RoleModel extends ActiveRecord {
 	public function getValidator($mode = self::SAVE_CREATE){
 		
 		$rules = array(
-			'title' => array('strip_tags' => TRUE, 'length' => array('max' => 255)),
+			'title' => array('required' => TRUE, 'strip_tags' => TRUE, 'length' => array('max' => 255)),
 			'level' => array('settype' => 'int'),
 			'description' => array('strip_tags' => TRUE, 'length' => array('max' => 65535)),
 		);
@@ -107,6 +107,10 @@ class User_RoleModel extends ActiveRecord {
 	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function postValidation(&$data){
 		
+		if ($data['level'] < 1 || $data['level'] > 49){
+			$this->setError('Уровень должен быть числом от 1 до 49');
+			return FALSE;
+		}
 		// $data['author'] = USER_AUTH_ID;
 		// $data['modif_date'] = time();
 		// if($this->isNewObj)
@@ -134,9 +138,8 @@ class User_RoleCollection extends ARCollection{
 	 */
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',
-		'title' => 'Заголовок',
+		'title' => 'Роль',
 		'level' => 'Уровень',
-		'description' => 'Описание',
 	);
 	
 	

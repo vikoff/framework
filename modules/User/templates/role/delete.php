@@ -2,24 +2,15 @@
 <div style="text-align: center;">
 
 	<div class="paragraph">
-
-		Хотите удалить запись #<?= $this->instanceId; ?>		
-
-		id: <?= $this->id; ?>, 
-		Заголовок: <?= $this->title; ?>, 
-		Уровень: <?= $this->level; ?>, 
-		Описание: <?= $this->description; ?>, 
-		
-		безвозвратно?
-
+		Хотите удалить роль <b><?= $this->title; ?></b>?
 	</div>
 	
 	<div class="paragraph">
-		<form action="" method="post">
+		<form action="<?= href('admin/users/roles'); ?>" method="post">
 			<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
 			<?= FORMCODE; ?>			
-			<input class="button" type="submit" name="action[admin/user/delete]" value="Удалить" />
-			<a class="button" href="<?= href('admin/user/user'); ?>">Отмена</a>
+			<input class="button" type="submit" name="action[admin/users/roles/delete]" value="Удалить" />
+			<a class="button" href="<?= href('admin/users/roles'); ?>">Отмена</a>
 		</form>
 	</div>
 	

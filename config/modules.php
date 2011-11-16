@@ -34,12 +34,22 @@ return array (
     'name' => 'error',
     'title' => 'Административная панель',
     'controller' => 'Admin_Controller',
+    'resources' => 
+    array (
+      'view' => 'Просмотр',
+      'edit' => 'Редактирование',
+    ),
   ),
   'menu' => 
   array (
     'name' => 'menu',
     'title' => 'Административная панель',
     'controller' => 'Admin_Controller',
+    'resources' => 
+    array (
+      'view' => 'Просмотр',
+      'edit' => 'Редактирование',
+    ),
   ),
   'page' => 
   array (

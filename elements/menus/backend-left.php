@@ -50,19 +50,19 @@ switch($topMenuHref){
 			array(
 				'title' => 'Список пользователей',
 				'href' => $topMenuHref.'/list',
-				'active' => in_array($r->getParts(2), array('', 'list')),
-			),
-		
-			array(
-				'title' => 'Создание пользователя',
-				'href' => $topMenuHref.'/create',
-				'active' => $r->getParts(2) == 'create',
+				'active' => in_array($r->getParts(2), array('', 'list', 'create', 'edit', 'delete')),
 			),
 		
 			array(
 				'title' => 'Управление ролями',
 				'href' => $topMenuHref.'/roles',
 				'active' => $r->getParts(2) == 'roles',
+			),
+		
+			array(
+				'title' => 'Управление доступом',
+				'href' => $topMenuHref.'/acl',
+				'active' => $r->getParts(2) == 'acl',
 			),
 		
 			array(

@@ -22,6 +22,7 @@ class User_AdminController extends Controller{
 		
 		'display_list'		=> 'edit',
 		'display_view'		=> 'edit',
+		'display_acl'		=> 'edit',
 		'display_ban'		=> 'edit',
 		'display_create'	=> 'edit',
 		'display_edit'		=> 'edit',
@@ -147,6 +148,24 @@ class User_AdminController extends Controller{
 		BackendLayout::get()
 			->prependTitle('Удаление пользователя #'.$instanceId)
 			->setContentPhpFile(self::TPL_PATH.'delete.php', $variables)
+			->render();
+	}
+	
+	public function display_acl(){
+		
+		$acl = User_Acl::get();
+		
+		$variables = array(
+			'rolesList' => User_RoleCollection::load()->getAll(),
+			'resourcesList' => $acl->getResourcesList(),
+			'accessRules' => $acl->getAllAccessRules(),
+		);
+		
+		// echo '<pre>'; print_r(User_RoleCollection::load()->getAll()); die;
+		
+		BackendLayout::get()
+			->prependTitle('Управление доступом')
+			->setContentPhpFile(self::TPL_PATH.'acl.php', $variables)
 			->render();
 	}
 	

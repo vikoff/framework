@@ -120,6 +120,12 @@ class App {
 		}
 		return new $this->_modulesConfig[$module][$key]( $this->_modulesConfig[$module] );
 	}
+	
+	/** ПОЛУЧЕНИЕ МАССИВА КОНФИГУРАЦИИ ВСЕХ МОДУЛЕЙ */
+	public function getModulesConfig(){
+		
+		return $this->_modulesConfig;
+	}
 
 	/** ПРОВЕРИТЬ НЕОБХОДИМОСТЬ ВЫПОЛЕННИЯ ДЕЙСТВИЯ */
 	public function _checkAction(){

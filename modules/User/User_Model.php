@@ -202,7 +202,7 @@ class User_Model extends ActiveRecord{
 	}
 	
 	/** ЗАНЯТ ЛИ EMAIL */
-	static public function isEmailInUse($email, $excludeId = 0){
+	public static function isEmailInUse($email, $excludeId = 0){
 	
 		$db = db::get();
 		$sql = 'SELECT COUNT(1) FROM '.self::TABLE.' WHERE email='.$db->qe($email);
@@ -213,25 +213,25 @@ class User_Model extends ActiveRecord{
 	}
 	
 	/** ЗАНЯТ ЛИ ЛОГИН */
-	static public function isLoginInUse($login){
+	public static function isLoginInUse($login){
 		
 		$db = db::get();
 		return $db->getOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE login='.$db->qe($login));
 	}
 	
 	/** ПРОВЕРИТЬ, ИМЕЕТ ЛИ ПОЛЬЗОВАТЕЛЬ УКАЗАННЫЕ ПРАВА */
-	static public function hasPerm($perm){
+	public static function hasPerm($perm){
 
 		return USER_AUTH_PERMS >= $perm;
 	}
 
 	/** ПОЛУЧИТЬ СПИСОК ВОЗМОЖНЫХ ПРАВ ПОЛЬЗОВАТЕЛЕЙ */
-	static public function getPermsList(){
+	public static function getPermsList(){
 		return array(PERMS_UNREG, PERMS_REG, PERMS_MODERATOR, PERMS_ADMIN, PERMS_SUPERADMIN, PERMS_ROOT);
 	}
 	
 	/** ПОЛУЧИТЬ ТЕКСТОВОЕ НАЗВАНИЕ ПРАВ ПОЛЬЗОВАТЕЛЯ */
-	static public function getPermName($perm){
+	public static function getPermName($perm){
 		switch($perm){
 			case PERMS_UNREG:
 				return 'Гость';
@@ -251,7 +251,7 @@ class User_Model extends ActiveRecord{
 	}
 	
 	/** ТЕКСТОВОЕ ЗНАЧЕНИЕ ПАРАМЕТРА "ПОЛ ПОЛЬЗОВАТЕЛЯ" */
-	static public function getGenderString($gender){
+	public static function getGenderString($gender){
 		if($gender == self::GENDER_FEMALE)
 			return 'женщина';
 		elseif($gender == self::GENDER_MALE)
@@ -273,6 +273,7 @@ class User_Model extends ActiveRecord{
 		
 		return 0;
 	}
+	
 }
 
 
