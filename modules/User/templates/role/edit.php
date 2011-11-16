@@ -20,6 +20,13 @@
 		<label class="title">Описание</label>
 		<?= Html_Form::textarea(array('name' => 'description', 'value' => $this->description, 'style' => 'width: 200px; height: 50px;')); ?>
 	</div>
+	
+	<? if(!$this->instanceId): ?>
+	<div class="paragraph">
+		<label class="title">Скопировать права доступа</label>
+		<?= Html_Form::select(array('name' => 'copy_role'), array_merge(array('0' => 'Не копировать'), $this->rolesList)); ?>
+	</div>
+	<? endif; ?>
 
 	<div class="paragraph" id="submit-box">
 		<input id="submit-save" class="button" type="submit" name="action[admin/user/roles/save][admin/users/roles/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />

@@ -223,6 +223,17 @@ class DbAdapter_sqlite extends DbAdapter{
 	}
 	
 	/**
+	 * TRUNCATE
+	 * очистка таблицы
+	 * @param string $table - имя таблицы
+	 * @return void
+	 */
+	public function truncate($table){
+		
+		$this->query('DELETE FROM '.$table);
+	}
+	
+	/**
 	 * ЭКРАНИРОВАНИЕ ДАННЫХ
 	 * выполняется с учетом типа данных для предотвращения SQL-инъекций
 	 * @param mixed строка для экранирования

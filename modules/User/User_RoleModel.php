@@ -102,7 +102,11 @@ class User_RoleModel extends ActiveRecord {
 	}
 		
 	/** ПРЕ-ВАЛИДАЦИЯ ДАННЫХ */
-	public function preValidation(&$data){}
+	public function preValidation(&$data){
+		
+		if ($this->isNewObj)
+			$this->additData['copy_role'] = getVar($data['copy_role'], 0, 'int');
+	}
 	
 	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function postValidation(&$data){
@@ -120,11 +124,18 @@ class User_RoleModel extends ActiveRecord {
 	/** ДЕЙСТВИЕ ПОСЛЕ СОХРАНЕНИЯ */
 	public function afterSave($data){
 		
+		// скопировать права доступа указанной роли
+		if ($this->isNewlyCreated && $this->additData['copy_role']){
+			User_Acl::get()->copyRules($this->additData['copy_role'], $this->id);
+			$role = User_RoleModel::load($this->additData['copy_role'])->getField('title');
+			Messenger::get()->addInfo('Правила доступа скопированы с роли <b>'.$role.'</b>');
+		}
 	}
 	
 	/** ПОДГОТОВКА К УДАЛЕНИЮ ОБЪЕКТА */
 	public function beforeDestroy(){
-	
+		
+		User_Acl::get()->deleteRole($this->id);
 	}
 	
 }

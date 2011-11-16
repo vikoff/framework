@@ -2,41 +2,56 @@
 <style type="text/css">
 	td.checkbox{
 		text-align: center;
+		padding: 0px;
+	}
+	td.checkbox label{
+		display: block;
+		width: 100%;
+		height: 100%;
 	}
 </style>
-<script type="text/javascript" src="http://scripts.vik-off.net/plugins/jquery.simpleCheckbox.js"></script>
-<script type="text/javascript">
-$(function(){
-	$('td.checkbox input[type="checkbox"]').simpleCheckbox();
-});
-</script>
 
 <? if ($this->resourcesList): ?>
 	
-	<table class="grid">
-	<tr>
-		<th>Модуль</th>
-		<th>Ресурс</th>
-		<? foreach($this->rolesList as $role): ?>
-			<th>
-				<?= $role['title']; ?><br />
-				(<?= $role['level']; ?>)
-			</th>
-		<? endforeach; ?>
-	</tr>
-	
-	<? foreach($this->resourcesList as $item): ?>
+	<form action="" method="post">
+		<?= FORMCODE; ?>
+		<input type="hidden" name="action" value="user/save-acl" />
+		
+		<table class="grid tr-highlight">
 		<tr>
-			<td><?= $item['module_title']; ?></td>
-			<td><?= $item['resource_title']; ?></td>
+			<th>Модуль</th>
+			<th>Ресурс</th>
 			<? foreach($this->rolesList as $role): ?>
-				<td class="checkbox">
-					<?= Html_Form::checkbox(array('checked' => !empty($this->accessRules[ $item['module'] ][ $item['resource'] ][ $role['id'] ]))); ?>
-				</td>
+				<th>
+					<?= $role['title']; ?><br />
+					(<?= $role['level']; ?>)
+				</th>
 			<? endforeach; ?>
 		</tr>
-	<? endforeach; ?>
-	</table>
+		
+		<? foreach($this->resourcesList as $item): ?>
+			<tr>
+				<td><?= $item['module_title']; ?></td>
+				<td><?= $item['resource_title']; ?></td>
+				<? foreach($this->rolesList as $role): ?>
+					<td class="checkbox">
+						<label>
+						<?= Html_Form::checkbox(array(
+							'name' => 'items['.$item['module'].'|'.$item['resource'].'|'.$role['id'].']',
+							'value' => 1,
+							'checked' => !empty($this->accessRules[ $item['module'] ][ $item['resource'] ][ $role['id'] ]))); ?>
+						</label>
+					</td>
+				<? endforeach; ?>
+			</tr>
+		<? endforeach; ?>
+		</table>
+		
+		<div class="paragraph" style="text-align: center;">
+			<input type="submit" value="Сохранить" />
+		</div>
+		
+	</form>
 <? else: ?>
 	Сохраненных записей пока нет.
 <? endif; ?>

@@ -72,11 +72,47 @@ class User_Acl {
 		foreach(db::get()->getAll('SELECT * FROM '.self::TABLE) as $rule){
 			if (!isset($rules[ $rule['module'] ]))
 				$rules[ $rule['module'] ] = array();
-			$rules[ $rule['module'] ][ $rule['resource'] ] = TRUE;
+			if (!isset($rules[ $rule['module'] ][ $rule['resource'] ]))
+				$rules[ $rule['module'] ][ $rule['resource'] ] = array();
+			$rules[ $rule['module'] ][ $rule['resource'] ][ $rule['role_id'] ] = TRUE;
 		}
 		
 		return $rules;
 	}
+	
+	public function saveRules($rulesRaw){
+		
+		$db = db::get();
+		$db->truncate(self::TABLE);
+		
+		foreach($rulesRaw as $row => $enable){
+			list($module, $resource, $role_id) = explode('|', $row) + array('','','');
+			$db->insert(self::TABLE, array(
+				'module' => $module,
+				'resource' => $resource,
+				'role_id' => $role_id,
+			));
+		}
+		
+		return TRUE;
+	}
+	
+	public function copyRules($fromRoleId, $toRoleId){
+		
+		$db = db::get();
+		$db->getOne('
+			INSERT INTO '.self::TABLE.'
+			SELECT '.$db->qe($toRoleId).' AS role_id, module, resource FROM '.self::TABLE.' WHERE role_id='.(int)$fromRoleId.'
+		');
+		return TRUE;
+	}
+	
+	public function deleteRole($role_id){
+		
+		db::get()->delete(self::TABLE, 'role_id='.(int)$role_id);
+		return TRUE;
+	}
+	
 }
 
 ?>

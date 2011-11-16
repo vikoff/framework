@@ -21,6 +21,7 @@ class User_Controller extends Controller{
 	public $methodResources = array(
 		'display_view'	=> 'edit',
 		
+		'action_save_acl' => 'edit',
 		'action_paginator_set_items_per_page' => 'public',
 		'ajax_check_login_unique' => 'public',
 	);
@@ -51,6 +52,15 @@ class User_Controller extends Controller{
 	////////////////////
 	////// ACTION //////
 	////////////////////
+	
+	/** ACTION SAVE ACL */
+	public function action_save_acl(){
+		
+		// echo '<pre>'; var_dump($_POST['items']); die;
+		User_Acl::get()->saveRules($_POST['items']);
+		Messenger::get()->addSuccess('Правила доступа сохранены');
+		return TRUE;
+	}
 	
 	// ACTION PAGINATOR_SET_ITEMS_PER_PAGE
 	public function action_paginator_set_items_per_page() {

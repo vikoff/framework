@@ -108,7 +108,7 @@ class db{
 	
 }
 
-abstract class DbAdapter{
+abstract class DbAdapter {
 	
 	/** флаг, что соединение установлено */
 	protected $_connected = FALSE;
@@ -366,7 +366,7 @@ abstract class DbAdapter{
 	
 	/**
 	 * DELETE
-	 * обновление записей в таблице
+	 * удаление записей из таблицы
 	 * @param string $table - имя таблицы
 	 * @param array $fieldsValues - массив пар (поле => значение) для обновления
 	 * @param string $conditions - SQL строка условия (без слова WHERE). Не должно быть пустой строкой.
@@ -384,6 +384,17 @@ abstract class DbAdapter{
 		$this->query($sql);
 
 		return $this->getAffectedNum();
+	}
+	
+	/**
+	 * TRUNCATE
+	 * очистка таблицы
+	 * @param string $table - имя таблицы
+	 * @return void
+	 */
+	public function truncate($table){
+		
+		$this->query('TRUNCATE TABLE '.$table);
 	}
 	
 	/**
