@@ -310,6 +310,7 @@ table.grid td.options{
 }
 table.grid .options a{
 	padding: 0px 3px;
+	text-decoration: none;
 }
 
 table.grid.wide{

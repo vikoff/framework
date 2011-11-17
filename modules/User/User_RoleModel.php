@@ -126,9 +126,13 @@ class User_RoleModel extends ActiveRecord {
 		
 		// скопировать права доступа указанной роли
 		if ($this->isNewlyCreated && $this->additData['copy_role']){
-			User_Acl::get()->copyRules($this->additData['copy_role'], $this->id);
-			$role = User_RoleModel::load($this->additData['copy_role'])->getField('title');
-			Messenger::get()->addInfo('Правила доступа скопированы с роли <b>'.$role.'</b>');
+			try{
+				User_Acl::get()->copyRules($this->additData['copy_role'], $this->id);
+				$role = User_RoleModel::load($this->additData['copy_role'])->getField('title');
+				Messenger::get()->addInfo('Правила доступа скопированы с роли <b>'.$role.'</b>');
+			} catch (Exception $e){
+				Messenger::get()->addError('роль #'.$this->additData['copy_role'].' не найдена');
+			}
 		}
 	}
 	
@@ -189,6 +193,11 @@ class User_RoleCollection extends ARCollection{
 		return $data;
 	}
 	
+	/** ПОЛУЧИТЬ СПИСОК РОЛЕЙ ВИДА array(id => title) */
+	public function getList(){
+		
+		return db::get()->getColIndexed('SELECT id, title FROM '.User_RoleModel::TABLE, 'id', array());
+	}
 }
 
 ?>

@@ -225,9 +225,13 @@ class Layout{
 		if(AJAX_MODE){
 			echo $message;
 		}else{
+			$variables = array(
+				'message' => $message,
+				'trace' => Debugger::get()->getBacktrace()
+			);
 			$this
 				->setTitle('Доступ запрещен')
-				->setContentPhpFile($this->_layoutDir.'error403.php', array('message' => $message))
+				->setContentPhpFile($this->_layoutDir.'error403.php', $variables)
 				->render();
 		}
 		exit();
@@ -241,9 +245,13 @@ class Layout{
 		if(AJAX_MODE){
 			echo $message;
 		}else{
+			$variables = array(
+				'message' => $message,
+				'trace' => Debugger::get()->getBacktrace()
+			);
 			$this
 				->setTitle('Страница не найдена')
-				->setContentPhpFile($this->_layoutDir.'error404.php', array('message' => $message))
+				->setContentPhpFile($this->_layoutDir.'error404.php', $variables)
 				->render();
 		}
 		exit();
