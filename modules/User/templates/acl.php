@@ -1,13 +1,19 @@
 
 <style type="text/css">
-	td.checkbox{
+	table.grid td.checkbox{
 		text-align: center;
 		padding: 0px;
 	}
-	td.checkbox label{
+	table.grid td.checkbox label{
 		display: block;
 		width: 100%;
 		height: 100%;
+	}
+	table.grid td.module{
+		font-weight: bold;
+		text-align: left;
+		font-size: 13px;
+		background-color: #F8F8F8;
 	}
 </style>
 
@@ -19,7 +25,6 @@
 		
 		<table class="grid tr-highlight">
 		<tr>
-			<th>Модуль</th>
 			<th>Ресурс</th>
 			<? foreach($this->rolesList as $role): ?>
 				<th>
@@ -29,20 +34,34 @@
 			<? endforeach; ?>
 		</tr>
 		
+		<? $module = null; ?>
+		<? $numCols = 1 + count($this->rolesList); ?>
+		
 		<? foreach($this->resourcesList as $item): ?>
 			<tr>
-				<td><?= $item['module_title']; ?></td>
-				<td><?= $item['resource_title']; ?></td>
-				<? foreach($this->rolesList as $role): ?>
-					<td class="checkbox">
-						<label>
-						<?= Html_Form::checkbox(array(
-							'name' => 'items['.$item['module'].'|'.$item['resource'].'|'.$role['id'].']',
-							'value' => 1,
-							'checked' => !empty($this->accessRules[ $item['module'] ][ $item['resource'] ][ $role['id'] ]))); ?>
-						</label>
+				
+				<? if ($item['module'] !== $module): ?>
+				
+					<? $module = $item['module']; ?>
+					<td colspan="<?= $numCols; ?>" class="module">
+						<span title="модуль <?= $item['module']; ?>"><?= $item['module_title']; ?></span>
 					</td>
-				<? endforeach; ?>
+				<? else: ?>
+				
+					<td><span title="ресурс <?= $item['resource']; ?>"><?= $item['resource_title']; ?></span></td>
+					
+					<? foreach($this->rolesList as $role): ?>
+						<td class="checkbox">
+							<label>
+							<?= Html_Form::checkbox(array(
+								'name' => 'items['.$item['module'].'|'.$item['resource'].'|'.$role['id'].']',
+								'value' => 1,
+								'checked' => !empty($this->accessRules[ $item['module'] ][ $item['resource'] ][ $role['id'] ]))); ?>
+							</label>
+						</td>
+					<? endforeach; ?>
+				
+				<? endif; ?>
 			</tr>
 		<? endforeach; ?>
 		</table>

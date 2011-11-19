@@ -2,7 +2,7 @@
 
 return array(
 	'name' => 'userStatistics',
-	'title' => 'Псевдонимы',
+	'title' => 'Пользовательская статистика',
 	'controller' => 'UserStatistics_Controller',
 	'adminController' => 'UserStatistics_AdminController',
 	'arrayParams' => TRUE,

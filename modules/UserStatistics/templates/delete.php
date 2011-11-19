@@ -17,7 +17,7 @@
 		
 		<p>
 			<input class="button" type="submit" name="action[user-statistics/delete]" value="Удалить" />
-			<a class="button" href="<?=App::href('admin/root/user-statistics');?>">Отмена</a>
+			<a class="button" href="<?=App::href('admin/manage/user-statistics');?>">Отмена</a>
 		</p>
 	</form>
 

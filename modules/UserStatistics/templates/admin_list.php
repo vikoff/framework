@@ -1,6 +1,6 @@
 <p>
 	<div style="float: right;">
-		<a class="button" href="{a href=admin/root/user-statistics/delete; ?>">Очистить статистику</a>
+		<a class="button" href="{a href=admin/manage/user-statistics/delete; ?>">Очистить статистику</a>
 	</div>
 	<div class="clear"> </div>
 </p>
@@ -43,7 +43,7 @@
 		<td><?= $item['has_js'] ? $item['browser_name'].' '.$item['browser_version'] : '-'; ?></td>
 		<td><?= $item['has_js'] ? $item['screen_width'].'x'.$item['screen_height'] : '-'; ?></td>
 		<td style="font-size: 11px;">
-			<a href="<?= href('admin/root/user-statistics/view/'.$item['id']); ?>">Подробней</a>
+			<a href="<?= href('admin/manage/user-statistics/view/'.$item['id']); ?>">Подробней</a>
 		</td>
 	</tr>
 	<? endforeach; ?>

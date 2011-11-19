@@ -1,5 +1,5 @@
 
-<div><a href="<?= href('admin/root/user-statistics/list'); ?>">Вернуться к списку</a></div>
+<div><a href="<?= href('admin/manage/user-statistics/list'); ?>">Вернуться к списку</a></div>
 
 <h2>Запись #<?= $this->id; ?></h2>
 

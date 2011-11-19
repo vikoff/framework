@@ -75,11 +75,11 @@
 	
 	<div class="paragraph">
 		<label class="title">Псевдоним</label>
-		<span class="description">
+		<div class="description">
 			уникальный идентификатор страницы [a-z, 0-9].<br />
 			Если не заполнен, система автоматически создаст псевдоним,<br />
 			соответствующий id страницы.
-		</span>
+		</div>
 		<input type="text" name="alias" value="<?= $this->alias; ?>" style="width: 300px;" />
 	</div>
 	

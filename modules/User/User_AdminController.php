@@ -109,7 +109,7 @@ class User_AdminController extends Controller{
 		$user = User_Model::create();
 			
 		$variables = array_merge(Tools::unescape($_POST), array(
-			'rolesList' => array(1 => 'Пользователь', 2 => 'Модератор', 3 => 'Администратор'),
+			'rolesList' => User_RoleCollection::load()->getList(),
 		));
 		
 		BackendLayout::get()
@@ -126,7 +126,7 @@ class User_AdminController extends Controller{
 			
 		$variables = array_merge($user->GetAllFieldsPrepared(), array(
 			'instanceId' => $instanceId,
-			'rolesList' => array(1 => 'Пользователь', 2 => 'Модератор', 3 => 'Администратор'),
+			'rolesList' => User_RoleCollection::load()->getList(),
 		));
 		
 		BackendLayout::get()

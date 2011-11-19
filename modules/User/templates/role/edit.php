@@ -24,12 +24,12 @@
 	<? if(!$this->instanceId): ?>
 	<div class="paragraph">
 		<label class="title">Скопировать права доступа</label>
-		<?= Html_Form::select(array('name' => 'copy_role'), array_merge(array('0' => 'Не копировать'), $this->rolesList)); ?>
+		<?= Html_Form::select(array('name' => 'copy_role'), array('0' => 'Не копировать') + $this->rolesList); ?>
 	</div>
 	<? endif; ?>
 
 	<div class="paragraph" id="submit-box">
-		<input id="submit-save" class="button" type="submit" name="action[admin/user/roles/save][admin/users/roles/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
+		<input id="submit-save" class="button" type="submit" name="action[admin/users/roles/save][admin/users/roles/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
 		<a id="submit-cancel" class="button" href="<?= href('admin/users/roles/list'); ?>" title="Отменить все изменения и вернуться к списку">отмена</a>
 		<? if($this->instanceId): ?>		
 			<a id="submit-delete" class="button" href="<?= href('admin/users/roles/delete/'.$this->instanceId); ?>" title="Удалить запись">удалить</a>

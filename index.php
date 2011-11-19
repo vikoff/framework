@@ -25,6 +25,9 @@ header('Content-Type: text/html; charset=utf-8');
 // подключение файлов CMF
 require_once(FS_ROOT.'setup.php');
 
+// инициализация класса Request, чтобы отсеять ненужные запросы (favicon)
+Request::get();
+
 // сохранение статистики
 UserStatistics_Model::get()->savePrimaryStatistics();
 
