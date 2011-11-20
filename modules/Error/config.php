@@ -2,7 +2,7 @@
 
 return array(
 	'name' => 'error',
-	'title' => 'Административная панель',
+	'title' => 'Ошибки сайта',
 	'controller' => 'Admin_Controller',
 	'resources' => array(
 		'view' => 'Просмотр',

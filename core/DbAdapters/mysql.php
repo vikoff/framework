@@ -264,18 +264,15 @@ class DbAdapter_mysql extends DbAdapter{
 	
 	/**
 	 * ЭКРАНИРОВАНИЕ ДАННЫХ
-	 * выполняется с учетом типа данных для предотвращения SQL-инъекций
+	 * выполняется для строк для предотвращения SQL-инъекций
 	 * @param mixed строка для экранирования
 	 * @param mixed - безопасная строка
 	 */
 	public function escape($str){
 		
-		if(!in_array(strtolower(gettype($str)), array('integer', 'double', 'boolean', 'null'))){
-			if(get_magic_quotes_gpc() || get_magic_quotes_runtime())
-				$str = stripslashes($str);
-			$str = mysql_real_escape_string($str, $this->_dbrs);
-		}
-		return $str;
+		return gettype($str) == 'string'
+			? mysql_real_escape_string($str, $this->_dbrs)
+			: $str;
 	}
 	
 	/**

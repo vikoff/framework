@@ -29,6 +29,9 @@ class Request {
 		
 		$this->_requestString = $requestString;
 		$this->parseRequest();
+		
+		if (!empty($_POST))
+			Tools::unescape($_POST);
 	}
 	
 	/** РАЗБОР URL ЗАПРОСА */

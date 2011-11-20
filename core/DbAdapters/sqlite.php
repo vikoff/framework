@@ -241,12 +241,9 @@ class DbAdapter_sqlite extends DbAdapter{
 	 */
 	public function escape($str){
 		
-		if(!in_array(strtolower(gettype($str)), array('integer', 'double', 'boolean', 'null'))){
-			if(get_magic_quotes_gpc() || get_magic_quotes_runtime())
-				$str = stripslashes($str);
-			$str = sqlite_escape_string($str);
-		}
-		return $str;
+		return gettype($str) == 'string'
+			? sqlite_escape_string($str)
+			: $str;
 	}
 	
 	/**

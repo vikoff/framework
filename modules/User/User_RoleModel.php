@@ -57,8 +57,6 @@ class User_RoleModel extends ActiveRecord {
 	/** ПОДГОТОВКА ДАННЫХ К ОТОБРАЖЕНИЮ */
 	public function beforeDisplay($data){
 	
-		// $data['modif_date'] = YDate::loadTimestamp($data['modif_date'])->getStrDateShortTime();
-		// $data['create_date'] = YDate::loadTimestamp($data['create_date'])->getStrDateShortTime();
 		return $data;
 	}
 	
@@ -157,11 +155,22 @@ class User_RoleCollection extends ARCollection{
 		'level' => 'Уровень',
 	);
 	
+	public $roles = array();
+	
+	private static $_instance = null;
+	
 	
 	/** ТОЧКА ВХОДА В КЛАСС */
 	public static function load(){
+		
+		if (is_null(self::$_instance))
+			self::$_instance = new User_RoleCollection();
 			
-		return new User_RoleCollection();
+		return self::$_instance;
+	}
+	
+	public function __construct(){
+		$this->roles = $this->_getAll();
 	}
 
 	/** ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ */
@@ -182,8 +191,7 @@ class User_RoleCollection extends ARCollection{
 		return $data;
 	}
 	
-	/** ПОЛУЧИТЬ СПИСОК ВСЕХ ЭЛЕМЕНТОВ */
-	public function getAll(){
+	private function _getAll(){
 		
 		$data = db::get()->getAllIndexed('SELECT * FROM '.User_RoleModel::TABLE, 'id', array());
 		
@@ -191,6 +199,19 @@ class User_RoleCollection extends ARCollection{
 			$row = User_RoleModel::forceLoad($row['id'], $row)->getAllFieldsPrepared();
 		
 		return $data;
+	}
+	
+	/** ПОЛУЧИТЬ СПИСОК ВСЕХ ЭЛЕМЕНТОВ */
+	public function getAll(){
+		
+		return $this->roles;
+	}
+	
+	public function getTitle($roleId){
+		
+		return isset($this->roles[$roleId])
+			? $this->roles[$roleId]['title']
+			: '';
 	}
 	
 	/** ПОЛУЧИТЬ СПИСОК РОЛЕЙ ВИДА array(id => title) */

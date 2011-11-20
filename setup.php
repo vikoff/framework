@@ -39,6 +39,7 @@ CurUser::init();
 
 define('USER_AUTH_ID', CurUser::get()->getAuthData('id'));
 define('USER_AUTH_PERMS', CurUser::get()->getAuthData('perms'));
+define('USER_AUTH_ROLE_ID', 0);
 
 
 ########## ПРОЧЕЕ ##########

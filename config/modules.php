@@ -32,7 +32,7 @@ return array (
   'error' => 
   array (
     'name' => 'error',
-    'title' => 'Административная панель',
+    'title' => 'Ошибки сайта',
     'controller' => 'Admin_Controller',
     'resources' => 
     array (
@@ -43,7 +43,7 @@ return array (
   'menu' => 
   array (
     'name' => 'menu',
-    'title' => 'Административная панель',
+    'title' => 'Меню',
     'controller' => 'Admin_Controller',
     'resources' => 
     array (
@@ -96,7 +96,7 @@ return array (
   'userStatistics' => 
   array (
     'name' => 'userStatistics',
-    'title' => 'Псевдонимы',
+    'title' => 'Пользовательская статистика',
     'controller' => 'UserStatistics_Controller',
     'adminController' => 'UserStatistics_AdminController',
     'arrayParams' => true,

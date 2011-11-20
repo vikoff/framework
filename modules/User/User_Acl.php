@@ -2,7 +2,7 @@
 
 class User_Acl {
 	
-	const TABLE = 'user_access';
+	const TABLE = 'user_acl';
 	
 	private static $_instance = null;
 	
@@ -24,14 +24,8 @@ class User_Acl {
 	
 	private function _loadUserPermissions(){
 		
-		// $db = db::get();
-		// $_data = $db->getAll('SELECT module, resource FROM acl WHERE role='.$db->qe(USER_AUTH_ROLE));
-		
-		// DEBUG
-		$_data = array(
-			array('module' => 'page', 'resource' => 'view'),
-			array('module' => 'user', 'resource' => 'public'),
-		);
+		$db = db::get();
+		$_data = $db->getAll('SELECT module, resource FROM '.self::TABLE.' WHERE role_id='.USER_AUTH_ROLE_ID);
 		
 		foreach($_data as $row)
 			$this->_userPermissions[ $row['module'] ][ $row['resource'] ] = 1;
@@ -39,7 +33,10 @@ class User_Acl {
 	
 	public function isResourceAllowed($module, $resource){
 		
-		if(CurUser::get()->isRoot())
+		if (CurUser::get()->isRoot())
+			return TRUE;
+		
+		if ($resource == 'public')
 			return TRUE;
 			
 		return isset($this->_userPermissions[ $module ][ $resource ]);
@@ -47,7 +44,6 @@ class User_Acl {
 	
 	public function getResourcesList(){
 		
-		// echo '<pre>'; print_r(Config::get()->getModulesConfig()); die;
 		$list = array();
 		foreach(App::get()->getModulesConfig() as $module => $conf){
 			if (!isset($conf['resources']))

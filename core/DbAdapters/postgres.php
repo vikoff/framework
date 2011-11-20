@@ -383,12 +383,9 @@ class DbAdapter_postgres extends DbAdapter{
 	 */
 	public function escape($str){
 		
-		if(!in_array(strtolower(gettype($str)), array('integer', 'double', 'boolean', 'null'))){
-			if(get_magic_quotes_gpc() || get_magic_quotes_runtime())
-				$str = stripslashes($str);
-			$str = pg_escape_string($this->_dbrs, $str);
-		}
-		return $str;
+		return gettype($str) == 'string'
+			? pg_escape_string($this->_dbrs, $str)
+			: $str;
 	}
 	
 	/**

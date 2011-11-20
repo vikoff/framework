@@ -121,8 +121,19 @@ class YDate{
 				if(!is_array($date) || !count($date)){
 					$this->_curDate = NULL;
 				}else{
-					$date = $date + array('year' => 0, 'month' => 0, 'day' => 0, 'hour' => 0, 'min' => 0, 'sec' => 0);
-					$this->_curDate = mktime($date['hour'], $date['min'], $date['sec'], $date['month'], $date['day'], $date['year']);
+					$hasVal = FALSE;
+					foreach($date as $k => $v) {
+						if (!empty($v)) {
+							$hasVal = TRUE;
+							break;
+						}
+					}
+					if ($hasVal) {
+						$date = $date + array('year' => 0, 'month' => 0, 'day' => 0, 'hour' => 0, 'min' => 0, 'sec' => 0);
+						$this->_curDate = mktime((int)$date['hour'], (int)$date['min'], (int)$date['sec'], (int)$date['month'], (int)$date['day'], (int)$date['year']);
+					} else {
+						$this->_curDate = NULL;
+					}
 				}
 				break;
 		}

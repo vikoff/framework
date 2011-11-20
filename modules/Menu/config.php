@@ -2,7 +2,7 @@
 
 return array(
 	'name' => 'menu',
-	'title' => 'Административная панель',
+	'title' => 'Меню',
 	'controller' => 'Admin_Controller',
 	'resources' => array(
 		'view' => 'Просмотр',

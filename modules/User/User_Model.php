@@ -6,6 +6,7 @@ class User_Model extends ActiveRecord{
 	const SAVE_ADMIN_EDIT   = 'adm-edit';
 	const SAVE_ADMIN_PASS   = 'adm-pass';
 	const SAVE_REGISTER     = 'reg';
+	const SAVE_EDIT   	    = 'reg';
 	const SAVE_PASS         = 'pass';
 	
 	
@@ -45,7 +46,7 @@ class User_Model extends ActiveRecord{
 	public function beforeDisplay($data){
 		
 		$data['fio'] = $this->getName();
-		$data['role_str'] = '';
+		$data['role_str'] = User_RoleCollection::load()->getTitle(getVar($data['role_id']));
 		$data['regdate'] = YDate::loadTimestamp(getVar($data['regdate']))->getStrDateShortTime();
 		
 		return $data;
