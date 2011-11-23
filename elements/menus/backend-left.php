@@ -113,7 +113,7 @@ switch($topMenuHref){
 			array(
 				'title' => 'Консоль',
 				'href' => $topMenuHref.'/console',
-				'active' => $r->getParts(2) == 'console',
+				'active' => in_array($r->getParts(2), array('', 'console')),
 			),
 		
 			array(

@@ -5,7 +5,7 @@ class Admin_SqlController extends Controller {
 	const TPL_PATH = 'modules/Admin/templates/sql/';
 	const MODULE = 'admin';
 	
-	protected $_displayIndex = 'index';
+	protected $_displayIndex = 'console';
 	
 	public $methodResources = array(
 	
