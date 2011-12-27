@@ -108,7 +108,7 @@ class User_AdminController extends Controller{
 			
 		$user = User_Model::create();
 			
-		$variables = array_merge(Tools::unescape($_POST), array(
+		$variables = array_merge($_POST, array(
 			'rolesList' => User_RoleCollection::load()->getList(),
 		));
 		
@@ -220,7 +220,7 @@ class User_AdminController extends Controller{
 		
 		$user = User_Model::create();
 		
-		if($user->save(Tools::unescape($_POST), User_Model::SAVE_ADMIN_CREATE)){
+		if($user->save($_POST, User_Model::SAVE_ADMIN_CREATE)){
 			Messenger::get()->addSuccess('Новый пользователь успешно создан');
 			return TRUE;
 		}else{
@@ -234,7 +234,7 @@ class User_AdminController extends Controller{
 		
 		$user = User_Model::load(getVar($_POST['id']));
 		
-		if($user->save(Tools::unescape($_POST), User_Model::SAVE_ADMIN_EDIT)){
+		if($user->save($_POST, User_Model::SAVE_ADMIN_EDIT)){
 			Messenger::get()->addSuccess('Данные пользователя сохранены');
 			return TRUE;
 		}else{
@@ -248,7 +248,7 @@ class User_AdminController extends Controller{
 		
 		$user = User_Model::load(getVar($_POST['id']));
 		
-		if($user->save(Tools::unescape($_POST), User_Model::SAVE_ADMIN_PASS)){
+		if($user->save($_POST, User_Model::SAVE_ADMIN_PASS)){
 			Messenger::get()->ns('password-change')->addSuccess('Пароль обновлен');
 			return TRUE;
 		}else{

@@ -16,7 +16,6 @@ class Admin_Controller extends Controller{
 		'display_content'   => 'content',
 		'display_config'    => 'content',
 		'display_users'     => 'content',
-		'display_modules'   => 'content',
 		'display_manage'    => 'content',
 		
 		'action_read_modules_config' => 'content',

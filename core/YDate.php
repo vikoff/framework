@@ -7,9 +7,10 @@ class YDate{
 	const STR_DATE_TIME = 'strDateTime';
 	
 	const TYPE_NOW		 = 0; // текущая дата
-	const TYPE_TIMESTAMP = 1; // дата в виде timestamp
-	const TYPE_DB_DATE   = 2; // дата в виде YYYY-MM-DD[ HH:MM:SS]
-	const TYPE_ARRAY	 = 3; // дата в виде array('year' => 1, 'month' => 1, 'day' => 1[, 'hour' => 1, 'min' => 1, 'sec' => 1)
+	const TYPE_EMPTY     = 1; // пустая дата (null)
+	const TYPE_TIMESTAMP = 2; // дата в виде timestamp
+	const TYPE_DB_DATE   = 3; // дата в виде YYYY-MM-DD[ HH:MM:SS]
+	const TYPE_ARRAY	 = 4; // дата в виде array('year' => 1, 'month' => 1, 'day' => 1[, 'hour' => 1, 'min' => 1, 'sec' => 1)
 	
 	/** var null|int $_curDate - текущая дата */
 	private $_curDate = null;
@@ -17,7 +18,7 @@ class YDate{
 	/** var bool $_useMonthFullName - использовать для вывода полные имена месяцев */
 	private $_useMonthFullName = FALSE;
 	
-	static public $months = array(
+	public static $months = array(
 		1 => 'янв',
 		2 => 'фев',
 		3 => 'мар',
@@ -32,7 +33,7 @@ class YDate{
 		12 => 'дек',
 	);
 	
-	static public $fullMonths = array(
+	public static $fullMonths = array(
 		1 => 'января',
 		2 => 'февраля',
 		3 => 'марта',
@@ -49,43 +50,50 @@ class YDate{
 	
 	// СПИСОК МЕСЯЦЕВ
 	// именительный длинный
-	static public $_monthsNomFull = array(1 => 'январь',2 => 'февраль', 3 => 'март', 4 => 'апрель', 5 => 'май', 6 => 'июнь', 7 => 'июль', 8 => 'август', 9 => 'сентябрь', 10 => 'октябрь', 11 => 'ноябрь', 12 => 'декабрь');
+	public static $_monthsNomFull = array(1 => 'январь',2 => 'февраль', 3 => 'март', 4 => 'апрель', 5 => 'май', 6 => 'июнь', 7 => 'июль', 8 => 'август', 9 => 'сентябрь', 10 => 'октябрь', 11 => 'ноябрь', 12 => 'декабрь');
 	// родительный длинный
-	static public $_monthsGenFull = array(1 => 'января',2 => 'февраля', 3 => 'марта', 4 => 'апреля', 5 => 'мая', 6 => 'июня', 7 => 'июля', 8 => 'августа', 9 => 'сентября', 10 => 'октября', 11 => 'ноября', 12 => 'декабря');
+	public static $_monthsGenFull = array(1 => 'января',2 => 'февраля', 3 => 'марта', 4 => 'апреля', 5 => 'мая', 6 => 'июня', 7 => 'июля', 8 => 'августа', 9 => 'сентября', 10 => 'октября', 11 => 'ноября', 12 => 'декабря');
 	// именительный/родительный короткий
-	static public $_monthsShort = array(1 => 'янв', 2 => 'фев', 3 => 'мар', 4 => 'апр', 5 => 'мая', 6 => 'июн', 7 => 'июл', 8 => 'авг', 9 => 'сен', 10 => 'окт', 11 => 'ноя', 12 => 'дек');
+	public static $_monthsShort = array(1 => 'янв', 2 => 'фев', 3 => 'мар', 4 => 'апр', 5 => 'мая', 6 => 'июн', 7 => 'июл', 8 => 'авг', 9 => 'сен', 10 => 'окт', 11 => 'ноя', 12 => 'дек');
 	
 	
 	/** ИНИЦИАЛИЗАЦИЯ КЛАССА ПРОИЗВОЛЬНЫМ ЗНАЧЕНИЕМ */
-	static public function load($type, $date = ''){
+	public static function load($type, $date = ''){
 
 		$instance = new YDate($type, $date);
 		return $instance;
 	}
 	
 	/** ИНИЦИАЛИЗАЦИЯ КЛАССА ТЕКУЩИМ ВРЕМЕНЕМ */
-	static public function loadNow(){
+	public static function loadNow(){
 
 		$instance = new YDate(self::TYPE_NOW);
 		return $instance;
 	}
 	
+	/** ИНИЦИАЛИЗАЦИЯ КЛАССА ПУСТЫМ ЗНАЧЕНИЕМ */
+	public static function loadEmpty(){
+		
+		$instance = new YDate(self::TYPE_EMPTY);
+		return $instance;
+	}
+	
 	/** ИНИЦИАЛИЗАЦИЯ КЛАССА ДАТОЙ ФОРМАТА БД */
-	static public function loadDbDate($date){
+	public static function loadDbDate($date){
 
 		$instance = new YDate(self::TYPE_DB_DATE, $date);
 		return $instance;
 	}
 	
 	/** ИНИЦИАЛИЗАЦИЯ КЛАССА TIMESTAMP-МЕТКОЙ */
-	static public function loadTimestamp($date){
+	public static function loadTimestamp($date){
 
 		$instance = new YDate(self::TYPE_TIMESTAMP, $date);
 		return $instance;
 	}
 	
 	/** ИНИЦИАЛИЗАЦИЯ КЛАССА TIMESTAMP-МЕТКОЙ */
-	static public function loadArray($arr){
+	public static function loadArray($arr){
 
 		$instance = new YDate(self::TYPE_ARRAY, $arr);
 		return $instance;
@@ -97,6 +105,7 @@ class YDate{
 	 * и преобразует ее во внутреннее представление для дальнейшей работы.
 	 * @param const $type одно из следующих значений:
 	 *     self::TYPE_NOW
+	 *     self::TYPE_EMPTY
 	 *     self::TYPE_TIMESTAMP
 	 *     self::TYPE_DB_DATE
 	 *     self::TYPE_ARRAY
@@ -108,6 +117,9 @@ class YDate{
 		switch($type){
 			case self::TYPE_NOW:
 				$this->_curDate = time();
+				break;
+			case self::TYPE_EMPTY:
+				$this->_curDate = null;
 				break;
 			case self::TYPE_TIMESTAMP:
 				// дата считается пустой, если не является ненулевым числом
@@ -167,6 +179,7 @@ class YDate{
 	public function addTime($time){
 		
 		$this->_curDate += $time;
+		return $this;
 	}
 	
 	/**
@@ -177,6 +190,7 @@ class YDate{
 	public function subTime($time){
 		
 		$this->_curDate -= $time;
+		return $this;
 	}
 	
 	/**
@@ -389,26 +403,26 @@ class YDate{
 	
 	
 	// ПОЛУЧИТЬ НАЗВАНИЕ МЕСЯЦА ПО ИНДЕКСУ
-	static public function getMonthName($index){
+	public static function getMonthName($index){
 		
 		$index = (int)$index; // преобразует 01 в 1
 		return (isset(self::$months[$index]) ? self::$months[$index] : '');
 	}
 	
-	static public function getMonthFullName($index){
+	public static function getMonthFullName($index){
 		
 		$index = (int)$index; // преобразует 01 в 1
 		return (isset(self::$fullMonths[$index]) ? self::$fullMonths[$index] : '');
 	}
 	
 	// ПОЛУЧИТЬ ИНДЕКС МЕСЯЦА ПО НАЗВАНИЮ
-	static public function getMonthIndex($name){
+	public static function getMonthIndex($name){
 		$name = (string)$name;
 		return (int)(in_array($name, self::$months) ? array_search($name, self::$months) : 0);
 	}
 	
 	// ПЕРЕВОД TIMESTAMP В ТЕКСТОВОЕ ЗНАЧЕНИЕ ДАТЫ
-	static function timestamp2date($t, $part = self::STR_DATE_TIME, $defatult = ' - '){
+	public static function timestamp2date($t, $part = self::STR_DATE_TIME, $defatult = ' - '){
 	
 		$t = (int)$t;
 		if(!$t)	return $defatult;
@@ -461,7 +475,7 @@ class YDate{
 	}
 	
 	// ПЕРЕВОД ДАТЫ, РАЗДЕЛЕННОЙ СЕПАРАТОРОМ В ЧЕЛОВЕКОЧИТАЕМЫЙ ФОРМАТ
-	static public function sepNum2date($num, $sep = '-', $toString = FALSE){
+	public static function sepNum2date($num, $sep = '-', $toString = FALSE){
 		$num = (string)$num;
 		if(strlen($num) != 10)
 			return array('day' => '', 'month' => '', 'year' => '');
@@ -475,7 +489,7 @@ class YDate{
 	}
 	
 	// ПОЛУЧИТЬ РАЗНИЦУ МЕЖДУ ДВУМЯ ДАТАМИ
-	static public function dateDiff($timestamp1, $timestamp2, $toString = FALSE){
+	public static function dateDiff($timestamp1, $timestamp2, $toString = FALSE){
 		
 		$diff = abs($timestamp1 - $timestamp2);
 		$result = array(
@@ -513,7 +527,7 @@ class YDate{
 	}
 
 	// ПОЛУЧИТЬ HTML СПИСОК МИНУТ ДЛЯ ТЭГА <SELECT>
-	static public function getMinutesList($selected = 0){
+	public static function getMinutesList($selected = 0){
 		$output = '';
 		for($i = 0; $i <= 59; $i++)
 			$output .= '<option value="'.$i.'"'.($i == $selected ? ' selected' : '').'>'.sprintf('%02d', $i).'</option>';
@@ -521,7 +535,7 @@ class YDate{
 	}
 	
 	// ПОЛУЧИТЬ HTML СПИСОК ЧАСОВ <SELECT>
-	static public function getHoursList($selected = 0){
+	public static function getHoursList($selected = 0){
 		$output = '';
 		for($i = 0; $i <= 23; $i++)
 			$output .= '<option value="'.$i.'"'.($i == $selected ? ' selected' : '').'>'.sprintf('%02d', $i).'</option>';
@@ -529,7 +543,7 @@ class YDate{
 	}
 
 	// ПОЛУЧИТЬ HTML СПИСОК ДНЕЙ МЕСЯЦА ДЛЯ ТЭГА <SELECT>
-	static public function getDaysList($selected = 0){
+	public static function getDaysList($selected = 0){
 	
 		$output = '';
 		for($i = 1; $i <= 31; $i++)
@@ -538,7 +552,7 @@ class YDate{
 	}
 	
 	// ПОЛУЧИТЬ HTML СПИСОК МЕСЯЦЕВ ДЛЯ ТЭГА <SELECT>
-	static public function getMonthsList($selected = ''){
+	public static function getMonthsList($selected = ''){
 		$output = '';
 		foreach(self::$months as $index => $name)
 			$output .= '<option value="'.$index.'"'.(($index == $selected || $name == $selected) ? ' selected' : '').'>'.$name.'</option>';
@@ -546,7 +560,7 @@ class YDate{
 	}
 	
 	// ПОЛУЧИТЬ HTML СПИСОК ЛЕТ ДЛЯ ТЭГА <SELECT>
-	static public function getYearsList($selected = 0){
+	public static function getYearsList($selected = 0){
 		$output = '';
 		$startVal = date('Y');
 		$endVal = $startVal - 100;

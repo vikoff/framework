@@ -265,13 +265,11 @@ class DbAdapter_sqlite extends DbAdapter{
 	 */
 	public function quote($cell){
 		
-		switch(strtolower(gettype($cell))){
-			case 'boolean':
-				return $cell ? '1' : '0';
-			case 'null':
-				return 'NULL';
-			default:
-				return "'".$cell."'";
+		switch(gettype($cell)){
+			case 'boolean': return $cell ? '1' : '0';
+			case 'null':    return 'NULL';
+			case 'object':  return $cell;
+			default:        return "'".$cell."'";
 		}
 	}
 	

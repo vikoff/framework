@@ -41,7 +41,7 @@ class YArray{
 	}
 	
 	// ПОЛУЧИТЬ ПЕРВЫЙ КЛЮЧ В МАССИВЕ
-	static public function getFirstKey($arr){
+	public static function getFirstKey($arr){
 		if(!is_array($arr))
 			return NULL;
 		reset($arr);
@@ -49,12 +49,12 @@ class YArray{
 	}
 	
 	// ПОЛУЧИТЬ ПОСЛЕДНИЙ КЛЮЧ В МАССИВЕ
-	static public function getLastKey($arr){
+	public static function getLastKey($arr){
 		return (is_array($arr)) ? array_pop(array_keys($arr)) : 0;
 	}
 	
 	// ПОЛУЧИТЬ СЛЕДУЮЩИЙ КЛЮЧ В МАССИВЕ
-	static function getNextIndex($cur_index, $arr){
+	public static function getNextIndex($cur_index, $arr){
 	
 		$cur_index = (int)$cur_index;
 		$desired_index = FALSE;
@@ -76,7 +76,7 @@ class YArray{
 	}
 	
 	// ПОЛУЧИТЬ ПРЕДЫДУЩИЙ КЛЮЧ В МАССИВЕ
-	static function get_prev_index($cur_index, $arr){
+	public static function get_prev_index($cur_index, $arr){
 		
 		if(!count($arr))
 			return 0;
@@ -97,8 +97,8 @@ class YArray{
 		return $desired_index;
 	}
 	
-	/* УЛУЧШЕННАЯ ДЕСЕРИАЛИЗАЦИЯ */
-	static function unserialize($arr){
+	/** УЛУЧШЕННАЯ ДЕСЕРИАЛИЗАЦИЯ */
+	public static function unserialize($arr){
 		$default = array();
 		$output = array();
 		if(is_array($arr)){return $arr;}
@@ -112,7 +112,7 @@ class YArray{
 	 * $input - одномерный ассоциативный массив входных данных;
 	 * $convert_rules - одномерный ассоциативный массив ключи которого - имена изменяемых полей, а значения - тип преобразования.
 	**/
-	static function convert($input, $convert_rules){
+	public static function convert($input, $convert_rules){
 
 		if(is_array($input) && is_array($convert_rules)){
 			foreach($convert_rules as $field => $operation){
@@ -137,7 +137,7 @@ class YArray{
 	}
 	
 	// ПРЕОБРАЗОВАНИЕ СТРОКИ В АССОЦИАТИВНЫЙ МАССИВ
-	static public function string2hash($string, $separator = ','){
+	public static function string2hash($string, $separator = ','){
 		
 		$string = (string)$string;
 		if(!strlen($string))

@@ -59,7 +59,7 @@ class User_Model extends ActiveRecord{
 			'login' 	 => array('required' => TRUE, 'function' => array('User_Model', 'validateLogin'), 'match' => '/^[a-zA-Z][\w-]+$/', 'length' => array('min' => '2', 'max' => '255')),
 			'password' 	 => array('required' => TRUE, 'function' => array('User_Model', 'validatePassword'), 'hash' => 'sha1'),
 			'password_confirm'	=> array('compare' => 'password', 'hash' => 'sha1', 'unsetAfter' => TRUE),
-			'email' 	 => array('required' => TRUE, 'length' => array('max' => '100'), 'email' => true),
+			'email' 	 => array('required' => TRUE, 'length' => array('max' => '100'), 'email' => TRUE),
 			'surname' 	 => array('required' => TRUE, 'length' => array('max' => '255')),
 			'name' 		 => array('required' => TRUE, 'length' => array('max' => '255')),
 			'role_id' 	 => array('required' => TRUE, 'settype' => 'int'),

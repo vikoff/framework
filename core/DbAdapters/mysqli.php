@@ -329,12 +329,9 @@ class DbAdapter_mysqli implements DbAdapter{
 	// ESCAPE
 	public function escape($str){
 		
-		if(!is_numeric($str)){
-			if(get_magic_quotes_gpc() || get_magic_quotes_runtime())
-				$str = stripslashes($str);
-			$str = mysql_real_escape_string($str, $this->_dbrs);
-		}
-		return $str;
+		return gettype($str) == 'string'
+			? mysql_real_escape_string($str, $this->_dbrs)
+			: $str;
 	}
 	
 	// QUOTE FIELD NAME
