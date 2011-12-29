@@ -428,6 +428,18 @@ abstract class DbAdapter {
 		return $this->quote($this->escape($cell));
 	}
 	
+	/**
+	 * получить строку, которая будет обработана адаптером без преобразований
+	 * (без эскейпирования и заковычивания)
+	 * полезно для SQL функций, например NOW()
+	 * @param string $statement - SQL выражение
+	 * @return DbStatement object
+	 */
+	public function raw($statement){
+		
+		return new DbStatement($statement);
+	}
+	
 	/** 
 	 * СОХРАНИТЬ ЗАПРОС
 	 * @access protected
@@ -629,9 +641,14 @@ abstract class DbAdapter {
  * Класс, экземпляры которого используются как части SQL выражения
  * над которыми не надо производить эскейпирование или закавычивание
  */
-class Db_statement {
+class DbStatement {
 	
 	private $_statement = '';
+	
+	public static function create($statement){
+		
+		return new DbStatement($statement);
+	}
 	
 	public function __construct($statement){
 		
@@ -642,7 +659,6 @@ class Db_statement {
 		
 		return $this->_statement;
 	}
-	
 }
 
 ?>
