@@ -3,12 +3,12 @@
 class Tools {
 	
 	/* ПОЛУЧИТЬ ЧИСЛО ИЗ ЛЮБОЙ СТРОКИ, ГДЕ ЕСТЬ ЦИФРЫ */
-	static function getint($str){
+	public static function getint($str){
 		return intval(preg_replace("/[^\d]/", "", $str));
 	}
 	
 	/* УНИФИЦИРОВАННЫЕ РЕГУЛЯРНЫЕ ВЫРАЖЕНИЯ */
-	static function getRegExp($param){
+	public static function getRegExp($param){
 		$rus = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя';
 		switch($param){
 			case 'id':			return '/^[\d]{1,20}$/i';
@@ -19,7 +19,7 @@ class Tools {
 	}
 	
 	/* ФУНКЦИЯ ОЧИСТКИ ДИРЕКТОРИИ ОТ ВСЕХ ФАЙЛОВ */
-	static function clearDir($dirNam){
+	public static function clearDir($dirNam){
 		if(!is_dir($dirNam)){return false;}
 		chdir($dirNam);
 		$files = scandir($dirNam);
@@ -39,7 +39,7 @@ class Tools {
 				@unlink($file);
 	}
 	
-	static public function mkDir($dir){
+	public static function mkDir($dir){
 
 		$dir = (string)$dir;
 		
@@ -49,7 +49,7 @@ class Tools {
 		return mkdir($dir, 0777, TRUE);
 	}
 	
-	static function dir_avail($dir_name){
+	public static function dir_avail($dir_name){
 		
 		if(!$dir_name){
 			Error::fatal_error('Пустое имя папки');
@@ -68,7 +68,7 @@ class Tools {
 	}
 	
 	/* ПОЛУЧИТЬ "ФАМИЛИЯ И.О." ИЗ "ФАМИЛИЯ ИМЯ ОТЧЕСТВО" */
-	static function get_short_name($longname, $flags = '')
+	public static function get_short_name($longname, $flags = '')
 	{
 		$output = '';
 		$longname = trim($longname);
@@ -89,7 +89,7 @@ class Tools {
 		return $output;
 	}
 	
-	static function truncate($str, $len = 128, $ending = '...'){
+	public static function truncate($str, $len = 128, $ending = '...'){
 		
 		$len = (int)$len;
 		$output = '';
@@ -99,11 +99,11 @@ class Tools {
 		return $output;
 	}
 	
-	static function get_ext($filename){
+	public static function get_ext($filename){
 		return strtolower(substr(strrchr($filename, '.'), 1));
 	}
 	
-	static public function isWinServer(){
+	public static function isWinServer(){
 		return isset($_SERVER['WINDIR']) ? TRUE : FALSE;
 	}
 	

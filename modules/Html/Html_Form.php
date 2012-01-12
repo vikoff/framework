@@ -76,6 +76,26 @@ class Html_Form {
 	}
 	
 	/**
+	 * СГЕГЕРИРОВАТЬ HTML INPUT type="radio"
+	 * @param array $attrs - все параметры радио-кнопки вида 'параметр' => 'значение'
+	 *                       ВАЖНО: параметр 'checked' нужно передавать в виде bool
+	 * @return string html input type=radio
+	 */
+	public static function radio($attrs){
+		
+		if(!empty($attrs['checked']))
+			$attrs['checked'] = 'checked';
+		else
+			unset($attrs['checked']);
+			
+		$preparedAttrs = array();
+		foreach($attrs as $k => &$v)
+			$preparedAttrs[] = $k.'="'.$v.'"';
+		
+		return '<input type="radio" '.implode(' ', $preparedAttrs).' />';
+	}
+	
+	/**
 	 * СГЕНЕРИРОВАТЬ HTML SELECT
 	 * @param array|false $selectAttrs - атрибуты тега selelect. Если FALSE, тогда генерируются только опции
 	 * @param array $optionsArr - ассоциативный массив, $value => $title

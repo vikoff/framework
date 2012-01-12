@@ -1,5 +1,9 @@
 <?
 
+/**
+ * класс для работы с базой данных
+ * @author Yuriy Novikov
+ */
 class db{ 
 	
 	/**
@@ -405,13 +409,11 @@ abstract class DbAdapter {
 	 */
 	public function quote($cell){
 		
-		switch(strtolower(gettype($cell))){
-			case 'boolean':
-				return $cell ? 'TRUE' : 'FALSE';
-			case 'null':
-				return 'NULL';
-			default:
-				return "'".$cell."'";
+		switch(gettype($cell)){
+			case 'boolean': return $cell ? 'TRUE' : 'FALSE';
+			case 'null':    return 'NULL';
+			case 'object':  return $cell;
+			default:        return "'".$cell."'";
 		}
 	}
 	
@@ -424,6 +426,18 @@ abstract class DbAdapter {
 	public function qe($cell){
 		
 		return $this->quote($this->escape($cell));
+	}
+	
+	/**
+	 * получить строку, которая будет обработана адаптером без преобразований
+	 * (без эскейпирования и заковычивания)
+	 * полезно для SQL функций, например NOW()
+	 * @param string $statement - SQL выражение
+	 * @return DbStatement object
+	 */
+	public function raw($statement){
+		
+		return new DbStatement($statement);
 	}
 	
 	/** 
@@ -621,6 +635,30 @@ abstract class DbAdapter {
 		}
 	}
 
+}
+
+/**
+ * Класс, экземпляры которого используются как части SQL выражения
+ * над которыми не надо производить эскейпирование или закавычивание
+ */
+class DbStatement {
+	
+	private $_statement = '';
+	
+	public static function create($statement){
+		
+		return new DbStatement($statement);
+	}
+	
+	public function __construct($statement){
+		
+		$this->_statement = $statement;
+	}
+	
+	public function __toString(){
+		
+		return $this->_statement;
+	}
 }
 
 ?>

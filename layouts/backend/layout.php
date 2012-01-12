@@ -15,8 +15,8 @@
 
 <?=$this->_getLinkTagsHTML();?>
 
-	<link rel="stylesheet" href="css/common.css" type="text/css" />
-	<link rel="stylesheet" href="css/backend.css" type="text/css" />
+	<link rel="stylesheet" href="<?= WWW_ROOT; ?>css/common.css" type="text/css" />
+	<link id="backend-css" rel="stylesheet" href="<?= WWW_ROOT; ?>css/backend.css" type="text/css" />
 	<!-- <link rel="icon" type="image/png" href="favicon.ico" /> -->
 	
 	<script type="text/javascript">
@@ -25,26 +25,43 @@
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 	<script type="text/javascript" src="http://scripts.vik-off.net/debug.js"></script>
 	
-	<script type="text/javascript" src="js/jquery.validate.pack.js"></script>
-	<script type="text/javascript" src="js/jquery.ctrlentersend.min.js"></script>
-	<script type="text/javascript" src="js/jquery.floatblock.js"></script>
-	<script type="text/javascript" src="js/common.js"></script>
-	<script type="text/javascript" src="js/backend.js"></script>
+	<script type="text/javascript" src="<?= WWW_ROOT; ?>js/jquery.browser.min.js"></script>
+	<script type="text/javascript" src="<?= WWW_ROOT; ?>js/jquery.validate.pack.js"></script>
+	<script type="text/javascript" src="<?= WWW_ROOT; ?>js/jquery.ctrlentersend.min.js"></script>
+	<script type="text/javascript" src="<?= WWW_ROOT; ?>js/jquery.floatblock.js"></script>
+	<script type="text/javascript" src="<?= WWW_ROOT; ?>js/common.js"></script>
+	<script type="text/javascript" src="<?= WWW_ROOT; ?>js/backend.js"></script>
 </head>
 <body>
 
 <div id="site-container">
 
 	<div id="top">
-	
-		<a href="<?=href('admin');?>" style="display: block; color: black; text-decoration: none; float: left; padding: 10px; background-color: #FFD46D;"><strong><?=CFG_SITE_NAME;?></strong></a>
 		
-		<div style="text-align: right;">
+		<a href="<?=href('admin');?>" id="top-logo"><?= CFG_SITE_NAME; ?></a>
+		
+		<div id="top-right" style="">
 			<a href="<?= href(''); ?>">На сайт</a>
 			<form action="" method="post" class="inline" onsubmit="return confirm('Уверены?');">
 				<?= FORMCODE; ?>
 				<input type="submit" class="button" name="action[user/profile/logout]" value="Выход" />
 			</form>
+			<br />
+			<a href="#" onclick="changeStyle(); return false;" style="font-size: 9px;">применить старый стиль</a>
+			<script>
+				function changeStyle(){
+					var c=$('#backend-css');
+					c.detach();
+					if (c.data('old')) {
+						c.attr('href', c.attr('href').replace('backend_old', 'backend'));
+						c.data('old', false);
+					} else {
+						c.attr('href', c.attr('href').replace('backend', 'backend_old'));
+						c.data('old', true);
+					}
+					c.appendTo('head');
+				}
+			</script>
 		</div>
 		
 		<div id="top-menu-list">
@@ -89,6 +106,7 @@
 	<?=CFG_SITE_NAME;?>
 </div>
 
+<?= $this->_getClientStatisticsLoaderHTML(); ?>
 <?= Debugger::get()->getPageInfoHTML();?>
 
 </body>

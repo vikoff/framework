@@ -24,6 +24,8 @@ class Error_Model{
 	
 	private $_textString;
 	
+	public $isCli = FALSE;
+	
 	public $mode;
 	public $time;
 	public $url;
@@ -133,6 +135,8 @@ class Error_Model{
 	// КОНСТРУКТОР (СОЗДАЕТ ЭКЗЕМПЛЯР ОШИБКИ)
 	public function __construct($errlevel, $errstr, $errfile, $errline, $errcontext, $backtrace, $mode = self::DISPLAY_MODE){
 		
+		$this->isCli = PHP_SAPI === 'cli';
+		
 		$this->_errlevel = $errlevel;
 		$this->_errstr = $errstr;
 		$this->_errfile = $errfile;
@@ -151,7 +155,7 @@ class Error_Model{
 	public function handlerAction(){
 		
 		$this->time = time();
-		$this->url = 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+		$this->url = $this->isCli ? '' : 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
 			
 		if(self::$_config['keepFileLog'])
 			$this->log2file();
@@ -162,8 +166,12 @@ class Error_Model{
 		if(self::$_config['keepEmailLog'])
 			$this->log2email();
 		
-		if(self::$_config['display'] && (self::$_config['minPermsForDisplay'] == 0 || User::hasPerm(self::$_config['minPermsForDisplay'])))
-			$this->printHTML();
+		if(self::$_config['display'] && (self::$_config['minPermsForDisplay'] == 0 || User::hasPerm(self::$_config['minPermsForDisplay']))) {
+			if ($this->isCli)
+				echo $this->getText();
+			else
+				$this->printHTML();
+		}
 		
 		if($this->_errlevel & (E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR)){
 			echo'Извините, произошла ошибка! Наши специалисты уже работают над ее устранением.';
