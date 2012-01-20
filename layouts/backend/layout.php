@@ -22,8 +22,8 @@
 	<script type="text/javascript">
 		var WWW_ROOT = '<?= WWW_ROOT; ?>';
 	</script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-	<script type="text/javascript" src="http://scripts.vik-off.net/debug.js"></script>
+	<!--script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script-->
+	<!--script type="text/javascript" src="http://scripts.vik-off.net/debug.js"></script-->
 	
 	<script type="text/javascript" src="<?= WWW_ROOT; ?>js/jquery.browser.min.js"></script>
 	<script type="text/javascript" src="<?= WWW_ROOT; ?>js/jquery.validate.pack.js"></script>
