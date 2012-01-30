@@ -13,6 +13,16 @@ table.statistics-nested td{
 }
 </style>
 
+<form action="" method="get">
+	Сортировать по:
+	<?= Html_Form::select(array('name' => 'sort'), $this->sortArr, getVar($_GET['sort'])); ?>
+	<label>
+		<?= Html_Form::checkbox(array('name' => 'sort-desc', 'value' => 1, 'checked' => 1)); ?>
+		В обратном порядке
+	</label>
+	<input class="button" type="submit" value="Сортировать" />
+</form>
+
 <?= $this->pagination; ?>
 
 <? if ($this->collection): ?>
@@ -22,35 +32,26 @@ table.statistics-nested td{
 		<th><?= $this->sorters['uid']; ?></th>
 		<th>Посещенные страницы</th>
 		<th><?= $this->sorters['user_ip']; ?></th>
-		<th><?= $this->sorters['referer']; ?></th>
-		<th><?= $this->sorters['has_js']; ?></th>
 		<th><?= $this->sorters['browser']; ?></th>
-		<th><?= $this->sorters['screen_resolution']; ?></th>
 		<th>Опции</th>
 	</tr>
 	
 	<? foreach ($this->collection as $item): ?>
 	<tr>
-		<td rowspan="2"><a href="<?= href('users/view/'.$item['uid']); ?>"><?= $item['uid']; ?></a></td>
-		<td style="border-bottom: none;">
-			<? if ($item['pages_info']): ?>
-				Всего: <?= $item['num_pages']; ?> страниц<br />
-			<? else: ?>
-				-
-			<? endif; ?>
+		<td>
+			<a href="<?= href('users/view/'.$item['uid']); ?>"><?= $item['login']; ?></a>
 		</td>
-		<td><?= $item['user_ip']; ?></td>
-		<td><?= $item['referer']; ?></td>
-		<td><?= $item['has_js'] ? '<span class="green">✔</span>' : '<span class="red">✘</span>'; ?></td>
-		<td><?= $item['has_js'] ? $item['browser_name'].'&nbsp;'.$item['browser_version'] : '-'; ?></td>
-		<td><?= $item['has_js'] ? $item['screen_width'].'x'.$item['screen_height'] : '-'; ?></td>
-		<td rowspan="2" style="font-size: 11px;">
-			<a href="<?= href('admin/manage/user-statistics/view/'.$item['id']); ?>">Подробней</a>
-		</td>
-	</tr>
-	<tr style="border-bottom: solid 2px #BBB;">
-		<td colspan="6" style="padding: 0; border-top: none;">
+		<td>
 			<table class="small-grid statistics-nested">
+			<? if ($item['referer']): ?>
+			<tr>
+				<td class="grey">Referer</td>
+				<td><?= $item['referer']; ?></td>
+			<tr>
+			<? endif; ?>
+			<tr>
+				<td class="grey">Всего</td>
+				<td><?= $item['num_pages']; ?> страниц</td>
 			<tr>
 				<td class="grey">Первая</td>
 				<td><?= $item['pages_info']['first_page']; ?></td>
@@ -62,6 +63,16 @@ table.statistics-nested td{
 				<td class="grey"><?= $item['pages_info']['last_page_time']; ?></td>
 			</tr>
 			</table>
+		</td>
+		<td><?= $item['user_ip']; ?></td>
+		<td>
+			<?= $item['has_js'] ?
+				$item['browser_name'].'&nbsp;'.$item['browser_version'].'<br />'
+				.$item['screen_width'].'x'.$item['screen_height']
+				: '-'; ?>
+		</td>
+		<td style="font-size: 11px;">
+			<a href="<?= href('admin/manage/user-statistics/view/'.$item['id']); ?>">Подробней</a>
 		</td>
 	</tr>
 	<? endforeach; ?>

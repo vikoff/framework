@@ -363,11 +363,11 @@ class YDate{
 	}
 	
 	/** ПОЛУЧИТЬ HTML СПИСОК ЛЕТ ДЛЯ ТЭГА <SELECT> */
-	public function getYearsListCurActive(){
+	public function getYearsListCurActive($startYear = null, $endYear = null){
 		$selected = is_null($this->_curDate) ? null : date('Y', $this->_curDate);
 		$output = '';
-		$startVal = date('Y');
-		$endVal = $startVal - 100;
+		$startVal = !is_null($startYear) ? $startYear : date('Y');
+		$endVal = !is_null($endYear) ? $endYear : ($startVal - 100);
 		for($i = $startVal; $i >= $endVal; $i--)
 			$output .= '<option value="'.$i.'"'.($i == $selected ? ' selected="selected"' : '').'>'.$i.'</option>'."\n";
 		return $output;

@@ -404,8 +404,8 @@ class DbAdapter_mysql extends DbAdapter{
 					foreach($rows as $rowIndex => $row){
 						foreach($row as &$cell){
 							if(is_string($cell)){
-								$cell = str_replace("\n", '\\r\\n', $cell);
-								$cell = str_replace("\r", '', $cell);
+								$cell = str_replace("\n", '\\n', $cell);
+								$cell = str_replace("\r", '\\r', $cell);
 							}
 							$cell = $this->qe($cell);
 						}

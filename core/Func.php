@@ -9,13 +9,16 @@
  */
 function getVar(&$varname, $defaultVal = '', $type = ''){
 
-	if(!isset($varname))
+	if (!isset($varname))
 		return $defaultVal;
 	
-	if(strlen($type))
-		settype($varname, $type);
-	
-	return $varname;
+	if (!empty($type)) {
+		$copy = $varname;
+		settype($copy, $type);
+		return $copy;
+	} else {
+		return $varname;
+	}
 }
 
 function href($href){

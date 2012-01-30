@@ -4,7 +4,7 @@
  * класс для работы с базой данных
  * @author Yuriy Novikov
  */
-class db{ 
+class db { 
 	
 	/**
 	 * экземпляры класса db (один экземпляр - одно подключение)
@@ -164,7 +164,6 @@ abstract class DbAdapter {
 	abstract public function getAffectedNum();
 	abstract public function query($query);
 	abstract public function getOne($query, $default_value = null);
-	abstract public function getCell($query, $row, $column, $default_value = 0);
 	abstract public function getCol($query, $default_value = array());
 	abstract public function getColIndexed($query, $default_value = 0);
 	abstract public function getRow($query, $default_value = array());
@@ -178,7 +177,7 @@ abstract class DbAdapter {
 	 * @param variant $field - строка имени поля
 	 * @return string заключенная в нужный тип ковычек строка
 	 */
-	public function quoteFieldName($field){}
+	abstract function quoteFieldName($field);
 	abstract public function describe($table);
 	abstract public function showTables();
 	abstract public function showCreateTable($table);
@@ -194,6 +193,7 @@ abstract class DbAdapter {
 	
 	/** ВКЛЮЧИТЬ РЕЖИМ ОТЛОВА ОШИБОК */
 	public function enableErrorHandlingMode(){
+		debug_print_backtrace();
 		$this->_errorHandlingMode = TRUE;
 	}
 	
@@ -409,11 +409,13 @@ abstract class DbAdapter {
 	 */
 	public function quote($cell){
 		
-		switch(gettype($cell)){
-			case 'boolean': return $cell ? 'TRUE' : 'FALSE';
-			case 'null':    return 'NULL';
-			case 'object':  return $cell;
-			default:        return "'".$cell."'";
+		switch(strtolower(gettype($cell))){
+			case 'boolean':
+				return $cell ? 'TRUE' : 'FALSE';
+			case 'null':
+				return 'NULL';
+			default:
+				return "'".$cell."'";
 		}
 	}
 	
@@ -521,7 +523,7 @@ abstract class DbAdapter {
 	 * @return void
 	 */
 	protected function error($msg, $sql = ''){
-	
+		
 		$fullmsg = ""
 			."\n\nError on ".date('Y-m-d H:i:s')."\n"
 			."[  SQL] ".str_repeat('-', 80)."\n\n"
@@ -541,7 +543,7 @@ abstract class DbAdapter {
 		}
 		// выброс ошибок
 		else{
-		
+			
 			if(PHP_SAPI != 'cli')
 				$fullmsg = '<pre>'.$fullmsg.'</pre>';
 			
@@ -595,6 +597,7 @@ abstract class DbAdapter {
 			$singleQuery .= $row;
 			
 			if(substr($row, -2) == ";\n"){
+				$singleQuery = str_replace(array('\r', '\n'), array("\r", "\n"), $singleQuery);
 				$this->query($singleQuery);
 				$singleQuery = '';
 				$numCommands++;
@@ -611,9 +614,7 @@ abstract class DbAdapter {
 	 * @output выдает текст sql-дампа
 	 * @return void
 	 */
-	public function makeDump($database = null, $tables = null){
-	
-	}
+	public function makeDump($database = null, $tables = null){}
 	
 	/**
 	 * ДЕСТРУКОТР

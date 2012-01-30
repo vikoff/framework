@@ -85,10 +85,19 @@ class Layout{
 		return $this;
 	}
 	
-	public function addBreadcrumb($breadcrumb){
+	public function addBreadcrumb($title, $href = null){
 		
-		$this->_manualBreadcrumbs[] = $breadcrumb;
+		$this->_manualBreadcrumbs[] = array($href, $title);
 		return $this;
+	}
+	
+	public function href($url){
+	
+	return WWW_ROOT.(CFG_USE_SEF
+		// http://site.com/controller/method?param=value
+		? $url
+		// http://site.com/index.php?r=controller/method&param=value
+		: 'index.php'.(!empty($url) ? '?r='.str_replace('?', '&', $url) : ''));
 	}
 	
 	/** ОЧИСТИТЬ КОНТЕНТ */
@@ -167,7 +176,7 @@ class Layout{
 		foreach($all as $index => $v)
 			$breadcrumbs[] = is_null($v[0]) || ($index + 1) == $num
 				? '<span class="item">'.$v[1].'</span>'
-				: '<a class="item" href="'.href($v[0]).'">'.$v[1].'</a>';
+				: '<a class="item" href="'.$this->href($v[0]).'">'.$v[1].'</a>';
 		
 		return $num ? '<div class="breadcrumbs">'.implode('<span class="mediator"> » </span>', $breadcrumbs).'</div>' : '';
 	}
@@ -202,7 +211,7 @@ class Layout{
 		}else{
 			$this
 				->setTitle('Ошибка')
-				->setContentPhpFile('error.php', array('message' => $message))
+				->setContentPhpFile($this->_layoutDir.'error.php', array('message' => $message))
 				->render();
 		}
 		exit();
@@ -225,13 +234,9 @@ class Layout{
 		if(AJAX_MODE){
 			echo $message;
 		}else{
-			$variables = array(
-				'message' => $message,
-				'trace' => Debugger::get()->getBacktrace()
-			);
 			$this
 				->setTitle('Доступ запрещен')
-				->setContentPhpFile($this->_layoutDir.'error403.php', $variables)
+				->setContentPhpFile($this->_layoutDir.'error403.php', array('message' => $message))
 				->render();
 		}
 		exit();
@@ -245,13 +250,9 @@ class Layout{
 		if(AJAX_MODE){
 			echo $message;
 		}else{
-			$variables = array(
-				'message' => $message,
-				'trace' => Debugger::get()->getBacktrace()
-			);
 			$this
 				->setTitle('Страница не найдена')
-				->setContentPhpFile($this->_layoutDir.'error404.php', $variables)
+				->setContentPhpFile($this->_layoutDir.'error404.php', array('message' => $message))
 				->render();
 		}
 		exit();
@@ -334,10 +335,15 @@ class Layout{
 		return isset($this->$name) ? $this->$name : '';
 	}
 	
+	public function __isset($name){
+		
+		return isset($this->$name);
+	}
+	
 	/** ПОЛУЧИТЬ СОДЕРЖИМОЕ HTML ФАЙЛА */
 	public function getContentHtmlFile($file){
 		
-		return file_get_contents($this->_tplPath.$file);
+		return file_get_contents($file);
 	}
 	
 	/** ПОЛУЧИТЬ ПРОИНТЕРПРЕТИРОВАННОЕ СОДЕРЖИМОЕ PHP ФАЙЛА */
@@ -347,7 +353,7 @@ class Layout{
 			$this->$k = $v;
 			
 		ob_start();
-		include($this->_tplPath.$file);
+		include($file);
 		
 		foreach($variables as $k => $v)
 			unset($this->$k);

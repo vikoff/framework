@@ -42,6 +42,7 @@ class UserStatistics_AdminController extends Controller{
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
 			'sorters' => $collection->getSortableLinks(),
+			'sortArr' => $collection->getSortArray(),
 		);
 		
 		BackendLayout::get()

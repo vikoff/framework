@@ -252,10 +252,12 @@ class UserStatistics_Model {
 
 class UserStatistics_Collection extends ARCollection {
 	
+	protected $_sortArray = array();
+	
 	// поля, по которым возможно сортировка коллекции
 	// каждый ключ должен быть корректным выражением для SQL ORDER BY
 	protected $_sortableFieldsTitles = array(
-		'id' => array('id _DIR_', 'id'),
+		'id' => array('s.id _DIR_', 'id'),
 		'uid' => array('uid _DIR_', 'uid'),
 		'user_ip' => 'IP',
 		'referer' => 'referer',
@@ -275,11 +277,17 @@ class UserStatistics_Collection extends ARCollection {
 	// ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ
 	public function getPaginated(){
 		
-		$sorter = new Sorter('s.id', 'DESC', $this->_sortableFieldsTitles);
-		$paginator = new Paginator('sql', array('*', 'FROM '.UserStatistics_Model::TABLE.' s ORDER BY '.$sorter->getOrderBy()), '~50');
+		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
+		$paginator = new Paginator('sql', array(
+			's.*, u.'.CurUser::LOGIN_FIELD.' AS login ',
+			'FROM '.UserStatistics_Model::TABLE.' s
+			 JOIN '.User_Model::TABLE.' u ON u.id=s.uid
+			 ORDER BY '.$sorter->getOrderBy()), '~50');
 		
 		$db = db::get();
 		$data = $db->getAllIndexed($paginator->getSql(), 'id', array());
+		
+		// echo '<pre>'; print_r($data); die;
 		
 		// получение посещенных страниц
 		if (!empty($data)){
@@ -293,10 +301,16 @@ class UserStatistics_Collection extends ARCollection {
 			$row = UserStatistics_Model::beforeDisplay($row);
 		
 		$this->_sortableLinks = $sorter->getSortableLinks();
+		$this->_sortArray = $sorter->getSortArray();
 		$this->_pagination = $paginator->getButtons();
 		$this->_linkTags = $paginator->getLinkTags();
 		
 		return $data;
+	}
+	
+	public function getSortArray(){
+		
+		return $this->_sortArray;
 	}
 	
 }

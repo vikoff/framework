@@ -253,7 +253,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 * @param string - имя поля, заключенное в кавычки
 	 */
 	public function quoteFieldName($field){
-		return "'".$field."'";
+		return '"'.$field.'"';
 	}
 	
 	/**
@@ -265,11 +265,13 @@ class DbAdapter_sqlite extends DbAdapter{
 	 */
 	public function quote($cell){
 		
-		switch(gettype($cell)){
-			case 'boolean': return $cell ? '1' : '0';
-			case 'null':    return 'NULL';
-			case 'object':  return $cell;
-			default:        return "'".$cell."'";
+		switch(strtolower(gettype($cell))){
+			case 'boolean':
+				return $cell ? '1' : '0';
+			case 'null':
+				return 'NULL';
+			default:
+				return "'".$cell."'";
 		}
 	}
 	
@@ -352,8 +354,10 @@ class DbAdapter_sqlite extends DbAdapter{
 		echo $cmnt." Encoding : ".$this->_encoding.$lf;
 		echo $cmnt." Generation Time: ".date("d M Y H:i:s").$lf;
 		echo $cmnt." PHP Version: ".phpversion().$lf;
-		echo $cmnt."";
-
+		echo $lf;
+		echo $cmnt.' START TRANSACTION'.$lf;
+		echo 'BEGIN;'.$lf;
+		
 		foreach($tables as $table){
 
 			echo $lf;
@@ -390,8 +394,8 @@ class DbAdapter_sqlite extends DbAdapter{
 					foreach($rows as $rowIndex => $row){
 						foreach($row as &$cell){
 							if(is_string($cell)){
-								$cell = str_replace("\n", '\\r\\n', $cell);
-								$cell = str_replace("\r", '', $cell);
+								$cell = str_replace("\n", '\\n', $cell);
+								$cell = str_replace("\r", '\\r', $cell);
 							}
 							$cell = $this->qe($cell);
 						}
@@ -402,6 +406,10 @@ class DbAdapter_sqlite extends DbAdapter{
 				}
 			}
 		}
+		echo $lf;
+		echo $cmnt.' COMMIT TRANSACTION'.$lf;
+		echo 'COMMIT;'.$lf;
+		echo $lf;
 		echo $cmnt." ".$lf;
 		echo $cmnt." END DATABASE DUMP".$lf;
 		echo $cmnt." ".$lf;

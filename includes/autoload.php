@@ -12,6 +12,7 @@ function __autoload($className){
 		'Debugger'			=> 'core/Debugger.php',
 		'DbAdapter_mysql'	=> 'core/DbAdapters/mysql.php',
 		'DbAdapter_sqlite'	=> 'core/DbAdapters/sqlite.php',
+		'DbAdapter_pdo_sqlite'	=> 'core/DbAdapters/pdo_sqlite.php',
 		'Controller' 		=> 'core/Controller.php',
 		'ActiveRecord' 		=> 'core/ActiveRecord.php',
 		'ARCollection' 		=> 'core/ActiveRecord.php',

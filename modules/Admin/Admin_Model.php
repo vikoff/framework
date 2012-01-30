@@ -10,18 +10,19 @@ class Admin_Model {
 		$sqlsArr = explode(";\n", $sqls);
 		$results = array();
 		
-		$db->enableErrorHandlingMode();
+		// $db->enableErrorHandlingMode();
 		
 		// формируем массив результатов с ключами sql, time, result, numrows
 		foreach($sqlsArr as $sql){
 			$sql = trim($sql);
 			if(!empty($sql)){
+				$sql = str_replace(array('\r', '\n'), array("\r", "\n"), $sql);
 				$result = $db->getAll($sql);
 				$results[] = array_merge($db->getLastQueryInfo(), array('result' => $result, 'numrows' => count($result)));
 			}
 		}
 		
-		$db->disableErrorHandlingMode();
+		// $db->disableErrorHandlingMode();
 		
 		return $results;
 	}

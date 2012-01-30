@@ -26,6 +26,14 @@ class ActiveRecord {
 	
 	protected $_errors = array();
 	
+	/**
+	 * поля для сериализации
+	 * вида array('поле-контейнер' => array(список полей для сериализации));
+	 * @var array
+	 */
+	protected $_serialization = array();
+	
+	/** контейнер для сохранения произвольных данных */
 	protected $additData = array();
 	
 	/**
@@ -59,7 +67,9 @@ class ActiveRecord {
 				$this->isExistsObj = TRUE;
 				$this->isNewObj = FALSE;
 				$this->_loadData();
-				$this->_accessCheck();
+				if ($this->_serialization)
+					$this->_unserialize();
+				$this->_init($this->_dbFieldValues);
 				break;
 			
 			// принудительная загрузка существующего объекта
@@ -69,6 +79,9 @@ class ActiveRecord {
 				$this->isExistsObj = TRUE;
 				$this->isNewObj = FALSE;
 				$this->_forceLoadData($data);
+				if ($this->_serialization)
+					$this->_unserialize();
+				$this->_init($this->_dbFieldValues);
 				break;
 				
 			// загрузка нового/существующего объекта в зависимости от id
@@ -80,7 +93,9 @@ class ActiveRecord {
 					$this->isExistsObj = TRUE;
 					$this->isNewObj = FALSE;
 					$this->_loadData();
-					$this->_accessCheck();
+					if ($this->_serialization)
+						$this->_unserialize();
+					$this->_init($this->_dbFieldValues);
 				}
 				// новый объект
 				else{
@@ -103,13 +118,10 @@ class ActiveRecord {
 			throw new Exception404($this->getConst('NOT_FOUND_MESSAGE'));
 			
 		$this->_afterLoad($this->_dbFieldValues);
-		$this->_fieldValuesForDisplay = $this->beforeDisplay($this->_dbFieldValues);
-		$this->_hasPreparedFieldsValues = TRUE;
 	}
 	
 	/**
 	 * ПРИНУДИТЕЛЬНАЯ ЗАГРУЗКА
-	 *
 	 * Загружает внешние данные в объект, заставляя его думать, что данные получены из БД.
 	 * То есть если будет вызван метод save, то никаких изменений в БД не попадет.
 	 * @param array $data - массив данных для загрузки
@@ -125,16 +137,51 @@ class ActiveRecord {
 		}
 			
 		$this->_afterForceLoad($this->_dbFieldValues);
-		$this->_fieldValuesForDisplay = $this->beforeDisplay($this->_dbFieldValues);
-		$this->_hasPreparedFieldsValues = TRUE;
 	}
 	
 	/**
-	 * ПРОВЕРКА ВОЗМОЖНОСТИ ДОСТУПА К ОБЪЕКТУ
-	 * Вызывается автоматически при загрузке существующего объекта
-	 * В случае запрета доступа генерирует нужное исключение
+	 * ДЕСЕРИАЛИЗАЦИЯ ДАННЫХ
+	 * загрузка сериализованных полей в объект так,
+	 * как будто каждое из них хранится в отдельной колонке БД.
+	 * выполняется при загрузке существующих объектов
+	 * в том числе принудильной загрузке
 	 */
-	protected function _accessCheck(){}
+	protected function _unserialize(){
+		
+		foreach ($this->_serialization as $boxKey => $keys) {
+			$boxData = !empty($this->_dbFieldValues[$boxKey])
+				? unserialize($this->_dbFieldValues[$boxKey])
+				: array();
+			foreach ($keys as $k)
+				$this->_dbFieldValues[$k] = isset($boxData[$k]) ? $boxData[$k] : '';
+		}
+	}
+	
+	/**
+	 * СЕРИАЛИЗАЦИЯ ДАННЫХ
+	 * выполняется перед сохранением любого объекта
+	 */
+	protected function _serialize(){
+		
+		foreach ($this->_serialization as $boxKey => $keys) {
+			$boxData = array();
+			foreach ($keys as $k) {
+				$boxData[$k] = isset($this->_dbFieldValues[$k]) ? $this->_dbFieldValues[$k] : '';
+				unset($this->_dbFieldValues[$k]);
+				unset($this->_modifiedFields[$k]);
+			}
+			$this->_dbFieldValues[$boxKey] = serialize($boxData);
+			$this->_modifiedFields[$boxKey] = TRUE;
+		}
+	}
+	
+	/**
+	 * ИНИЦИАЛИЗАЦИЯ ДАННЫХ
+	 * выполняется при любом типе создания существующего объекта
+	 * для новых объектов не выполняется
+	 * @param array &$data - загруженные в класс данные
+	 */
+	protected function _init(&$data){}
 	
 	/**
 	 * ДОЗАГРУЗКА ДАННЫХ
@@ -247,8 +294,10 @@ class ActiveRecord {
 		
 		if($this->postValidation($data, $saveMode) === FALSE)
 			return FALSE;
-				
+		
 		$this->setFields($data);
+		if ($this->_serialization)
+			$this->_serialize();
 		$this->_save();
 		$this->afterSave($data, $saveMode);
 		return $this->id;
@@ -335,8 +384,15 @@ class ActiveRecord {
 		return constant($this->getClass().'::'.$name);
 	}
 	
+	public function __get($key){
+		
+		return isset($this->_dbFieldValues[$key])
+			? $this->_dbFieldValues[$key]
+			: $this->getFieldPrepared($key);
+	}
 	
-	#### ОПЕРАЦИИ С БАЗОЙ ДАННЫХ ####
+	
+	//// ОПЕРАЦИИ С БАЗОЙ ДАННЫХ ////
 	
 	public function dbGetRow(){
 		return db::get()->getRow("SELECT * FROM ".$this->tableName." WHERE ".$this->pkField."='".$this->id."'");
@@ -353,17 +409,29 @@ class ActiveRecord {
 	public function dbDelete(){
 		return db::get()->delete($this->tableName, $this->pkField."='".$this->id."'");
 	}
-	
+
 }
 
 
 class ARCollection{
+	
+	protected $_filters = array();
+	protected $_options = array();
 	
 	protected $_pagination = '';
 	protected $_linkTags = array();
 	protected $_sortableFieldsTitles = array();
 	protected $_sortableLinks = array();
 	
+	protected function _getSqlFilter(){
+		
+		$db = db::get();
+		$whereArr = array();
+		foreach($this->_filters as $k => $v)
+			$whereArr[] = $db->quoteFieldName($k).'='.$db->qe($v);
+			
+		return !empty($whereArr) ? ' WHERE '.implode(' AND ', $whereArr) : '';
+	}
 	
 	// ПОЛУЧИТЬ SORTABLE LINKS
 	public function getSortableLinks(){

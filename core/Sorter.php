@@ -52,6 +52,12 @@ class Sorter{
 	public function __construct($sortField, $sortDirection, $sortFieldsTitles){
 		
 		$this->_sortingField = $sortField;
+		
+		// TODO! заменить в вызовах класса первый параметр с 's.id' на 'id'
+		if (($pos = strpos($this->_sortingField, '.')) !== FALSE)
+			$this->_sortingField = substr($this->_sortingField, $pos + 1);
+		// END TODO
+		
 		$this->_sortingDirection = strtolower($sortDirection);
 		$this->_sortingFieldsTitles = $sortFieldsTitles;
 		
@@ -72,27 +78,32 @@ class Sorter{
 				$this->_sortingDirection = 'DESC';
 				$_sortField = substr($_GET['sort'], 1);
 			}else{
-				$this->_sortingDirection = 'ASC';
+				$this->_sortingDirection = !empty($_GET['sort-desc']) ? 'DESC' : 'ASC';
 				$_sortField = $_GET['sort'];
 			}
 			// если полученное поле сортировки допустимо - используем его
 			if(array_key_exists($_sortField, $this->_sortingFieldsTitles)){
 				$this->_sortingField = $_sortField;
-				$this->_orderByStatement = is_array($this->_sortingFieldsTitles[$_sortField])
-					? str_replace('_DIR_', $this->_sortingDirection, $this->_sortingFieldsTitles[$_sortField][0])
-					: $this->_sortingField.' '.$this->_sortingDirection;
+				$this->_orderByStatement = $this->_createOrderByStatement($_sortField);
 			}
 			// если не допустимо - используем поля по умолчанию
 			else{
-				$this->_orderByStatement = $this->_sortingField.' '.$this->_sortingDirection;
+				$this->_orderByStatement = $this->_createOrderByStatement($this->_sortingField);
 			}
 		}
 		// если параметр $_GET['sort'] не передан, используем значения по умолчанию
 		else{
-			$this->_orderByStatement = $this->_sortingField.' '.$this->_sortingDirection;
+			$this->_orderByStatement = $this->_createOrderByStatement($this->_sortingField);
 		}
 		
-		// echo '<hr>'.$this->_orderByStatement.'<hr>';
+		// echo '<hr>'.$this->_orderByStatement.'<hr>'; die;
+	}
+	
+	public function _createOrderByStatement($_sortField){
+		
+		return is_array($this->_sortingFieldsTitles[$_sortField])
+			? str_replace('_DIR_', $this->_sortingDirection, $this->_sortingFieldsTitles[$_sortField][0])
+			: $_sortField.' '.$this->_sortingDirection;
 	}
 	
 	/**
@@ -111,28 +122,51 @@ class Sorter{
 	public function getSortableLinks(){
 		
 		if(is_null($this->_sortableLinks)){
-		
+			
 			$this->_sortableLinks = array();
+			// $askBtn = '<span style="font-size: 12px;">▲</span>';
+			// $dscBtn = '<span style="font-size: 12px;">▼</span>';
+			$askBtn = '<span style="font-size: 10px;">↑</span>';
+			$dscBtn = '<span style="font-size: 10px;">↓</span>';
+			
 			foreach($this->_sortingFieldsTitles as $field => $title){
 				$title = is_array($title) ? $title[1] : $title;
-				$titleSuffix = '';
 				$dirSign = '';
+				$dir = '';
 				if($field == $this->_sortingField){
 					if($this->_sortingDirection == 'ASC'){
+						$dir = 'asc';
 						$dirSign = '-';
-						$titleSuffix = '&nbsp;<span style="font-size: 10px;">▲</span>';
 					}else{
+						$dir = 'dsc';
 						$dirSign = '';
-						$titleSuffix = '&nbsp;<span style="font-size: 10px;">▼</span>';
 					}
 				}
-				$this->_sortableLinks[$field] = '<a href="'.App::getHrefReplaced('sort', $dirSign.$field).'">'.$title.$titleSuffix.'</a>';
+				$this->_sortableLinks[$field] = ''
+					.'<a href="'.App::getHrefReplaced('sort', $dirSign.$field).'">'.$title.'</a>'
+					.'&nbsp;'
+					.($dir == 'asc' ? '<span style="color: #F00;">'.$askBtn.'</span>' : '<a style="text-decoration: none;" href="'.App::getHrefReplaced('sort', $field).'">'.$askBtn.'</a>')
+					// .'&nbsp;'
+					.($dir == 'dsc' ? '<span style="color: #F00;">'.$dscBtn.'</span>' : '<a style="text-decoration: none;" href="'.App::getHrefReplaced('sort', '-'.$field).'">'.$dscBtn.'</a>')
+					;
 			}
 		}
 		
 		return $this->_sortableLinks;
 	}
-
+	
+	/**
+	 * GET SORT ARRAY
+	 * @return array массив пар field => title для сортировки
+	 */
+	public function getSortArray(){
+		
+		$arr = array();
+		foreach($this->_sortingFieldsTitles as $field => $title)
+			$arr[$field] = is_array($title) ? $title[1] : $title;
+		
+		return $arr;
+	}
 }
 
 ?>

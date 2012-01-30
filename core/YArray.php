@@ -27,6 +27,29 @@ class YArray{
 		return $arr;
 	}
 	
+	public static function settype($arr, $type){
+		
+		if(!is_array($arr))
+			return;
+		foreach($arr as &$v)
+			if(is_array($v))
+				self::settype($v);			
+			else
+				settype($v, $type);
+	}
+	
+	public static function settypeReturn($arr, $type){
+	
+		if(!is_array($arr))
+			return array();
+		foreach($arr as &$v)
+			if(is_array($v))
+				$v = self::settypeReturn($v, $type);			
+			else
+				settype($v, $type);
+		return $arr;
+	}
+	
 	// TRIM ДЛЯ МАССИВА
 	public static function trim($arr){
 		
@@ -99,12 +122,16 @@ class YArray{
 	
 	/** УЛУЧШЕННАЯ ДЕСЕРИАЛИЗАЦИЯ */
 	public static function unserialize($arr){
-		$default = array();
+		
 		$output = array();
-		if(is_array($arr)){return $arr;}
-		if($arr){$output = unserialize(trim($arr));}
-		if(is_array($output)){return $output;}
-		else{return $default;}
+		
+		if(is_array($arr))
+			return $arr;
+			
+		if($arr)
+			$output = unserialize(trim($arr));
+			
+		return is_array($output) ? $output : array();
 	}
 	
 	/**

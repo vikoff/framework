@@ -175,10 +175,10 @@ abstract class Controller {
 				
 				// выполнение редиректа (если надо)
 				if(!empty($this->_redirectUrl))
-					App::redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
+					$this->redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
 			} else {
 				if($this->_forceRedirect && !empty($this->_redirectUrl))
-					App::redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
+					$this->redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
 			}
 		}
 		catch(Exception404 $e){$this->error404handler($e->getMessage());}
@@ -247,8 +247,10 @@ abstract class Controller {
 	/** ПОЛУЧИТЬ ЭКЗЕМЛЯР КОНТРОЛЛЕРА ДЛЯ ПРОКСИРОВАНИЯ */
 	public function getProxyControllerInstance($proxy){
 		
-		return App::get()->isModule($proxy)
-			? App::get()->getModule($proxy)
+		$app = App::get();
+		$adminMode = $app->isAdminMode();
+		return $app->isModule($proxy, $adminMode)
+			? $app->getModule($proxy, $adminMode)
 			: new $proxy($this->_config);
 	}
 	
@@ -267,18 +269,18 @@ abstract class Controller {
 	// ОБРАБОТЧИК ОШИБКИ
 	public function errorHandler($msg, $line = 0){
 		
-		$msg = $msg.(USER_AUTH_PERMS >= Error_Model::getConfig('minPermsForDisplay') && !empty($line) ? ' (#'.$line.')' : '');
+		$msg = $msg.(USER_AUTH_LEVEL >= Error_Model::getConfig('minPermsForDisplay') && !empty($line) ? ' (#'.$line.')' : '');
 		
 		if(App::$adminMode)
-			BackendViewer::get()->error($msg);
+			BackendLayout::get()->error($msg);
 		else
-			FrontendViewer::get()->error($msg);
+			FrontendLayout::get()->error($msg);
 	}
 	
 	// ОБРАБОТЧИК ОШИБКИ 403
 	public function error403handler($msg, $line = 0){
 		
-		$msg = USER_AUTH_PERMS >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
+		$msg = USER_AUTH_LEVEL >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
 		
 		$layoutClass = App::get()->isAdminMode() ? BackendLayout::get() : FrontendLayout::get();
 		$layoutClass->error403($msg);
@@ -287,7 +289,7 @@ abstract class Controller {
 	// ОБРАБОТЧИК ОШИБКИ 404
 	public function error404handler($msg, $line = 0){
 		
-		$msg = USER_AUTH_PERMS >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
+		$msg = USER_AUTH_LEVEL >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
 		
 		$layoutClass = App::get()->isAdminMode() ? BackendLayout::get() : FrontendLayout::get();
 		$layoutClass->error404($msg);
@@ -331,6 +333,12 @@ abstract class Controller {
 		return constant($this->getClass().'::'.$name);
 	}
 	
+	public function redirect($uri){
+		
+		$uri = href($uri);
+		header('location: '.$uri);
+		exit();
+	}
 }
 
 ?>
