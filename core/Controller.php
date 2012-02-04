@@ -213,9 +213,9 @@ abstract class Controller {
 			else
 				call_user_func_array(array($this, $method), $params);
 		}
-		catch(Exception404 $e){$this->error404handler($e->getMessage());}
-		catch(Exception403 $e){$this->error403handler($e->getMessage());}
-		catch(Exception $e){$this->errorHandler($e->getMessage());}
+		catch(Exception404 $e){ $this->error404handler($e->getMessage()); }
+		catch(Exception403 $e){ $this->error403handler($e->getMessage()); }
+		catch(Exception $e){ $this->errorHandler($e->getMessage()); }
 		
 		return TRUE;
 	}
@@ -269,7 +269,7 @@ abstract class Controller {
 	// ОБРАБОТЧИК ОШИБКИ
 	public function errorHandler($msg, $line = 0){
 		
-		$msg = $msg.(USER_AUTH_LEVEL >= Error_Model::getConfig('minPermsForDisplay') && !empty($line) ? ' (#'.$line.')' : '');
+		$msg = $msg.(USER_AUTH_LEVEL >= Error_Model::getConfig('minLevelForDisplay') && !empty($line) ? ' (#'.$line.')' : '');
 		
 		if(App::$adminMode)
 			BackendLayout::get()->error($msg);
@@ -280,7 +280,7 @@ abstract class Controller {
 	// ОБРАБОТЧИК ОШИБКИ 403
 	public function error403handler($msg, $line = 0){
 		
-		$msg = USER_AUTH_LEVEL >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
+		$msg = USER_AUTH_LEVEL >= Error_Model::getConfig('minLevelForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
 		
 		$layoutClass = App::get()->isAdminMode() ? BackendLayout::get() : FrontendLayout::get();
 		$layoutClass->error403($msg);
@@ -289,7 +289,7 @@ abstract class Controller {
 	// ОБРАБОТЧИК ОШИБКИ 404
 	public function error404handler($msg, $line = 0){
 		
-		$msg = USER_AUTH_LEVEL >= Error_Model::getConfig('minPermsForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
+		$msg = USER_AUTH_LEVEL >= Error_Model::getConfig('minLevelForDisplay') ? $msg.(!empty($line) ? ' (#'.$line.')' : '') : '';
 		
 		$layoutClass = App::get()->isAdminMode() ? BackendLayout::get() : FrontendLayout::get();
 		$layoutClass->error404($msg);
