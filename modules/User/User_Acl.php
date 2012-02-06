@@ -38,7 +38,10 @@ class User_Acl {
 		
 		if ($resource == 'public')
 			return TRUE;
-			
+		
+		if ($resource == 'root')
+			return FALSE;
+		
 		return isset($this->_userPermissions[ $module ][ $resource ]);
 	}
 	

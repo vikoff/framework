@@ -12,7 +12,6 @@
 class UserStatistics_Model {
 	
 	const TABLE = 'user_stat';
-	const TABLE_PAGES = 'user_stat_pages';
 	
 	private static $_enabled = FALSE;
 	
@@ -58,7 +57,7 @@ class UserStatistics_Model {
 		if(!$data)
 			throw new Exception('Данные не найдены');
 		
-		$data['pages'] = $db->getAll('SELECT * FROM '.UserStatistics_Model::TABLE_PAGES.' WHERE session_id='.$id);
+		$data['pages'] = $db->getAll('SELECT * FROM user_stat_pages WHERE session_id='.$id);
 		return self::beforeDisplay($data, TRUE);
 	}
 	
@@ -92,7 +91,7 @@ class UserStatistics_Model {
 		$requestUrl = getVar($_SERVER['SERVER_NAME']).getVar($_SERVER['REQUEST_URI']);
 		
 		// если запрашиваемый URL совпадает с предыдущим, ничего не сохраняем
-		if($requestUrl == $_SESSION['vik-off-user-statistics']['last-url'])
+		if($requestUrl == $_SESSION['vik-off-user-statistics']['last-url'] && empty($_POST))
 			return;
 		
 		$db = db::get();
@@ -111,10 +110,11 @@ class UserStatistics_Model {
 		}
 		
 		// сохранение запрошенной страницы
-		$db->insert(self::TABLE_PAGES, array(
+		$db->insert('user_stat_pages', array(
 			'session_id' => $_SESSION['vik-off-user-statistics']['session-id'],
 			'url'        => $requestUrl,
 			'is_ajax'    => AJAX_MODE ? TRUE : FALSE,
+			'is_post'    => !empty($_POST),
 			'post_data'  => null,
 			'date'       => time(),
 		));
@@ -259,6 +259,9 @@ class UserStatistics_Collection extends ARCollection {
 	protected $_sortableFieldsTitles = array(
 		'id' => array('s.id _DIR_', 'id'),
 		'uid' => array('uid _DIR_', 'uid'),
+		'login' => 'Логин',
+		'last_date' => array('(SELECT MAX(date) FROM user_stat_pages WHERE session_id=s.id) _DIR_', 'Последняя дата'),
+		'num_pages' => array('(SELECT COUNT(1) FROM user_stat_pages WHERE session_id=s.id) _DIR_', 'Кол-во страниц'),
 		'user_ip' => 'IP',
 		'referer' => 'referer',
 		'has_js' => 'JS',
@@ -277,11 +280,13 @@ class UserStatistics_Collection extends ARCollection {
 	// ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ
 	public function getPaginated(){
 		
-		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
+		$sorter = new Sorter('last_date', 'DESC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array(
-			's.*, u.'.CurUser::LOGIN_FIELD.' AS login ',
+			's.*, u.'.CurUser::LOGIN_FIELD.' AS login,
+			(SELECT MAX(date) FROM user_stat_pages WHERE session_id=s.id) AS last_date,
+			(SELECT COUNT(1) FROM user_stat_pages WHERE session_id=s.id) AS num_pages',
 			'FROM '.UserStatistics_Model::TABLE.' s
-			 JOIN '.User_Model::TABLE.' u ON u.id=s.uid
+			 LEFT JOIN '.User_Model::TABLE.' u ON u.id=s.uid
 			 ORDER BY '.$sorter->getOrderBy()), '~50');
 		
 		$db = db::get();
@@ -291,7 +296,7 @@ class UserStatistics_Collection extends ARCollection {
 		
 		// получение посещенных страниц
 		if (!empty($data)){
-			$pages = $db->getAll('SELECT * FROM '.UserStatistics_Model::TABLE_PAGES.' WHERE session_id IN('.implode(',', array_keys($data)).')');
+			$pages = $db->getAll('SELECT * FROM user_stat_pages WHERE session_id IN('.implode(',', array_keys($data)).')');
 			foreach($pages as $p)
 				$data[ $p['session_id'] ]['pages'][] = $p;
 		}

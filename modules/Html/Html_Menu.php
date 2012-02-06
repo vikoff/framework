@@ -1,6 +1,6 @@
 <?php
 
-class Menu_Model {
+class Html_Menu {
 	
 	const FILES_PATH = 'elements/menus/';
 	

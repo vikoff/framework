@@ -1,0 +1,9 @@
+-------- 2012-02-06 22:33:40 --------
+SELECT COUNT(1) FROM user_stat s
+			 JOIN users u ON u.id=s.uid
+			 ORDER BY login ASC
+SELECT s.*, u.login AS login  FROM user_stat s
+			 JOIN users u ON u.id=s.uid
+			 ORDER BY login ASC LIMIT 0, 50
+SELECT * FROM user_stat_pages WHERE session_id IN(105,110,124,181,236,238,251,264,276,278,286,288,294,336,338,339,340,341,342,343,344,347,350,351,353,356,364,365,368,369,370,371,372,375,381,384,388,401,402,404,408,411,412,413,414,418,419,420,421,423)
+

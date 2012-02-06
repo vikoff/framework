@@ -23,7 +23,7 @@ class FrontendLayout extends Layout {
 	/** ИНИЦИАЛИЗАЦИЯ */
 	protected function init(){
 		
-		$this->_topMenu = new Menu_Model('frontend-top');
+		$this->_topMenu = new Html_Menu('frontend-top');
 	}
 	
 	public function _getLoginBlockHTML(){

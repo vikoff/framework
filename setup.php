@@ -18,16 +18,6 @@ require(FS_ROOT.'includes/autoload.php');
 set_error_handler(array('Error_Model', 'error_handler'));	
 
 
-########## ПРАВА ПОЛЬЗОВАТЕЛЕЙ ##########
-
-define('PERMS_UNREG', 		0);
-define('PERMS_REG', 		10);
-define('PERMS_MODERATOR',	20);
-define('PERMS_ADMIN', 		30);
-define('PERMS_SUPERADMIN',	40);
-define('PERMS_ROOT', 		50);
-
-
 ########## ИНИЦИАЛИЗАЦИЯ КОНФИГА ##########
 
 Config::init();
@@ -35,11 +25,15 @@ Config::init();
 
 ########## ИНИЦИАЛИЗАЦИЯ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ##########
 
-CurUser::init();
+$user = CurUser::init();
 
-define('USER_AUTH_ID', CurUser::get()->getAuthData('id'));
-define('USER_AUTH_PERMS', CurUser::get()->getAuthData('perms'));
-define('USER_AUTH_ROLE_ID', 0);
+$roleId = $user->isLogged()
+	? $user->role_id
+	: User_RoleCollection::load()->getGuestRole('id');
+
+define('USER_AUTH_ID', $user->getAuthData('id'));
+define('USER_AUTH_LEVEL', User_RoleCollection::load()->getRole($roleId, 'level'));
+define('USER_AUTH_ROLE_ID', $roleId);
 
 
 ########## ПРОЧЕЕ ##########

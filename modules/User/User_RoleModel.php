@@ -8,6 +8,11 @@ class User_RoleModel extends ActiveRecord {
 	/** таблица БД */
 	const TABLE = 'user_roles';
 	
+	/** флаг, выделяющий роль для гостей */
+	const FLAG_GUEST = 1;
+	/** флаг, выделяющий роль для зарегистрировавшихся пользователей */
+	const FLAG_REG = 2;
+	
 	/** типы сохранения */
 	const SAVE_CREATE   = 'create';
 	const SAVE_EDIT     = 'edit';
@@ -109,7 +114,8 @@ class User_RoleModel extends ActiveRecord {
 	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function postValidation(&$data){
 		
-		if ($data['level'] < 1 || $data['level'] > 49){
+		// проверка level
+		if ($data['level'] < 0 || $data['level'] > 49){
 			$this->setError('Уровень должен быть числом от 1 до 49');
 			return FALSE;
 		}
@@ -126,7 +132,7 @@ class User_RoleModel extends ActiveRecord {
 		if ($this->isNewlyCreated && $this->additData['copy_role']){
 			try{
 				User_Acl::get()->copyRules($this->additData['copy_role'], $this->id);
-				$role = User_RoleModel::load($this->additData['copy_role'])->getField('title');
+				$role = User_RoleModel::load($this->additData['copy_role'])->title;
 				Messenger::get()->addInfo('Правила доступа скопированы с роли <b>'.$role.'</b>');
 			} catch (Exception $e){
 				Messenger::get()->addError('роль #'.$this->additData['copy_role'].' не найдена');
@@ -153,6 +159,7 @@ class User_RoleCollection extends ARCollection{
 		'id' => 'id',
 		'title' => 'Роль',
 		'level' => 'Уровень',
+		'flag' => 'Флаг',
 	);
 	
 	public $roles = array();
@@ -176,7 +183,7 @@ class User_RoleCollection extends ARCollection{
 	/** ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ */
 	public function getPaginated(){
 		
-		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
+		$sorter = new Sorter('level', 'ASC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array('*', 'FROM '.User_RoleModel::TABLE.' ORDER BY '.$sorter->getOrderBy()), 50);
 		
 		$data = db::get()->getAll($paginator->getSql(), array());
@@ -193,7 +200,7 @@ class User_RoleCollection extends ARCollection{
 	
 	private function _getAll(){
 		
-		$data = db::get()->getAllIndexed('SELECT * FROM '.User_RoleModel::TABLE, 'id', array());
+		$data = db::get()->getAllIndexed('SELECT * FROM '.User_RoleModel::TABLE.' ORDER BY level', 'id', array());
 		
 		foreach($data as &$row)
 			$row = User_RoleModel::forceLoad($row['id'], $row)->getAllFieldsPrepared();
@@ -214,10 +221,49 @@ class User_RoleCollection extends ARCollection{
 			: '';
 	}
 	
+	public function getRole($id, $key = null) {
+		
+		// ROOT
+		if ($id == -1)
+			$role = array('id' => -1, 'title' => 'ROOT', 'level' => 50);
+		else
+			$role = isset($this->roles[$id])
+				? $this->roles[$id]
+				: array('id' => 0, 'title' => 'ROLE NOT FOUND', 'level' => 0);
+		
+		return $key ? $role[$key] : $role;
+	}
+	
+	public function getGuestRole($key = null) {
+		
+		$role = array('id' => 0, 'title' => 'ROLE NOT FOUND', 'level' => 0);
+		foreach ($this->roles as $r) {
+			if ($r['flag'] == User_RoleModel::FLAG_GUEST) {
+				$role = $r;
+				break;
+			}
+		}
+		
+		return $key ? $role[$key] : $role;
+	}
+	
+	public function getRegRole($key = null) {
+		
+		$role = array('id' => 0, 'title' => 'ROLE NOT FOUND', 'level' => 0);
+		foreach ($this->roles as $r) {
+			if ($r['flag'] == User_RoleModel::FLAG_REG) {
+				$role = $r;
+				break;
+			}
+		}
+		
+		return $key ? $role[$key] : $role;
+	}
+	
 	/** ПОЛУЧИТЬ СПИСОК РОЛЕЙ ВИДА array(id => title) */
 	public function getList(){
 		
-		return db::get()->getColIndexed('SELECT id, title FROM '.User_RoleModel::TABLE, 'id', array());
+		return db::get()->getColIndexed('SELECT id, title FROM '.User_RoleModel::TABLE.' ORDER BY level', 'id', array());
 	}
 }
 

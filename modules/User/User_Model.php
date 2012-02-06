@@ -220,37 +220,6 @@ class User_Model extends ActiveRecord{
 		return $db->getOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE login='.$db->qe($login));
 	}
 	
-	/** ПРОВЕРИТЬ, ИМЕЕТ ЛИ ПОЛЬЗОВАТЕЛЬ УКАЗАННЫЕ ПРАВА */
-	public static function hasPerm($perm){
-
-		return USER_AUTH_PERMS >= $perm;
-	}
-
-	/** ПОЛУЧИТЬ СПИСОК ВОЗМОЖНЫХ ПРАВ ПОЛЬЗОВАТЕЛЕЙ */
-	public static function getPermsList(){
-		return array(PERMS_UNREG, PERMS_REG, PERMS_MODERATOR, PERMS_ADMIN, PERMS_SUPERADMIN, PERMS_ROOT);
-	}
-	
-	/** ПОЛУЧИТЬ ТЕКСТОВОЕ НАЗВАНИЕ ПРАВ ПОЛЬЗОВАТЕЛЯ */
-	public static function getPermName($perm){
-		switch($perm){
-			case PERMS_UNREG:
-				return 'Гость';
-			case PERMS_REG:
-				return 'Пользователь';
-			case PERMS_MODERATOR:
-				return 'Модератор';
-			case PERMS_ADMIN:
-				return 'Администратор';
-			case PERMS_SUPERADMIN:
-				return 'Суперадминистратор';
-			case PERMS_ROOT:
-				return 'ROOT';
-			default:
-				trigger_error('Неверная группа пользователей: '.$perm, E_USER_ERROR);
-		}
-	}
-	
 	/** ТЕКСТОВОЕ ЗНАЧЕНИЕ ПАРАМЕТРА "ПОЛ ПОЛЬЗОВАТЕЛЯ" */
 	public static function getGenderString($gender){
 		if($gender == self::GENDER_FEMALE)
