@@ -32,13 +32,15 @@
 <tr>
 	<th>Дата</th>
 	<th>URL</th>
-	<th>Ajax</th>
+	<th>is ajax</th>
+	<th>is post</th>
 </tr>
 <? foreach ($this->pages as $p): ?>
 	<tr>
 		<td><?= $p['date']; ?></td>
 		<td><?= $p['url']; ?></td>
 		<td style="text-align: center;"><?= $p['is_ajax'] ? '<span class="green">✔</span>' : '-'; ?></td>
+		<td style="text-align: center;"><?= $p['is_post'] ? '<span class="green">✔</span>' : '-'; ?></td>
 	</tr>
 <? endforeach; ?>
 </table>

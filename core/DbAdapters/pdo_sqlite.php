@@ -192,8 +192,12 @@ class DbAdapter_pdo_sqlite extends DbAdapter{
 		
 		foreach($fieldsValues as $field => $value){
 			$fields[] = $this->quoteFieldName($field);
-			$values[] = $value;
-			$valuePhs[] = '?';
+			if (is_object($value)) {
+				$valuePhs[] = $value;
+			} else {
+				$values[] = $value;
+				$valuePhs[] = '?';
+			}
 		}
 		
 		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES ('.implode(',', $valuePhs).')';
@@ -214,8 +218,12 @@ class DbAdapter_pdo_sqlite extends DbAdapter{
 		$update_arr = array();
 		$bind_arr = array();
 		foreach($fieldsValues as $field => $value) {
-			$update_arr[] = $this->quoteFieldName($field).'=?';
-			$bind_arr[] = $value;
+			if (is_object($value)) {
+				$update_arr[] = $this->quoteFieldName($field).'='.$value;
+			} else {
+				$update_arr[] = $this->quoteFieldName($field).'=?';
+				$bind_arr[] = $value;
+			}
 		}
 	
 		if(!strlen($where))

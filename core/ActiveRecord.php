@@ -427,8 +427,17 @@ class ARCollection{
 		
 		$db = db::get();
 		$whereArr = array();
-		foreach($this->_filters as $k => $v)
-			$whereArr[] = $db->quoteFieldName($k).'='.$db->qe($v);
+		foreach($this->_filters as $k => $v) {
+			if (is_array($v)) { // массивы
+				$vals = array();
+				foreach ($v as $subv)
+					$vals[] = $db->qe($subv);
+				if ($vals)
+					$whereArr[] = $db->quoteFieldName($k).' IN ('.implode(',', $vals).')';
+			} else { // строки
+				$whereArr[] = $db->quoteFieldName($k).'='.$db->qe($v);
+			}
+		}
 			
 		return !empty($whereArr) ? ' WHERE '.implode(' AND ', $whereArr) : '';
 	}
