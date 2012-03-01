@@ -28,19 +28,23 @@
 </table>
 
 <h3>Посещенные страницы (всего <?= $this->num_pages; ?>)</h3>
-<table class="grid tr-highlight" style="text-align: left; margin: 1em 0;">
+<table class="grid tr-highlight user-stat-pages">
+<colgroup span="2" />
+<colgroup span="2" align="center" />
 <tr>
 	<th>Дата</th>
 	<th>URL</th>
 	<th>is ajax</th>
 	<th>is post</th>
+	<th>post action</th>
 </tr>
 <? foreach ($this->pages as $p): ?>
 	<tr>
 		<td><?= $p['date']; ?></td>
 		<td><?= $p['url']; ?></td>
-		<td style="text-align: center;"><?= $p['is_ajax'] ? '<span class="green">✔</span>' : '-'; ?></td>
-		<td style="text-align: center;"><?= $p['is_post'] ? '<span class="green">✔</span>' : '-'; ?></td>
+		<?= $p['is_ajax'] ? '<td class="active">+</td>' : '<td>-</td>'; ?>
+		<?= $p['is_post'] ? '<td class="active">+</td>' : '<td>-</td>'; ?>
+		<td><?= $p['is_post'] ? $p['post_action'] : ''; ?></td>
 	</tr>
 <? endforeach; ?>
 </table>

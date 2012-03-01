@@ -63,9 +63,7 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 }
 </style>
 
-<? if ($this->collection): ?>
-	
-	<form method="get" action="" class="paragraph">
+<form method="get" action="" class="paragraph">
 	
 	<? if (!empty($_GET['sort'])): ?>
 		<input type="hidden" name="sort" value="<?= $_GET['sort'] ?>" />
@@ -100,8 +98,10 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 			</td>
 		</tr>
 	</table>
-	</form>
+</form>
 
+<? if ($this->collection): ?>
+	
 	<?= $this->pagination; ?>
 	
 	<table class="grid statistics" style="text-align: center;">
@@ -128,10 +128,14 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 				-
 			<? endif; ?>
 		</td>
-		<td><a href="<?= href('users/view/'.$item['uid']); ?>"><?= $item['login']; ?></a></td>
-		<td style="text-align: left;"><?= $item['user_ip']; ?></td>
-		<td><?= $item['has_js'] ? $item['browser_name'].'&nbsp;'.$item['browser_version'] : '-'; ?></td>
-		<td><?= $item['has_js'] ? $item['screen_width'].'x'.$item['screen_height'] : '-'; ?></td>
+		<td style="white-space: nowrap;"><a href="<?= href('admin/users/view/'.$item['uid']); ?>"><?= $item['login']; ?></a></td>
+		<td style="text-align: left;" class="grey"><?= $item['user_ip']; ?></td>
+		<? if ($item['has_js']): ?>
+			<td><?= $item['has_js'] ? $item['browser_name'].'&nbsp;'.$item['browser_version'] : '-'; ?></td>
+			<td><?= $item['has_js'] ? $item['screen_width'].'x'.$item['screen_height'] : '-'; ?></td>
+		<? else: ?>
+			<td colspan="2" class="grey"><?= $item['user_agent_raw']; ?></td>
+		<? endif; ?>
 		<td rowspan="4" class="detail">
 			<a href="<?= href('admin/manage/user-statistics/view/'.$item['id']); ?>">Подробней</a>
 		</td>
@@ -155,7 +159,7 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 		</td>
 	</tr>
 	<tr class="urls" style="">
-		<td class="grey"><?= $item['pages_info']['last_page_time']; ?></td>
+		<td><?= $item['pages_info']['last_page_time']; ?></td>
 		<td class="grey" style="text-align: right;">Последняя</td>
 		<td colspan="4">
 			<? if (strlen($item['pages_info']['last_page']) > 80): ?>
