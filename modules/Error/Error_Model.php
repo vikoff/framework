@@ -24,11 +24,11 @@ class Error_Model{
 	
 	private $_textString;
 	
-	public $isCli = FALSE;
-	
 	public $mode;
+	public $firstTime;
 	public $time;
 	public $url;
+	public $occurNum = 0;
 	
 	/**
 	 * полный путь, по которому лежат шаблоны модуля
@@ -38,7 +38,7 @@ class Error_Model{
 	
 	private static $_config = array(
 		'display' => TRUE,				// отображать ошибки или нет
-		'minPermsForDisplay' => 0,		// минимальные права для отображения ошибок
+		'minLevelForDisplay' => 0,		// минимальные права для отображения ошибок
 		'keepFileLog' => FALSE,			// вести лог ошибок в файл
 		'fileLogPath' => null,			// путь к файлу лога ошибок (обязателен при ведении файл-лога)
 		'keepDbLog' => FALSE,			// вести лог ошибок в базу данных
@@ -126,16 +126,16 @@ class Error_Model{
 			self::DISPLAY_MODE);
 			
 		$instance->_dbId = $id;
+		$instance->firstTime = $data['firstdate'];
 		$instance->time = $data['lastdate'];
 		$instance->url  = $data['url'];
+		$instance->occurNum  = $data['occur_num'];
 		
 		return $instance;
 	}
 	
 	// КОНСТРУКТОР (СОЗДАЕТ ЭКЗЕМПЛЯР ОШИБКИ)
 	public function __construct($errlevel, $errstr, $errfile, $errline, $errcontext, $backtrace, $mode = self::DISPLAY_MODE){
-		
-		$this->isCli = PHP_SAPI === 'cli';
 		
 		$this->_errlevel = $errlevel;
 		$this->_errstr = $errstr;
@@ -155,7 +155,7 @@ class Error_Model{
 	public function handlerAction(){
 		
 		$this->time = time();
-		$this->url = $this->isCli ? '' : 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+		$this->url = 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
 			
 		if(self::$_config['keepFileLog'])
 			$this->log2file();
@@ -166,15 +166,11 @@ class Error_Model{
 		if(self::$_config['keepEmailLog'])
 			$this->log2email();
 		
-		if(self::$_config['display'] && (self::$_config['minPermsForDisplay'] == 0 || User::hasPerm(self::$_config['minPermsForDisplay']))) {
-			if ($this->isCli)
-				echo $this->getText();
-			else
-				$this->printHTML();
-		}
+		if(self::$_config['display'] && (!self::$_config['minLevelForDisplay'] || CurUser::get()->level >= self::$_config['minLevelForDisplay']))
+			$this->printHTML();
 		
 		if($this->_errlevel & (E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR)){
-			echo'Извините, произошла ошибка! Наши специалисты уже работают над ее устранением.';
+			echo 'Извините, произошла ошибка! Наши специалисты уже работают над ее устранением.';
 			exit();
 		}
 		
@@ -215,8 +211,11 @@ class Error_Model{
 		$ERROR_FILE = $this->_errfile;
 		$ERROR_LINE = $this->_errline;
 		$BACKTRACE  = $_backtrace;
+		$UID        = USER_AUTH_ID;
+		$ERROR_FIRST_TIME = date('Y-m-d H:i:s', $this->firstTime);
 		$ERROR_TIME = date('Y-m-d H:i:s', $this->time);
-		$ERROR_URL = $this->url;
+		$ERROR_URL  = $this->url;
+		$OCCUR_NUM  = $this->occurNum;
 		
 		if($return){
 			ob_start();
@@ -226,7 +225,6 @@ class Error_Model{
 		}else{
 			echo $this->_getHtmlCssJs();
 			include(FS_ROOT.self::TPL_PATH.'view.php');
-			die;
 			return null;
 		}
 	
@@ -318,11 +316,18 @@ class Error_Model{
 		if(self::$_config['keepDbSessionDump'])
 			$fields['session_dump'] = base64_encode(serialize($_SESSION));
 		
+		$fields['uid'] = USER_AUTH_ID;
 		$fields['lastdate'] = time();
-		if($lastid = db::get()->getOne('SELECT id FROM '.self::$_config['dbTableName'].' WHERE hash=\''.$fields['hash'].'\' LIMIT 1', 0)){
-			db::get()->update(self::$_config['dbTableName'], array('lastdate' => $fields['lastdate']), 'id='.$lastid);
+		$db = db::get();
+		
+		if($lastid = $db->getOne('SELECT id FROM '.self::$_config['dbTableName'].' WHERE hash='.$db->qe($fields['hash']).' LIMIT 1', 0)){
+			$db->update(self::$_config['dbTableName'],
+				array('lastdate' => $fields['lastdate'], 'occur_num' => $db->raw('occur_num+1')),
+				'id='.$lastid);
 		}else{
-			db::get()->insert(self::$_config['dbTableName'], $fields);
+			$fields['occur_num'] = 1;
+			$fields['firstdate'] = $fields['lastdate'];
+			$db->insert(self::$_config['dbTableName'], $fields);
 		}
 	}
 	
@@ -358,10 +363,10 @@ class Error_Model{
 	
 }
 
-class ErrorCollection extends ARCollection{
+class Error_Collection extends ARCollection {
 	
 	// ТОЧКА ВХОДА В КЛАСС
-	public static function Load(){
+	public static function load(){
 			
 		$instance = new ErrorCollection();
 		return $instance;

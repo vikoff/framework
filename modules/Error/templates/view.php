@@ -13,7 +13,7 @@
 			<form class="inline" action="" method="post" onsubmit="return confirm('Удалить?');">
 				<input type="hidden" name="id" value="<?=$DB_ID;?>" />
 				<?=FORMCODE;?>
-				<input type="submit" class="button-small" name="action[core/error-delete-item]" value="удалить" />
+				<input type="submit" class="button-small" name="action[admin/error-delete-item]" value="удалить" />
 			</form>
 		<? else: ?>
 			<a href="#" onclick="this.parentNode.parentNode.style.display = 'none'; return false;" class="button-small">Закрыть</a>
@@ -27,8 +27,13 @@
 	</div>
 	
 	<div class="error-meta-info">
-		Время возникновения: <?=$ERROR_TIME;?><br />
-		Запрашиваемый URL: <a href="<?=$ERROR_URL;?>"><?=$ERROR_URL;?></a>
+		id пользователя: <?=$UID;?><br />
+		<? if ($ERROR_FIRST_TIME != $ERROR_TIME): ?>
+			Время первого возникновения: <?=$ERROR_FIRST_TIME;?><br />
+		<? endif; ?>
+		Время последнего возникновения: <?=$ERROR_TIME;?><br />
+		Запрашиваемый URL: <a href="<?=$ERROR_URL;?>"><?=$ERROR_URL;?></a><br />
+		<? if ($OCCUR_NUM): ?>Количество возникновений: <?= $OCCUR_NUM; ?><br /><? endif; ?>
 	</div>
 
 </div>

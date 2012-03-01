@@ -58,13 +58,15 @@ CREATE TABLE `pages` (
 /* СОХРАНЕНИЕ ОШИБОК */
 DROP TABLE IF EXISTS `error_log`;
 CREATE TABLE `error_log` (
-  `id` int(10) 	UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` 			INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `uid`			INT(10) UNSIGNED,
   `url`			TEXT,
   `description` TEXT,
   `session_dump` TEXT,
   `hash`		CHAR(32),
-  `lastdate` 	INT(10) UNSIGNED DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `occur_num`	INT(10) UNSIGNED DEFAULT 1,
+  `firstdate` 	INT(10) UNSIGNED DEFAULT NULL,
+  `lastdate` 	INT(10) UNSIGNED DEFAULT NULL
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /* ПОЛЬЗОВАТЕЛЬСКАЯ СТАТИСТИКА */

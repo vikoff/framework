@@ -167,6 +167,7 @@ class Sorter{
 		
 		return $arr;
 	}
+	
 }
 
 ?>

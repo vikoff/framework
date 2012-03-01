@@ -11,6 +11,7 @@
 		id="sql-input"
 		name="query"
 		class="ctrlentersend"
+		spellcheck="false"
 		style="width: 98%; height: 150px; font-size: 14px; font-family: monospace;"><?=$this->query;?></textarea>
 		
 	<div style="text-align: right; margin-top: 10px;">

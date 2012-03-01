@@ -24,8 +24,8 @@ class BackendLayout extends Layout {
 	/** ИНИЦИАЛИЗАЦИЯ */
 	protected function init(){
 		
-		$this->_topMenu = new Menu_Model('backend-top');
-		$this->_leftMenu = new Menu_Model('backend-left', array('topMenu' => $this->_topMenu));
+		$this->_topMenu = new Html_Menu('backend-top');
+		$this->_leftMenu = new Html_Menu('backend-left', array('topMenu' => $this->_topMenu));
 	}
 	
 	protected function _constructAutoBreadcrumbs(){

@@ -33,18 +33,7 @@ return array (
   array (
     'name' => 'error',
     'title' => 'Ошибки сайта',
-    'controller' => 'Admin_Controller',
-    'resources' => 
-    array (
-      'view' => 'Просмотр',
-      'edit' => 'Редактирование',
-    ),
-  ),
-  'menu' => 
-  array (
-    'name' => 'menu',
-    'title' => 'Меню',
-    'controller' => 'Admin_Controller',
+    'adminController' => 'Admin_Controller',
     'resources' => 
     array (
       'view' => 'Просмотр',
@@ -96,14 +85,14 @@ return array (
   'userStatistics' => 
   array (
     'name' => 'userStatistics',
-    'title' => 'Пользовательская статистика',
+    'title' => 'Статистика посещений',
     'controller' => 'UserStatistics_Controller',
     'adminController' => 'UserStatistics_AdminController',
     'arrayParams' => true,
     'resources' => 
     array (
       'public' => 'Общедоступные действия',
-      'view' => 'Просмотр данных пользователя',
+      'view' => 'Просмотр данных',
       'edit' => 'Редактирование данных',
     ),
   ),

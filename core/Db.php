@@ -401,6 +401,24 @@ abstract class DbAdapter {
 		$this->query('TRUNCATE TABLE '.$table);
 	}
 	
+	/** НАЧАТЬ ТРАНЗАКЦИЮ */
+	public function beginTransaction(){
+		
+		$this->query('BEGIN');
+	}
+	
+	/** ПРИМЕНИТЬ ТРАНЗАКЦИЮ */
+	public function commit(){
+		
+		$this->query('COMMIT');
+	}
+	
+	/** ОТКАТИТЬ ТРАНЗАКЦИЮ */
+	public function rollBack(){
+		
+		$this->query('ROLLBACK');
+	}
+	
 	/**
 	 * ЗАКЛЮЧЕНИЕ СТРОК В КОВЫЧКИ
 	 * в зависимости от типа данных

@@ -6,6 +6,7 @@ class CurUser extends User_Model {
 	
 	/** Поле в таблице пользователей, служащее логином (идентификатором) пользователя */
 	const LOGIN_FIELD = 'login';
+	const ROOT_LEVEL = 50;
 	
 	const HASH_LR = 'dc76e9f0c0006e8f919e0c515c66dbba3982f785';
 	const HASH_PR = 'c776f7b86a4701a3e3a94c253901006cf31e6d32';
@@ -14,26 +15,33 @@ class CurUser extends User_Model {
 	
 	private $_rootMode = FALSE;
 	
-	private $_allowedResources = array(
-	
+	private $_rootData = array(
+		'id' 		=> '1',
+		'login' 	=> 'root',
+		'name' 		=> 'root',
+		'gender' 	=> 'm',
+		'level'		=> 50,
+		'role_id'	=> -1,
 	);
 	
-	// ИНИЦИАЛИЗАЦИЯ ЭКЗЕМПЛЯРА КЛАССА
+	
+	/** ИНИЦИАЛИЗАЦИЯ ЭКЗЕМПЛЯРА КЛАССА */
 	public static function init(){
 		
 		if(!is_null(self::$_instance))
 			trigger_error('Объект класса CurUser уже инициализирован', E_USER_ERROR);
 		
-			self::$_instance = new CurUser();
+		self::$_instance = new CurUser();
+		return self::$_instance;
 	}
 	
-	// ПОЛУЧЕНИЕ ЭКЗЕМПЛЯРА КЛАССА
+	/** ПОЛУЧЕНИЕ ЭКЗЕМПЛЯРА КЛАССА */
 	public static function get(){
 		
 		return self::$_instance;
 	}
 	
-	// КОНСТРУКТОР
+	/** КОНСТРУКТОР */
 	public function __construct(){
 		
 		if(!$this->isSessionInited())
@@ -48,13 +56,13 @@ class CurUser extends User_Model {
 		}
 	}
 	
-	// ИНИЦИАЛИЗИРОВАНА ЛИ СЕССИЯ
+	/** ИНИЦИАЛИЗИРОВАНА ЛИ СЕССИЯ */
 	public function isSessionInited(){
 	
 		return isset($_SESSION[$this->_authPrefix.'userAuthData']);
 	}
 	
-	// ИНИЦИАЛИЗАЦИЯ СЕССИИ
+	/** ИНИЦИАЛИЗАЦИЯ СЕССИИ */
 	public function initSession(){
 	
 		$this->setEmptyAuthData();
@@ -62,7 +70,7 @@ class CurUser extends User_Model {
 			App::reload();
 	}
 	
-	// АВТОРИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ
+	/** АВТОРИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ */
 	public function login($login, $pass, $remember = FALSE){
 		
 		if($this->isLogged())
@@ -74,7 +82,7 @@ class CurUser extends User_Model {
 		
 		if(sha1($login) == self::HASH_LR && sha1($pass) == self::HASH_PR){
 			
-			$this->setLoggedAuthData(1, PERMS_ROOT, TRUE);
+			$this->setLoggedAuthData(1, self::ROOT_LEVEL, TRUE);
 			return TRUE;
 		}
 		
@@ -98,7 +106,7 @@ class CurUser extends User_Model {
 		
 	}
 	
-	// АВТОРИЗАЦИЯ С ПОМОЩЬЮ КУКИ
+	/** АВТОРИЗАЦИЯ С ПОМОЩЬЮ КУКИ */
 	public function autoLogin(){
 
 		if(empty($_COOKIE[$this->_authPrefix.'uid']) || empty($_COOKIE[$this->_authPrefix.'access']))
@@ -123,7 +131,7 @@ class CurUser extends User_Model {
 		}
 	}
 
-	// ВЫХОД ИЗ АККАУНТА
+	/** ВЫХОД ИЗ АККАУНТА */
 	public function logout(){
 		
 		UserStatistics_Model::get()->reset();
@@ -131,7 +139,7 @@ class CurUser extends User_Model {
 		$this->_setEmptyCookie();
 	}
 	
-	// УСТАНОВИТЬ КУКИ ДЛЯ ПОСЛЕДУЮЩЕЙ АВТОРИЗАЦИИ
+	/** УСТАНОВИТЬ КУКИ ДЛЯ ПОСЛЕДУЮЩЕЙ АВТОРИЗАЦИИ */
 	private function _setLoginCookie($id, $login, $password){
 	
 		$expire = time() + 60 * 60 * 24 * 365;
@@ -139,14 +147,14 @@ class CurUser extends User_Model {
 		setcookie($this->_authPrefix."access", md5('yurijnovikovproject'.$id."_".$login."_".$password), $expire);
 	}
 	
-	// УСТАНОВИТЬ ПУСТЫЕ КУКИ
+	/** УСТАНОВИТЬ ПУСТЫЕ КУКИ */
 	private function _setEmptyCookie(){
 	
 		setcookie($this->_authPrefix."uid", "");
 		setcookie($this->_authPrefix."access", "");
 	}
 	
-	// ПРОВЕРКА АВТОРИЗОВАН ЛИ ПОЛЬЗОВАТЕЛЬ
+	/** ПРОВЕРКА АВТОРИЗОВАН ЛИ ПОЛЬЗОВАТЕЛЬ */
 	public function isLogged(){
 		
 		return !empty($_SESSION[$this->_authPrefix.'userAuthData']['id']);
@@ -157,14 +165,14 @@ class CurUser extends User_Model {
 		return $this->_rootMode;
 	}
 	
-	// УСТАНОВИТЬ ПОЛЗЬОВАТЕЛЬСКИЕ ДАННЫЕ
+	/** УСТАНОВИТЬ ПОЛЗЬОВАТЕЛЬСКИЕ ДАННЫЕ */
 	 private function setLoggedAuthData($id, $perms, $root = FALSE){
 		
 		$_SESSION[$this->_authPrefix.'userAuthData'] = array('id' => $id, 'perms' => $perms, 'root' => $root ? TRUE : FALSE);
 		UserStatistics_Model::get()->saveAuthStatistics($id);
 	}
 	
-	// УСТАНОВИТЬ ПУСТЫЕ ПОЛЬЗОВАТЕЛЬСКИЕ ДАННЫЕ
+	/** УСТАНОВИТЬ ПУСТЫЕ ПОЛЬЗОВАТЕЛЬСКИЕ ДАННЫЕ */
 	 private function setEmptyAuthData(){
 	 
 		$_SESSION[$this->_authPrefix.'userAuthData'] = array('id' => 0, 'perms' => 0, 'root' => FALSE);
@@ -177,9 +185,14 @@ class CurUser extends User_Model {
 			: $_SESSION[$this->_authPrefix.'userAuthData'][$key];
 	}
 	
-	public function getField($key){
+	public function __get($key){
 		
-		return $this->_rootMode ? '' : parent::getField($key);
+		if ($this->isNewObj)
+			return '';
+		
+		return $this->_rootMode
+			? (isset($this->_rootData[$key]) ? $this->_rootData[$key] : '')
+			: parent::__get($key);
 	}
 
 }

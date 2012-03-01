@@ -38,7 +38,10 @@ class User_Acl {
 		
 		if ($resource == 'public')
 			return TRUE;
-			
+		
+		if ($resource == 'root')
+			return FALSE;
+		
 		return isset($this->_userPermissions[ $module ][ $resource ]);
 	}
 	
@@ -79,6 +82,9 @@ class User_Acl {
 	public function saveRules($rulesRaw){
 		
 		$db = db::get();
+		
+		$db->beginTransaction();
+		
 		$db->truncate(self::TABLE);
 		
 		foreach($rulesRaw as $row => $enable){
@@ -89,6 +95,8 @@ class User_Acl {
 				'role_id' => $role_id,
 			));
 		}
+		
+		$db->commit();
 		
 		return TRUE;
 	}
