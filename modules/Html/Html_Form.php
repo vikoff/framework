@@ -108,9 +108,12 @@ class Html_Form {
 	public static function select($selectAttrs, $optionsArr, $active = null, $params = array()){
 		
 		$options = '';
+		$isArr = is_array($active);
+		
 		foreach($optionsArr as $k => $v){
 			$key = !empty($params['keyEqVal']) ? $v : $k;
-			$options .= '<option value="'.$key.'"'.($key == $active ? ' selected="selected"' : '').'>'.$v.'</option>';
+			$sel = ($isArr && in_array($key, $active)) || (!$isArr && $key == $active) ? ' selected="selected"' : '';
+			$options .= '<option value="'.$key.'"'.$sel.'>'.$v.'</option>';
 		}
 		
 		if(is_array($selectAttrs)){

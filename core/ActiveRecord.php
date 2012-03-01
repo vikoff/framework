@@ -234,7 +234,7 @@ class ActiveRecord {
 			return $this->_fieldValuesForDisplay[$key];
 		
 		if($this->isExistsObj)
-			trigger_error('Неизвестное поле "'.$key.'"', E_USER_ERROR);
+			throw new Exception('Неизвестное поле "'.$key.'"');
 		else
 			trigger_error('Невозможно вызвать метод self::getFieldPrepared() для нового объекта', E_USER_ERROR);
 	}

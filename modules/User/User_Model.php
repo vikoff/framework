@@ -6,7 +6,7 @@ class User_Model extends ActiveRecord{
 	const SAVE_ADMIN_EDIT   = 'adm-edit';
 	const SAVE_ADMIN_PASS   = 'adm-pass';
 	const SAVE_REGISTER     = 'reg';
-	const SAVE_EDIT   	    = 'reg';
+	const SAVE_EDIT   	    = 'edit';
 	const SAVE_PASS         = 'pass';
 	
 	
@@ -258,6 +258,20 @@ class User_Collection extends ARCollection {
 		'regdate' => 'Дата регистрации',
 	);
 	
+	
+	/** ТОЧКА ВХОДА В КЛАСС */
+	public static function load($filters = array(), $options = array()){
+			
+		return new User_Collection($filters, $options);
+	}
+	
+	/** КОНСТРУКТОР */
+	public function __construct($filters = array(), $options = array()){
+		
+		$this->_filters = $filters;
+		$this->_options = $options;
+	}
+	
 	/** ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ */
 	public function getPaginated(){
 		
@@ -276,6 +290,16 @@ class User_Collection extends ARCollection {
 		return $data;
 	}
 	
+	public function getAll(){
+		
+		$where = $this->_getSqlFilter();
+		$data = db::get()->getAllIndexed('SELECT * FROM '.User_Model::TABLE.' '.$where, 'id', array());
+		
+		foreach($data as &$row)
+			$row = User_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
+		
+		return $data;
+	}
 }
 
 ?>

@@ -30,7 +30,7 @@ class Page_AdminController extends Controller{
 	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
 	public function checkResourcePermission($resource){
 		
-		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
+		return User_Acl::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
 	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
@@ -65,7 +65,7 @@ class Page_AdminController extends Controller{
 		
 		$pageTitle = 'Создание новой страницы';
 		
-		$variables = array_merge(Tools::unescape($_POST), array(
+		$variables = array_merge($_POST, array(
 			'instanceId' => 0,
 			'pageTitle'  => $pageTitle,
 			'validation' => Page_Model::Create()->getValidator()->getJsRules(),
@@ -84,7 +84,7 @@ class Page_AdminController extends Controller{
 		$instanceId = (int)$instanceId;
 		$instance = Page_Model::Load($instanceId);
 		
-		$pageTitle = '<span style="font-size: 14px;">Редактирование страницы</span> '.$instance->getField('title');
+		$pageTitle = '<span style="font-size: 14px;">Редактирование страницы</span> '.$instance->title;
 		$instanceData = $instance->GetAllFieldsPrepared();
 	
 		$variables = array_merge($instanceData, array(
@@ -150,7 +150,7 @@ class Page_AdminController extends Controller{
 		
 		$instance = Page_Model::create();
 		
-		if($instance->save(Tools::unescape($_POST))){
+		if($instance->save($_POST)){
 			Messenger::get()->addSuccess('Запись сохранена');
 			return TRUE;
 		}else{
@@ -166,7 +166,7 @@ class Page_AdminController extends Controller{
 		$instanceId = getVar($_POST['id'], 0, 'int');
 		$instance = Page_Model::load($instanceId);
 		
-		if($instance->save(Tools::unescape($_POST))){
+		if($instance->save($_POS)){
 			Messenger::get()->addSuccess('Запись сохранена');
 			return TRUE;
 		}else{
@@ -180,7 +180,7 @@ class Page_AdminController extends Controller{
 		
 		$instance = Page_Model::Load(getVar($_POST['id'], 0, 'int'));
 		$instance->publish();
-		Messenger::get()->addSuccess('Страница "'.$instance->getField('title').'" опубликована');
+		Messenger::get()->addSuccess('Страница "'.$instance->title.'" опубликована');
 		return TRUE;
 	}
 	
@@ -189,7 +189,7 @@ class Page_AdminController extends Controller{
 		
 		$instance = Page_Model::Load(getVar($_POST['id'], 0, 'int'));
 		$instance->unpublish();
-		Messenger::get()->addSuccess('Страница "'.$instance->getField('title').'" скрыта');
+		Messenger::get()->addSuccess('Страница "'.$instance->title.'" скрыта');
 		return TRUE;
 	}
 	

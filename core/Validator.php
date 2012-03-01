@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Validator {
 	
@@ -26,6 +26,7 @@ class Validator {
 		'invalidDataType' => 'поле {fieldname} имеет недопустимый формат',
 		'required'        => 'поле {fieldname} обязательно для заполнения',
 		'email'           => 'в поле {fieldname} введен некорректный email-адрес',
+		'url'             => 'в поле {fieldname} введен некорректный url',
 		'match'           => 'поле {fieldname} содержит недопустимые символы или имеет недопустимый формат',
 		'in'              => 'поле {fieldname} может принимать только значения {validValues}',
 		'notIn'           => 'в поле {fieldname} введено недопустимое значение',
@@ -53,6 +54,7 @@ class Validator {
 		'required',
 		'function',
 		'email',
+		'url',
 		'match',
 		'length',
 		'in',
@@ -373,7 +375,22 @@ class Validator {
 			$this->validData[$field] = '';
 			return;
 		}
-		$result = preg_match('/^[\w._%+-]+@[\w.-]+\.\w{2,10}$/', $this->validData[$field]);
+		$result = filter_var($this->validData[$field], FILTER_VALIDATE_EMAIL);
+		if(!$result)
+			$this->setError($this->getErrorText($field, 'email'));
+	}
+	
+	// ПРАВИЛО URL
+	public function rule_url($field, $execute){
+			
+		if(!$execute)
+			return;
+		
+		if(empty($this->validData[$field])){
+			$this->validData[$field] = '';
+			return;
+		}
+		$result = filter_var($this->validData[$field], FILTER_VALIDATE_URL);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'email'));
 	}
@@ -468,8 +485,14 @@ class Validator {
 	// ПРАВИЛО DB DATE
 	public function rule_dbDate($field, $execute){
 		
-		if(!isset($this->validData[$field]) || !$execute)
+		if (!$execute)
 			return;
+			
+		if(empty($this->validData[$field])) {
+			$this->validData[$field] = null;
+			return;
+		}
+	
 		$this->validData[$field] = substr($this->validData[$field], 0, 10);
 		$result = preg_match('/^\d{4}\-\d{2}\-\d{2}$/', $this->validData[$field]);
 		if(!$result)
@@ -479,8 +502,14 @@ class Validator {
 	// ПРАВИЛО DB TIME
 	public function rule_dbTime($field, $execute){
 		
-		if(!isset($this->validData[$field]) || !$execute)
+		if (!$execute)
 			return;
+			
+		if(empty($this->validData[$field])) {
+			$this->validData[$field] = null;
+			return;
+		}
+		
 		$result = preg_match('/^\d{2}\-\d{2}\-\d{2}$/', $this->validData[$field]);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'dbTime'));

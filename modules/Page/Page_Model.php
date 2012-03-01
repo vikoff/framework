@@ -56,7 +56,7 @@ class Page_Model extends ActiveRecord{
 	 */
 	protected function _accessCheck(){
 		
-		if(!App::get()->isAdminMode() && !$this->getField('published'))
+		if(!App::get()->isAdminMode() && !$this->published)
 			throw new Exception403('Доступ к странице ограничен');
 	}
 	
@@ -164,7 +164,7 @@ class Page_Model extends ActiveRecord{
 		
 		// создание файла для страницы, сохраненной в файле
 		$fullname = FS_ROOT.$this->getStorageFilename();
-		if ( $this->getField('stored_in_file') && !file_exists($fullname) ){
+		if ( $this->stored_in_file && !file_exists($fullname) ){
 			touch($fullname);
 			chmod($fullname, 0777);
 		}
@@ -188,14 +188,14 @@ class Page_Model extends ActiveRecord{
 			unlink($fullname);
 	}
 	
-	// ОПУБЛИКОВАТЬ СТРАНИЦУ
+	/** ОПУБЛИКОВАТЬ ЗАПИСЬ */
 	public function publish(){
 	
 		$this->setField('published', TRUE);
 		$this->_save();
 	}
 	
-	// СКРЫТЬ СТРАНИЦУ
+	/** СКРЫТЬ ЗАПИСЬ */
 	public function unpublish(){
 	
 		$this->setField('published', FALSE);
@@ -206,7 +206,7 @@ class Page_Model extends ActiveRecord{
 	/** ПРОВЕРИТЬ, ЯВЛЯЕТСЯ ЛИ СТРАНИЦА ФРАГМЕТНОМ */
 	public function isChunk(){
 		
-		return $this->getField('type') == self::TYPE_CHUNK;
+		return $this->type == self::TYPE_CHUNK;
 	}
 	
 	public static function getPageTypeTitle($type){
@@ -220,7 +220,7 @@ class Page_Model extends ActiveRecord{
 
 	public function getStorageFilename(){
 		
-		return $this->isExistsObj && $this->getField('stored_in_file')
+		return $this->isExistsObj && $this->stored_in_file
 			? self::FILE_PAGES_PATH.$this->id.'.php'
 			: null;
 	}

@@ -19,6 +19,7 @@ th{
 }
 td{
 	padding: 5px;
+	vertical-align: inherit;
 }
 ul{
 	margin: 0px;
@@ -55,11 +56,6 @@ a:hover{
 	display: inline;
 	margin: 0px;
 	padding: 0px;
-}
-.simpleText{
-	font-weight: normal;
-	text-decoration: none;
-	font-size: 13px;
 }
 .simple-text{
 	font-weight: normal;
@@ -116,18 +112,6 @@ label.error{
 	padding: 1px 5px;
 }
 
-/* СКРУГЛЕНИЕ УГЛОВ */
-
-.roundcorner-tl{-moz-border-radius-topleft: 5px; -webkit-border-top-left-radius: 5px; border-top-left-radius: 5px;}
-.roundcorner-tr{-moz-border-radius-topright: 5px; -webkit-border-top-right-radius: 5px; border-top-right-radius: 5px;}
-.roundcorner-bl{-moz-border-radius-bottomleft: 5px; -webkit-border-bottom-left-radius: 5px; border-bottom-left-radius: 5px;}
-.roundcorner-br{-moz-border-radius-bottomright: 5px; -webkit-border-bottom-right-radius: 5px; border-bottom-right-radius: 5px;}
-.roundcorner-top{-moz-border-radius-topleft: 5px; -webkit-border-top-left-radius: 5px; border-top-left-radius: 5px; -moz-border-radius-topright: 5px; -webkit-border-top-right-radius: 5px; border-top-right-radius: 5px;}
-.roundcorner-bottom{-moz-border-radius-bottomleft: 5px; -webkit-border-bottom-left-radius: 5px; border-bottom-left-radius: 5px; -moz-border-radius-bottomright: 5px; -webkit-border-bottom-right-radius: 5px; border-bottom-right-radius: 5px;}
-.roundcorner-right{ -moz-border-radius-topright: 5px; -webkit-border-top-right-radius: 5px; border-top-right-radius: 5px; -moz-border-radius-bottomright: 5px; -webkit-border-bottom-right-radius: 5px; border-bottom-right-radius: 5px;}
-.roundcorner-left{-moz-border-radius-topleft: 5px; -webkit-border-top-left-radius: 5px; border-top-left-radius: 5px; -moz-border-radius-bottomleft: 5px; -webkit-border-bottom-left-radius: 5px; border-bottom-left-radius: 5px;}
-.roundcorner-all{-moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px;}
-
 table.sql-dump{
 	margin: auto;
 	text-align: center;
@@ -159,4 +143,9 @@ table.php-page-statistics td{
 }
 table.php-page-statistics tr.b td{
 	font-weight: bold;
+}
+
+.long-inputs input[type="text"],
+.long-inputs input[type="password"]{
+	width: 95%;
 }

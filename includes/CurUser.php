@@ -1,4 +1,4 @@
-<?
+<?php
 	
 class CurUser extends User_Model {
 	
@@ -51,6 +51,7 @@ class CurUser extends User_Model {
 		
 		if($this->_rootMode){
 			parent::__construct($this->getAuthData('id'), self::INIT_EXISTS_FORCE, array('name' => 'root'));
+			$this->_afterLoad($this->_dbFieldValues);
 		}else{
 			parent::__construct($this->getAuthData('id'), self::INIT_ANY);
 		}
@@ -190,9 +191,11 @@ class CurUser extends User_Model {
 		if ($this->isNewObj)
 			return '';
 		
-		return $this->_rootMode
-			? (isset($this->_rootData[$key]) ? $this->_rootData[$key] : '')
-			: parent::__get($key);
+		try {
+			return parent::__get($key);
+		} catch (Exception $e) {
+			return '';
+		}
 	}
 
 }

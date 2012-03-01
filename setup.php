@@ -13,14 +13,14 @@ require(FS_ROOT.'core/App.php');
 require(FS_ROOT.'includes/autoload.php');
 
 
-########## УСТАНОВКА ОБРАБОТЧИКА ОШИБОК ##########
-
-set_error_handler(array('Error_Model', 'error_handler'));	
-
-
 ########## ИНИЦИАЛИЗАЦИЯ КОНФИГА ##########
 
 Config::init();
+
+
+########## УСТАНОВКА ОБРАБОТЧИКА ОШИБОК ##########
+
+set_error_handler(array('Error_Model', 'error_handler'));	
 
 
 ########## ИНИЦИАЛИЗАЦИЯ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ##########

@@ -1,4 +1,4 @@
-<?
+<?php
 
 class YDate{
 	
@@ -376,7 +376,7 @@ class YDate{
 	public static function getMonthName($index){
 		
 		$index = (int)$index; // преобразует 01 в 1
-		return (isset(self::$months[$index]) ? self::$months[$index] : '');
+		return (isset(self::$_monthsNomFull[$index]) ? self::$_monthsNomFull[$index] : '');
 	}
 	
 	public static function getMonthFullName($index){
@@ -388,7 +388,7 @@ class YDate{
 	// ПОЛУЧИТЬ ИНДЕКС МЕСЯЦА ПО НАЗВАНИЮ
 	public static function getMonthIndex($name){
 		$name = (string)$name;
-		return (int)(in_array($name, self::$months) ? array_search($name, self::$months) : 0);
+		return (int)(in_array($name, self::$_monthsNomFull) ? array_search($name, self::$_monthsNomFull) : 0);
 	}
 	
 	// ПЕРЕВОД TIMESTAMP В ТЕКСТОВОЕ ЗНАЧЕНИЕ ДАТЫ
@@ -524,7 +524,7 @@ class YDate{
 	// ПОЛУЧИТЬ HTML СПИСОК МЕСЯЦЕВ ДЛЯ ТЭГА <SELECT>
 	public static function getMonthsList($selected = ''){
 		$output = '';
-		foreach(self::$months as $index => $name)
+		foreach(self::$_monthsNomFull as $index => $name)
 			$output .= '<option value="'.$index.'"'.(($index == $selected || $name == $selected) ? ' selected' : '').'>'.$name.'</option>';
 		return $output;
 	}

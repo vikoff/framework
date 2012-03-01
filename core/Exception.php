@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Exception403 extends Exception{}
 

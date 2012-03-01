@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Request {
 	
@@ -30,8 +30,11 @@ class Request {
 		$this->_requestString = $requestString;
 		$this->parseRequest();
 		
+		if (!empty($_GET))
+			$_GET = Tools::unescape($_GET);
+		
 		if (!empty($_POST))
-			Tools::unescape($_POST);
+			$_POST = Tools::unescape($_POST);
 	}
 	
 	/** РАЗБОР URL ЗАПРОСА */
