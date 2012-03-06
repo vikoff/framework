@@ -24,7 +24,7 @@ class Admin_SqlController extends Controller {
 	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
 	public function checkResourcePermission($resource){
 		
-		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
+		return User_Acl::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
 	public function getClass(){
@@ -46,7 +46,7 @@ class Admin_SqlController extends Controller {
 	public function display_console($params = array()){
 		
 		$variables = array();
-		$query = Tools::unescape(getVar($_POST['query']));
+		$query = getVar($_POST['query']);
 		$variables['query'] = $query;
 		
 		if($query){
@@ -145,7 +145,10 @@ class Admin_SqlController extends Controller {
 		
 		$db = db::get();
 		$db->selectDb($dbName);
-		echo json_encode($db->showTables());
+		$tables = $db->showTables();
+		if ($tables)
+			sort($tables);
+		echo json_encode($tables);
 	}
 	
 }

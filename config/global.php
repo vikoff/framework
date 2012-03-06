@@ -33,7 +33,7 @@ db::create(array(
 
 ########## КОНФИГУРАЦИЯ КЛАССА СТАТИСТИКИ ##########
 
-UserStatistics_Model::enable();
+UserStatistics_Model::disable();
 
 
 ########## РАЗНОЕ ##########
