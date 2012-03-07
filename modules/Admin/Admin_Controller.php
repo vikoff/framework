@@ -187,20 +187,22 @@ class Admin_Controller extends Controller{
 	public function snippet_config_modules(){
 		
 		BackendLayout::get()
-			->setContentPhpFile(self::TPL_PATH.'config_modules.php')
+			->setContentPhpFile(self::TPL_PATH.'manage_modules.php')
 			->render();
 	}
 	
 	/** SNIPPET ERROR LOG */
 	public function snippet_error_log(){
 		
-		$collection = new ErrorCollection();
+		$collection = new Error_Collection();
 		$variables = array(
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
 		);
 		BackendLayout::get()
-			->setContentPhpFile(self::TPL_PATH.'manage_error_log.php', $variables);
+			->prependTitle('Лог ошибок')
+			->setContentPhpFile(self::TPL_PATH.'manage_error_log.php', $variables)
+			->render();
 	}
 	
 	public function snippet_fs_snapshot(){

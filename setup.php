@@ -27,14 +27,6 @@ set_error_handler(array('Error_Model', 'error_handler'));
 
 $user = CurUser::init();
 
-$roleId = $user->isLogged()
-	? $user->role_id
-	: User_RoleCollection::load()->getGuestRole('id');
-
-define('USER_AUTH_ID', $user->getAuthData('id'));
-define('USER_AUTH_LEVEL', User_RoleCollection::load()->getRole($roleId, 'level'));
-define('USER_AUTH_ROLE_ID', $roleId);
-
 
 ########## ПРОЧЕЕ ##########
 
