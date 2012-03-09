@@ -16,7 +16,7 @@
 <?=$this->_getLinkTagsHTML();?>
 
 	<link rel="stylesheet" href="<?= WWW_ROOT; ?>css/common.css" type="text/css" />
-	<link id="backend-css" rel="stylesheet" href="<?= WWW_ROOT; ?>css/backend.css" type="text/css" />
+	<link rel="stylesheet" href="<?= WWW_ROOT; ?>css/backend.css" type="text/css" />
 	<!-- <link rel="icon" type="image/png" href="favicon.ico" /> -->
 	
 	<script type="text/javascript">
@@ -45,22 +45,6 @@
 				<?= FORMCODE; ?>
 				<input type="submit" class="button" name="action[user/profile/logout]" value="Выход" />
 			</form>
-			<br />
-			<a href="#" onclick="changeStyle(); return false;" style="font-size: 9px;">применить старый стиль</a>
-			<script>
-				function changeStyle(){
-					var c=$('#backend-css');
-					c.detach();
-					if (c.data('old')) {
-						c.attr('href', c.attr('href').replace('backend_old', 'backend'));
-						c.data('old', false);
-					} else {
-						c.attr('href', c.attr('href').replace('backend', 'backend_old'));
-						c.data('old', true);
-					}
-					c.appendTo('head');
-				}
-			</script>
 		</div>
 		
 		<div id="top-menu-list">

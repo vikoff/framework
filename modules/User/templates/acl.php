@@ -38,30 +38,34 @@
 		<? $numCols = 1 + count($this->rolesList); ?>
 		
 		<? foreach($this->resourcesList as $item): ?>
-			<tr>
 				
-				<? if ($item['module'] !== $module): ?>
+			<? if ($item['module'] !== $module): ?>
 				
-					<? $module = $item['module']; ?>
+				<? $module = $item['module']; ?>
+				<tr>
 					<td colspan="<?= $numCols; ?>" class="module">
 						<span title="модуль <?= $item['module']; ?>"><?= $item['module_title']; ?></span>
 					</td>
-				<? else: ?>
+				</tr>
+			<? endif; ?>
+			
+			<? if ($item['resource'] == 'public' || $item['resource'] == 'root'): ?>
+				<? continue; ?>
+			<? endif; ?>
+			
+			<tr>
+				<td style="text-align: left;"><span title="ресурс <?= $item['resource']; ?>"><?= $item['resource_title']; ?></span></td>
 				
-					<td><span title="ресурс <?= $item['resource']; ?>"><?= $item['resource_title']; ?></span></td>
-					
-					<? foreach($this->rolesList as $role): ?>
-						<td class="checkbox">
-							<label>
-							<?= Html_Form::checkbox(array(
-								'name' => 'items['.$item['module'].'|'.$item['resource'].'|'.$role['id'].']',
-								'value' => 1,
-								'checked' => !empty($this->accessRules[ $item['module'] ][ $item['resource'] ][ $role['id'] ]))); ?>
-							</label>
-						</td>
-					<? endforeach; ?>
-				
-				<? endif; ?>
+				<? foreach($this->rolesList as $role): ?>
+					<td class="checkbox">
+						<label>
+						<?= Html_Form::checkbox(array(
+							'name' => 'items['.$item['module'].'|'.$item['resource'].'|'.$role['id'].']',
+							'value' => 1,
+							'checked' => !empty($this->accessRules[ $item['module'] ][ $item['resource'] ][ $role['id'] ]))); ?>
+						</label>
+					</td>
+				<? endforeach; ?>
 			</tr>
 		<? endforeach; ?>
 		</table>

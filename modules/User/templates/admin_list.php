@@ -25,7 +25,7 @@
 			
 		<td class="center" style="width: 120px;">
 			<div class="tr-hover-visible options">
-				<a href="<?= href('user/view/'.$item['id']); ?>" title="Просмотреть"><img src="images/backend/icon-view.png" alt="Просмотреть" /></a>
+				<a href="<?= href('admin/users/view/'.$item['id']); ?>" title="Просмотреть"><img src="images/backend/icon-view.png" alt="Просмотреть" /></a>
 				<a href="<?= href('admin/users/edit/'.$item['id']); ?>" title="Редактировать"><img src="images/backend/icon-edit.png" alt="Редактировать" /></a>
 				<a href="<?= href('admin/users/ban/'.$item['id']); ?>" title="Блокировать"><img src="images/backend/icon-ban.png" alt="Блокировать" /></a>
 				<a href="<?= href('admin/users/delete/'.$item['id']); ?>" title="Удалить"><img src="images/backend/icon-delete.png" alt="Удалить" /></a>

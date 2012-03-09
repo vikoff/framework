@@ -19,6 +19,7 @@ class User_RoleModel extends ActiveRecord {
 	
 	const NOT_FOUND_MESSAGE = 'Страница не найдена';
 
+	protected $_serialization = array('data' => array('description'));
 	
 	/** ТОЧКА ВХОДА В КЛАСС (СОЗДАНИЕ НОВОГО ОБЪЕКТА) */
 	public static function create(){
@@ -61,7 +62,12 @@ class User_RoleModel extends ActiveRecord {
 	
 	/** ПОДГОТОВКА ДАННЫХ К ОТОБРАЖЕНИЮ */
 	public function beforeDisplay($data){
-	
+		
+		$data['flag_str'] = ' - ';
+		switch ($data['flag']) {
+			case self::FLAG_GUEST: $data['flag_str'] = 'роль для гостей'; break;
+			case self::FLAG_REG: $data['flag_str'] = 'роль для зарегистрировавшихся'; break;
+		}
 		return $data;
 	}
 	
@@ -71,33 +77,17 @@ class User_RoleModel extends ActiveRecord {
 		$rules = array(
 			'title' => array('required' => TRUE, 'strip_tags' => TRUE, 'length' => array('max' => 255)),
 			'level' => array('settype' => 'int'),
+			'flag' => array('settype' => 'int'),
 			'description' => array('strip_tags' => TRUE, 'length' => array('max' => 65535)),
 		);
-		
-		$fields = array();
-		switch($mode) {
 			
-			case self::SAVE_CREATE:
-				$fields = array('title', 'level', 'description');
-				break;
-			
-			case self::SAVE_EDIT:
-				$fields = array('title', 'level', 'description');
-				break;
-			
-			default: trigger_error('Неверный ключ валидатора', E_USER_ERROR);
-		}
-		
-		$fieldsRules = array();
-		foreach($fields as $f)
-			$fieldsRules[$f] = $rules[$f];
-			
-		$validator = new Validator($fieldsRules);
+		$validator = new Validator($rules);
 		
 		$validator->setFieldTitles(array(
 			'id' => 'id',
 			'title' => 'Заголовок',
 			'level' => 'Уровень',
+			'flag' => 'Флаг',
 			'description' => 'Описание',
 		));
 		
@@ -119,10 +109,10 @@ class User_RoleModel extends ActiveRecord {
 			$this->setError('Уровень должен быть числом от 1 до 49');
 			return FALSE;
 		}
-		// $data['author'] = USER_AUTH_ID;
-		// $data['modif_date'] = time();
-		// if($this->isNewObj)
-			// $data['create_date'] = time();
+		
+		// если флаг указан, очистим его у других записей
+		if (!empty($data['flag']))
+			db::get()->update(self::TABLE, array('flag' => 0), 'flag='.$data['flag']);
 	}
 	
 	/** ДЕЙСТВИЕ ПОСЛЕ СОХРАНЕНИЯ */

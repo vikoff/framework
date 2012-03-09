@@ -14,12 +14,6 @@ switch($topMenuHref){
 				'href' => $topMenuHref.'/page',
 				'active' => $r->getParts(2) == 'page',
 			),
-		
-			array(
-				'title' => 'Тестовые сущности',
-				'href' => $topMenuHref.'/test-item',
-				'active' => $r->getParts(2) == 'test-item',
-			),
 		);
 		break;
 	
@@ -69,17 +63,6 @@ switch($topMenuHref){
 				'title' => 'Блокировки',
 				'href' => $topMenuHref.'/ban',
 				'active' => $r->getParts(2) == 'ban',
-			),
-		);
-		break;
-		
-	// MODULES //
-	case 'admin/modules':
-		$items = array(
-			array(
-				'title' => 'Получение данных о&nbsp;модулях',
-				'href' => $topMenuHref.'/read-config',
-				'active' => $r->getParts(2) == 'read-config',
 			),
 		);
 		break;

@@ -82,6 +82,9 @@ class User_Acl {
 	public function saveRules($rulesRaw){
 		
 		$db = db::get();
+		
+		$db->beginTransaction();
+		
 		$db->truncate(self::TABLE);
 		
 		foreach($rulesRaw as $row => $enable){
@@ -92,6 +95,8 @@ class User_Acl {
 				'role_id' => $role_id,
 			));
 		}
+		
+		$db->commit();
 		
 		return TRUE;
 	}

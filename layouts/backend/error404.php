@@ -12,13 +12,3 @@
 <div style="text-align: center; padding: 1em;">
 	<?=$this->message;?>
 </div>
-
-<? if($this->trace): ?>
-
-	<script type="text/javascript">
-	$(function(){
-		VikDebug.print('<?= Debugger::jsEscape($this->trace) ?>', "error stack trace", {activateTab: false, onPrintAction: "none"});
-	});
-	</script>
-
-<? endif; ?>

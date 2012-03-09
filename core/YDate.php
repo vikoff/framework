@@ -18,36 +18,6 @@ class YDate{
 	/** var bool $_useMonthFullName - использовать для вывода полные имена месяцев */
 	private $_useMonthFullName = FALSE;
 	
-	public static $months = array(
-		1 => 'янв',
-		2 => 'фев',
-		3 => 'мар',
-		4 => 'апр',
-		5 => 'мая',
-		6 => 'июн',
-		7 => 'июл',
-		8 => 'авг',
-		9 => 'сен',
-		10 => 'окт',
-		11 => 'ноя',
-		12 => 'дек',
-	);
-	
-	public static $fullMonths = array(
-		1 => 'января',
-		2 => 'февраля',
-		3 => 'марта',
-		4 => 'апреля',
-		5 => 'мая',
-		6 => 'июня',
-		7 => 'июля',
-		8 => 'августа',
-		9 => 'сентября',
-		10 => 'октября',
-		11 => 'ноября',
-		12 => 'декабря',
-	);
-	
 	// СПИСОК МЕСЯЦЕВ
 	// именительный длинный
 	public static $_monthsNomFull = array(1 => 'январь',2 => 'февраль', 3 => 'март', 4 => 'апрель', 5 => 'май', 6 => 'июнь', 7 => 'июль', 8 => 'август', 9 => 'сентябрь', 10 => 'октябрь', 11 => 'ноябрь', 12 => 'декабрь');
@@ -406,7 +376,7 @@ class YDate{
 	public static function getMonthName($index){
 		
 		$index = (int)$index; // преобразует 01 в 1
-		return (isset(self::$months[$index]) ? self::$months[$index] : '');
+		return (isset(self::$_monthsNomFull[$index]) ? self::$_monthsNomFull[$index] : '');
 	}
 	
 	public static function getMonthFullName($index){
@@ -418,7 +388,7 @@ class YDate{
 	// ПОЛУЧИТЬ ИНДЕКС МЕСЯЦА ПО НАЗВАНИЮ
 	public static function getMonthIndex($name){
 		$name = (string)$name;
-		return (int)(in_array($name, self::$months) ? array_search($name, self::$months) : 0);
+		return (int)(in_array($name, self::$_monthsNomFull) ? array_search($name, self::$_monthsNomFull) : 0);
 	}
 	
 	// ПЕРЕВОД TIMESTAMP В ТЕКСТОВОЕ ЗНАЧЕНИЕ ДАТЫ
@@ -554,7 +524,7 @@ class YDate{
 	// ПОЛУЧИТЬ HTML СПИСОК МЕСЯЦЕВ ДЛЯ ТЭГА <SELECT>
 	public static function getMonthsList($selected = ''){
 		$output = '';
-		foreach(self::$months as $index => $name)
+		foreach(self::$_monthsNomFull as $index => $name)
 			$output .= '<option value="'.$index.'"'.(($index == $selected || $name == $selected) ? ' selected' : '').'>'.$name.'</option>';
 		return $output;
 	}

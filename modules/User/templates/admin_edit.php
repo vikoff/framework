@@ -1,4 +1,8 @@
 
+<div class="options-row">
+	<a href="<?= $this->href('admin/users'); ?> ">вернуться к списку</a>
+</div>
+
 <h2>Пользователь #<?= $this->instanceId; ?> <?= $this->login; ?></h2>
 
 <h3>Редактирование данных</h3>
@@ -6,7 +10,7 @@
 	<?= FORMCODE; ?>	
 	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
 	
-	<table class="grid" style="margin: 1em 0;">
+	<table class="grid left" style="margin: 1em 0;">
 	<tr>
 		<th>id</th>
 		<td><?= $this->id; ?></td>
@@ -24,16 +28,16 @@
 		<td><?= Html_Form::inputText(array('name' => 'email', 'value' => $this->email)); ?></td>
 	</tr>
 	<tr>
+		<th>Роль</th>
+		<td><?= Html_Form::select(array('name' => 'role_id'), $this->rolesList, $this->role_id); ?></td>
+	</tr>
+	<tr>
 		<th>Фамилия</th>
 		<td><?= Html_Form::inputText(array('name' => 'surname', 'value' => $this->surname)); ?></td>
 	</tr>
 	<tr>
 		<th>Имя</th>
 		<td><?= Html_Form::inputText(array('name' => 'name', 'value' => $this->name)); ?></td>
-	</tr>
-	<tr>
-		<th>Роль</th>
-		<td><?= Html_Form::select(array('name' => 'role_id'), $this->rolesList, $this->role_id); ?></td>
 	</tr>
 
 	<tr>

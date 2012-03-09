@@ -1,81 +1,132 @@
 
 <ul id="submit-box-floating"></ul>
 
+<h2>Редактирование личных данных</h2>
+
 <form id="edit-form" action="" method="post">
 	<?= FORMCODE; ?>	
-	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
 	
-	<table id="edit-form-table">
+	<table id="edit-form-table" class="grid" style="margin: 1em auto; text-align: left;">
 	<tr>
-		<td class="title" colspan="2"><?= $this->pageTitle; ?></td>
+		<th>id</th>
+		<td>#<?= $this->id; ?></td>
 	</tr>
 	<tr>
-		<th>login</th>
-		<td><?= Html_Form::inputText(array('name' => 'login', 'value' => $this->login)); ?></td>
+		<th>логин</th>
+		<td><?= $this->login; ?></td>
 	</tr>
 	<tr>
-		<th>password</th>
-		<td><?= Html_Form::inputText(array('name' => 'password', 'value' => $this->password)); ?></td>
+		<th>роль</th>
+		<td><?= $this->role_str; ?></td>
 	</tr>
 	<tr>
-		<th>surname</th>
+		<th>Фамилия</th>
 		<td><?= Html_Form::inputText(array('name' => 'surname', 'value' => $this->surname)); ?></td>
 	</tr>
 	<tr>
-		<th>name</th>
+		<th>Имя</th>
 		<td><?= Html_Form::inputText(array('name' => 'name', 'value' => $this->name)); ?></td>
 	</tr>
 	<tr>
-		<th>patronymic</th>
+		<th>Отчество</th>
 		<td><?= Html_Form::inputText(array('name' => 'patronymic', 'value' => $this->patronymic)); ?></td>
 	</tr>
 	<tr>
-		<th>sex</th>
-		<td><?= Html_Form::inputText(array('name' => 'sex', 'value' => $this->sex)); ?></td>
+		<th>Пол</th>
+		<td><?= Html_Form::select(array('name' => 'gender'), array('m' => 'мужчина', 'f' => 'женщина'), $this->gender); ?></td>
 	</tr>
 	<tr>
-		<th>birthdate</th>
-		<td><?= Html_Form::inputText(array('name' => 'birthdate', 'value' => $this->birthdate)); ?></td>
+		<th>Дата рождения</th>
+		<td>
+			число <select name="birth[day]"><option value=""></option><?= $this->birth->getDaysListCurActive(); ?></select>
+			месяц <select name="birth[month]"><option value=""></option><?= $this->birth->getMonthsListCurActive(); ?></select>
+			год <select name="birth[year]"><option value=""></option><?= $this->birth->getYearsListCurActive(); ?></select>
+		</td>
 	</tr>
 	<tr>
-		<th>country</th>
+		<th>Страна</th>
 		<td><?= Html_Form::inputText(array('name' => 'country', 'value' => $this->country)); ?></td>
 	</tr>
 	<tr>
-		<th>city</th>
+		<th>Город</th>
 		<td><?= Html_Form::inputText(array('name' => 'city', 'value' => $this->city)); ?></td>
 	</tr>
 	<tr>
-		<th>level</th>
-		<td><?= Html_Form::inputText(array('name' => 'level', 'value' => $this->level)); ?></td>
+		<th>Адрес</th>
+		<td><?= Html_Form::textarea(array('name' => 'address', 'value' => $this->address, 'style' => 'width: 300px; height: 50px;')); ?></td>
 	</tr>
 	<tr>
-		<th>active</th>
-		<td><?= Html_Form::inputText(array('name' => 'active', 'value' => $this->active)); ?></td>
+		<th>Почтовый индекс</th>
+		<td><?= Html_Form::inputText(array('name' => 'post_index', 'value' => $this->post_index)); ?></td>
 	</tr>
 	<tr>
-		<th>regdate</th>
-		<td><?= Html_Form::inputText(array('name' => 'regdate', 'value' => $this->regdate)); ?></td>
+		<th>Телефон</th>
+		<td><?= Html_Form::inputText(array('name' => 'tel', 'value' => $this->tel)); ?></td>
+	</tr>
+	<tr>
+		<th>ICQ</th>
+		<td><?= Html_Form::inputText(array('name' => 'icq', 'value' => $this->icq)); ?></td>
+	</tr>
+	<tr>
+		<th>Skype</th>
+		<td><?= Html_Form::inputText(array('name' => 'skype', 'value' => $this->skype)); ?></td>
+	</tr>
+	<tr>
+		<th>Jabber</th>
+		<td><?= Html_Form::inputText(array('name' => 'jabber', 'value' => $this->jabber)); ?></td>
+	</tr>
+	<tr>
+		<th>Страница vkontakte.ru</th>
+		<td><?= Html_Form::inputText(array('name' => 'vk_page', 'value' => $this->vk_page)); ?></td>
+	</tr>
+	<tr>
+		<th>Сайт</th>
+		<td><?= Html_Form::inputText(array('name' => 'site', 'value' => $this->site)); ?></td>
 	</tr>
 
-	<tr id="submit-box">
-		<td class="actions" colspan="2">
-			<input id="submit-save" class="button" type="submit" name="action[admin/user/save][admin/content/user/list]" value="Сохранить" title="Созхранить изменения и вернуться к списку" />
-			<input id="submit-apply" class="button" type="submit" name="action[admin/user/save][admin/content/user/edit/<?= $this->instanceId ? $this->instanceId : '(%id%)' ; ?>]" value="Применить" title="Сохранить изменения и продолжить редактирование" />
-			<a id="submit-cancel" class="button" href="<?= href('admin/content/user/list'); ?>" title="Отменить все изменения и вернуться к списку">отмена</a>
-			<? if($this->instanceId): ?>			
-				<a id="submit-delete" class="button" href="<?= href('admin/content/user/delete/'.$this->instanceId); ?>" title="Удалить запись">удалить</a>
-				<a id="submit-copy" class="button" href="<?= href('admin/content/user/copy/'.$this->instanceId); ?>" title="Сделать копию записи">копировать</a>
-			<? endif; ?>		</td>
+	<tr>
+		<td colspan="2" style="text-align: center;">
+			<input class="button" type="submit" name="action[user/profile/edit]" value="Сохранить" />
+			<a class="button" href="<?= href(''); ?>">отмена</a>
+		</td>
 	</tr>
 	</table>
 </form>
 
-<script type="text/javascript">
+<br />
 
-$(function(){
-	$("#edit-form").validate( { <?= $this->validation; ?> } );
-	enableFloatingSubmits();
-});
+<h2>Изменение пароля</h2>
 
-</script>
+
+<? if ($this->passwordMessage): ?>
+	<div id="password-change-message"><?= $this->passwordMessage; ?></div>
+	<script type="text/javascript">
+	$(function(){
+		$(document).scrollTop($('#password-change-message').offset().top);
+	});
+	</script>
+<? endif; ?>
+
+<form action="" method="post">
+	<?= FORMCODE; ?>	
+	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
+	
+	<table class="grid" style="margin: 1em auto; text-align: left;">
+		<tr>
+			<th>Старый пароль</th>
+			<td><input type="password" name="old-password" value="" />
+		</tr>
+		<tr>
+			<th>Новый пароль</th>
+			<td><input type="password" name="new-password" value="" />
+		</tr>
+		<tr>
+			<th>Подтверждения пароля</th>
+			<td><input type="password" name="new-password-confirm" value="" />
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align: center;">
+				<input type="submit" name="action[user/profile/change-password]" class="button" value="Применить" />
+			</td>
+	</table>
+</form>

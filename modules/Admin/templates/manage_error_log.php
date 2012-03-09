@@ -1,16 +1,17 @@
 
-<?=$pagination;?>
 
-<?
-if(getVar($collection)){
+<? if ($this->collection): ?>
+	
+	<?= $this->pagination; ?>
 
-	foreach($collection as $item)
-		echo $item;
-		
-}else{
-	echo 'Запесей не найдено';
-}
-?>
+	<? foreach ($this->collection as $item): ?>
+		<?= $item; ?>
+	<? endforeach; ?>
+	
+	<?= $this->pagination; ?>
+	
+<? else: ?>
+	Запесей не найдено
+<? endif; ?>
 
-<?=$pagination;?>
 

@@ -4,16 +4,16 @@
 <form id="edit-form" action="" method="post">
 	<?= FORMCODE; ?>	
 	
-	<table class="grid" style="margin: 1em 0;">
+	<table class="grid left">
 	<tr>
 		<th class="title" colspan="2">Создание нового пользователя</th>
 	</tr>
 	<tr>
-		<th>Логин</th>
-		<td><?= Html_Form::inputText(array('id' => 'input-login', 'name' => 'login', 'value' => $this->login)); ?></td>
+		<th>Логин <span class="required">*</span></th>
+		<td><?= Html_Form::inputText(array('name' => 'login', 'value' => $this->login)); ?></td>
 	</tr>
 	<tr>
-		<th>Пароль</th>
+		<th>Пароль <span class="required">*</span></th>
 		<td>
 			<label><input type="radio" name="pass_type" value="input"> Ввести</label><br />
 			<label><input type="radio" name="pass_type" value="generate"> Сгенерировать автоматически</label><br />
@@ -40,20 +40,20 @@
 		</td>
 	</tr>
 	<tr>
-		<th>email</th>
-		<td><?= Html_Form::input(array('type' => 'text', 'name' => 'email', 'value' => $this->email)); ?></td>
+		<th>Роль <span class="required">*</span></th>
+		<td><?= Html_Form::select(array('name' => 'role_id'), $this->rolesList, $this->role_id); ?></td>
 	</tr>
 	<tr>
-		<th>Имя</th>
-		<td><?= Html_Form::inputText(array('name' => 'name', 'value' => $this->name)); ?></td>
+		<th>email</th>
+		<td><?= Html_Form::input(array('type' => 'text', 'name' => 'email', 'value' => $this->email)); ?></td>
 	</tr>
 	<tr>
 		<th>Фамилия</th>
 		<td><?= Html_Form::inputText(array('name' => 'surname', 'value' => $this->surname)); ?></td>
 	</tr>
 	<tr>
-		<th>Роль</th>
-		<td><?= Html_Form::select(array('name' => 'role_id'), $this->rolesList, $this->role_id); ?></td>
+		<th>Имя</th>
+		<td><?= Html_Form::inputText(array('name' => 'name', 'value' => $this->name)); ?></td>
 	</tr>
 
 	<tr>

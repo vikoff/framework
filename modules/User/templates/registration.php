@@ -5,8 +5,6 @@
 	
 	<h3>Регистрация нового пользователя</h3>
 	
-	<?= $this->_getUserMessagesHTML(); ?>
-	
 	<table class="reg-box" border>
 
 		<tr>
@@ -14,11 +12,11 @@
 			<td><?= Html_Form::inputText(array('name' => 'login', 'value' => $this->login)); ?></td>
 		</tr>
 		<tr>
-			<td class="left">Пароль<span class="required">*</span><br />(не менее 5 символов):</td>
+			<td class="left">Пароль:<span class="required">*</span></td>
 			<td><?= Html_Form::input(array('type' => 'password', 'name' => 'password', 'value' => $this->password)); ?></td>
 		</tr>
 		<tr>
-			<td class="left">Подтверждение пароля:<span class="required">*</span></td>
+			<td class="left">Подтверждение<br />пароля:<span class="required">*</span></td>
 			<td><?= Html_Form::input(array('type' => 'password', 'name' => 'password_confirm', 'value' => $this->password_confirm)); ?></td>
 		</tr>
 		<tr>
@@ -35,7 +33,7 @@
 		</tr>
 		
 		<tr>
-			<td class="left">Введите цифры с картинки:</td>
+			<td class="left">Введите<br />цифры с картинки:<span class="required">*</span></td>
 			<td>
 				<div class="captcha-box">
 					<img id="captcha" src="libs/captcha/captcha.php"/>

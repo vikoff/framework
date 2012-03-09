@@ -14,12 +14,12 @@ class Admin_Controller extends Controller{
 	public $methodResources = array(
 	
 		'display_content'   => 'content',
-		'display_config'    => 'content',
-		'display_users'     => 'content',
-		'display_manage'    => 'content',
+		'display_config'    => 'config',
+		'display_manage'    => 'manage',
 		
-		'action_read_modules_config' => 'content',
-		'action_make_fs_snapshot' => 'content',
+		'action_read_modules_config' => 'manage',
+		'action_make_fs_snapshot' => 'manage',
+		'action_error_delete_item' => 'manage',
 	);
 	
 	/**
@@ -41,7 +41,7 @@ class Admin_Controller extends Controller{
 	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
 	public function checkResourcePermission($resource){
 		
-		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
+		return User_Acl::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
 	/**
@@ -150,7 +150,7 @@ class Admin_Controller extends Controller{
 
 		if(empty($section)){
 			$viewer
-				->setContentHtmlFile(self::TPL_PATH.'manage_index.tpl')
+				->setContentHtmlFile(self::TPL_PATH.'manage_index.php')
 				->render();
 			exit();
 		}
@@ -195,18 +195,21 @@ class Admin_Controller extends Controller{
 	/** SNIPPET ERROR LOG */
 	public function snippet_error_log(){
 		
-		$collection = new ErrorCollection();
+		$collection = new Error_Collection();
 		$variables = array(
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
 		);
 		BackendLayout::get()
-			->setContentPhpFile(self::TPL_PATH.'manage_error_log.php', $variables);
+			->prependTitle('Лог ошибок')
+			->setContentPhpFile(self::TPL_PATH.'manage_error_log.php', $variables)
+			->render();
 	}
 	
 	public function snippet_fs_snapshot(){
 		
 		BackendLayout::get()
+			->prependTitle('Снимок файловой системы')
 			->setContentPhpFile(self::TPL_PATH.'manage_fs_snapshot.php')
 			->render();
 	}
@@ -257,6 +260,19 @@ class Admin_Controller extends Controller{
 		UserStatistics::get()->deleteOldStatistics($expiredValues[$expire]);
 		Messenger::get()->addSuccess('Старая статистика удалена.');
 		return TRUE;
+	}
+	
+	public function action_error_delete_item(){
+		
+		$id = getVar($_POST['id'], 0, 'int');
+		try{
+			Error_Model::load($id)->destroy();
+			Messenger::get()->addSuccess('Запись удалена');
+			return TRUE;
+		}catch(Exception $e){
+			Messenger::get()->addError('Не удалось удалить запись', $e->getMessage());
+			return FALSE;
+		}
 	}
 	
 	////////////////////

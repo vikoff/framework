@@ -353,7 +353,7 @@ class Layout{
 			$this->$k = $v;
 			
 		ob_start();
-		include($file);
+		include(FS_ROOT.$file);
 		
 		foreach($variables as $k => $v)
 			unset($this->$k);

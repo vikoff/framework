@@ -5,7 +5,8 @@ class Page_Controller extends Controller{
 	/** имя модуля */
 	const MODULE = 'page';
 	
-	const DEFAULT_VIEW = 'main';
+	const DEFAULT_VIEW_GUEST = 'main';
+	const DEFAULT_VIEW_USER = 'main-howto';
 	
 	/** путь к шаблонам (относительно FS_ROOT) */
 	const TPL_PATH = 'modules/Page/templates/';
@@ -22,7 +23,7 @@ class Page_Controller extends Controller{
 	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
 	public function checkResourcePermission($resource){
 		
-		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
+		return User_Acl::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
 	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
@@ -48,7 +49,7 @@ class Page_Controller extends Controller{
 	public function display_view($pageAlias = null){
 		
 		if (empty($pageAlias))
-			$pageAlias = self::DEFAULT_VIEW;
+			$pageAlias = CurUser::get()->isLogged() ? self::DEFAULT_VIEW_USER : self::DEFAULT_VIEW_GUEST;
 		
 		$variables = Page_Model::LoadByAlias($pageAlias)->GetAllFieldsPrepared();
 		FrontendLayout::get()

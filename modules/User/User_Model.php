@@ -6,9 +6,8 @@ class User_Model extends ActiveRecord{
 	const SAVE_ADMIN_EDIT   = 'adm-edit';
 	const SAVE_ADMIN_PASS   = 'adm-pass';
 	const SAVE_REGISTER     = 'reg';
-	const SAVE_EDIT   	    = 'reg';
+	const SAVE_EDIT   	    = 'edit';
 	const SAVE_PASS         = 'pass';
-	
 	
 	// пол
 	const GENDER_FEMALE 	= 'f';
@@ -107,12 +106,12 @@ class User_Model extends ActiveRecord{
 		return $validator;
 	}
 	
-	public function preValidation(&$data){
+	public function preValidation(&$data, $mode = null){
 		
 		$data['birthdate'] = !empty($data['birth']) ? YDate::loadArray($data['birth'])->getDbDate() : '0000-00-00';
 	}
 	
-	public function postValidation(&$data){
+	public function postValidation(&$data, $mode = null){
 		
 		if (!empty($data['email']) && self::isEmailInUse($data['email'], $this->id)){
 			$this->setError('Данные email-адрес уже используется');
@@ -148,16 +147,16 @@ class User_Model extends ActiveRecord{
 		
 		for($i = 0; $i < strlen($name); $i++){
 			if($name{$i} == 'f')
-				$outputArr[] = $this->getField('surname');
+				$outputArr[] = $this->surname;
 			elseif($name{$i} == 'i')
-				$outputArr[] = $this->getField('name');
+				$outputArr[] = $this->name;
 			elseif($name{$i} == 'o')
-				$outputArr[] = ''; //$this->getField('patronymic');
+				$outputArr[] = ''; //$this->patronymic;
 			else
 				trigger_error('Неизвестный код имени: "'.$name{$i}.'"', E_USER_ERROR);
 		}
 		$output = trim(implode(' ', $outputArr));
-		return strlen($output) ? $output : $this->getField('login');
+		return strlen($output) ? $output : $this->login;
 	}
 	
 	/** УСТАНОВИТЬ НОВЫЙ ПАРОЛЬ */
@@ -168,37 +167,12 @@ class User_Model extends ActiveRecord{
 			return FALSE;
 		}
 		
-		if(sha1($oldPassword) != db::get()->getOne('SELECT password FROM '.self::TABLE.' WHERE id='.$this->getField('id'), '')){
+		if(sha1($oldPassword) != $this->password){
 			$this->setError('Вы неверно ввели старый пароль');
 			return FALSE;
 		}
 		
-		db::get()->update(self::TABLE, array('password' => sha1($newPassword)), 'id='.$this->getField('id'));
-		return TRUE;
-	}
-	
-	/** УСТАНОВИТЬ НОВЫЙ УРОВЕНЬ ПРАВ */
-	public function setPerms($newPerms){
-	
-		if(!in_array($newPerms, self::getPermsList())){
-			$this->setError('Неверный идентификатор пользовательских прав "'.$newPerms.'"');
-			return FALSE;
-		}
-		
-		if($this->getField('level') > USER_AUTH_PERMS){
-			$this->setError('Невозможно изменять права пользователю, с правами выше текущего.');
-			return FALSE;
-		}
-		
-		if($newPerms == 0 || $newPerms > USER_AUTH_PERMS){
-			$this->setError('Невозможно присвоить пользователю уровень прав "'.self::getPermName($newPerms).'"');
-			return FALSE;
-		}
-		
-		$this
-			->setField('level', $newPerms)
-			->_save();
-		
+		db::get()->update(self::TABLE, array('password' => sha1($newPassword)), 'id='.$this->id);
 		return TRUE;
 	}
 	
@@ -222,6 +196,7 @@ class User_Model extends ActiveRecord{
 	
 	/** ТЕКСТОВОЕ ЗНАЧЕНИЕ ПАРАМЕТРА "ПОЛ ПОЛЬЗОВАТЕЛЯ" */
 	public static function getGenderString($gender){
+		
 		if($gender == self::GENDER_FEMALE)
 			return 'женщина';
 		elseif($gender == self::GENDER_MALE)
@@ -258,6 +233,20 @@ class User_Collection extends ARCollection {
 		'regdate' => 'Дата регистрации',
 	);
 	
+	
+	/** ТОЧКА ВХОДА В КЛАСС */
+	public static function load($filters = array(), $options = array()){
+			
+		return new User_Collection($filters, $options);
+	}
+	
+	/** КОНСТРУКТОР */
+	public function __construct($filters = array(), $options = array()){
+		
+		$this->_filters = $filters;
+		$this->_options = $options;
+	}
+	
 	/** ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ */
 	public function getPaginated(){
 		
@@ -276,6 +265,16 @@ class User_Collection extends ARCollection {
 		return $data;
 	}
 	
+	public function getAll(){
+		
+		$where = $this->_getSqlFilter();
+		$data = db::get()->getAllIndexed('SELECT * FROM '.User_Model::TABLE.' '.$where, 'id', array());
+		
+		foreach($data as &$row)
+			$row = User_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
+		
+		return $data;
+	}
 }
 
 ?>

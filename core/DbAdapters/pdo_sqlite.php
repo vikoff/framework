@@ -6,10 +6,12 @@ class DbAdapter_pdo_sqlite extends DbAdapter{
 	public function connect(){
 		
 		$start = microtime(1);
-		
-		$this->_dbrs = new PDO('sqlite:'.$this->connDatabase)or $this->error('Невозможно подключиться к базе данных');
-		$this->_connected = TRUE;
-		
+		try {
+			$this->_dbrs = new PDO('sqlite:'.$this->connDatabase);
+			$this->_connected = TRUE;
+		} catch (PDOException $e) {
+			$this->error('Невозможно подключиться к базе данных: '.$e->getMessage());
+		}
 		$this->_saveConnectTime(microtime(1) - $start);
 	}
 
@@ -192,8 +194,12 @@ class DbAdapter_pdo_sqlite extends DbAdapter{
 		
 		foreach($fieldsValues as $field => $value){
 			$fields[] = $this->quoteFieldName($field);
-			$values[] = $value;
-			$valuePhs[] = '?';
+			if (is_object($value)) {
+				$valuePhs[] = $value;
+			} else {
+				$values[] = $value;
+				$valuePhs[] = '?';
+			}
 		}
 		
 		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES ('.implode(',', $valuePhs).')';
@@ -214,8 +220,12 @@ class DbAdapter_pdo_sqlite extends DbAdapter{
 		$update_arr = array();
 		$bind_arr = array();
 		foreach($fieldsValues as $field => $value) {
-			$update_arr[] = $this->quoteFieldName($field).'=?';
-			$bind_arr[] = $value;
+			if (is_object($value)) {
+				$update_arr[] = $this->quoteFieldName($field).'='.$value;
+			} else {
+				$update_arr[] = $this->quoteFieldName($field).'=?';
+				$bind_arr[] = $value;
+			}
 		}
 	
 		if(!strlen($where))
