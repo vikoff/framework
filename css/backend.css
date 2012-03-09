@@ -70,11 +70,13 @@ td#body-left{
 }
 #left-menu-container{
 	position: relative;
+	left: 1px;
 	z-index: 10;
 	background-color: #555;
 	border: solid 5px #555;
 	border-right-style: none;
 	padding: 5px;
+	padding-right: 0px;
 	-moz-border-radius-topleft: 4px;
 	-webkit-border-top-left-radius: 4px;
 	border-top-left-radius: 4px;
@@ -90,6 +92,7 @@ box-shadow: -2px 2px 2px 0px #aaaaaa;
 	display: block;
 	margin: -1px 0px 0px;
 	padding: 8px 2px;
+	padding-right: 5px;
 	border-top: dashed 1px #888;
 	border-bottom: dashed 1px #888;
 	text-decoration: none;
@@ -105,7 +108,7 @@ box-shadow: -2px 2px 2px 0px #aaaaaa;
 	border-right-style: none;
 	color: #555;
 	margin-left: -6px;
-	margin-right: -6px;
+	/* margin-right: -6px; */
 	padding-left: 8px;
 	-webkit-border-top-left-radius: 8px;
 	-webkit-border-bottom-left-radius: 8px;
@@ -579,3 +582,14 @@ table#user-input-data-box td{
 	font-size: 11px;
 }
 .messages-list .text{}
+
+table.user-stat-pages{ 
+	text-align: left;
+}
+table.user-stat-pages th{ 
+	text-align: center;
+}
+.user-stat-pages td.active{
+	background-color: #D3F9D3;
+	color: green;
+}

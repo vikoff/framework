@@ -5,8 +5,7 @@ class Page_Controller extends Controller{
 	/** имя модуля */
 	const MODULE = 'page';
 	
-	const DEFAULT_VIEW_GUEST = 'main';
-	const DEFAULT_VIEW_USER = 'main-howto';
+	const DEFAULT_VIEW = 'main';
 	
 	/** путь к шаблонам (относительно FS_ROOT) */
 	const TPL_PATH = 'modules/Page/templates/';
@@ -49,7 +48,7 @@ class Page_Controller extends Controller{
 	public function display_view($pageAlias = null){
 		
 		if (empty($pageAlias))
-			$pageAlias = CurUser::get()->isLogged() ? self::DEFAULT_VIEW_USER : self::DEFAULT_VIEW_GUEST;
+			$pageAlias = self::DEFAULT_VIEW;
 		
 		$variables = Page_Model::LoadByAlias($pageAlias)->GetAllFieldsPrepared();
 		FrontendLayout::get()

@@ -1,5 +1,4 @@
 
-
 <? if ($this->collection): ?>
 	
 	<?= $this->pagination; ?>
@@ -13,5 +12,3 @@
 <? else: ?>
 	Запесей не найдено
 <? endif; ?>
-
-

@@ -1,6 +1,6 @@
 <p>
 	<div style="float: right;">
-		<a class="button" href="{a href=admin/manage/user-statistics/delete; ?>">Очистить статистику</a>
+		<a class="button" href="<?= $this->href('admin/manage/user-statistics/delete'); ?>">Очистить статистику</a>
 	</div>
 	<div class="clear"> </div>
 </p>
@@ -63,10 +63,47 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 }
 </style>
 
-<?= $this->pagination; ?>
+<form method="get" action="" class="paragraph">
+	
+	<? if (!empty($_GET['sort'])): ?>
+		<input type="hidden" name="sort" value="<?= $_GET['sort'] ?>" />
+	<? endif; ?>
+	
+	<table class="small-grid" style="margin: 5px 0 1em; text-align: center;">
+		<legend style="font-weight: bold;">Фильтр</legend>
+		<tr>
+			<td>Пользователи:</td>
+			<td>IP адреса:</td>
+			<td>Браузеры:</td>
+			<td rowspan="2">
+				<input class="button-small" type="submit" value="Применить"><br /><br />
+				<a class="button-small" href="<?= $this->href('admin/manage/user-statistics'); ?>">Сбросить</a>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<?= Html_Form::select(array('name' => 'users[]', 'multiple' => 'multiple', 'size' => 6),
+					array('0' => 'Все', '-1' => 'Гости') + $this->filters['users'],
+					getVar($_GET['users'])); ?>
+			</td>
+			<td>
+				<?= Html_Form::select(array('name' => 'ips[]', 'multiple' => 'multiple', 'size' => 6),
+					array('0' => 'Все') + $this->filters['ips'],
+					getVar($_GET['ips'])); ?>
+			</td>
+			<td>
+				<?= Html_Form::select(array('name' => 'browsers[]', 'multiple' => 'multiple', 'size' => 6),
+					array('0' => 'Все', '-1' => 'Не определенные') + $this->filters['browsers'],
+					getVar($_GET['browsers'])); ?>
+			</td>
+		</tr>
+	</table>
+</form>
 
 <? if ($this->collection): ?>
-
+	
+	<?= $this->pagination; ?>
+	
 	<table class="grid statistics" style="text-align: center;">
 	<thead>
 	<tr>
@@ -91,10 +128,14 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 				-
 			<? endif; ?>
 		</td>
-		<td><a href="<?= href('users/view/'.$item['uid']); ?>"><?= $item['login']; ?></a></td>
-		<td style="text-align: left;"><?= $item['user_ip']; ?></td>
-		<td><?= $item['has_js'] ? $item['browser_name'].'&nbsp;'.$item['browser_version'] : '-'; ?></td>
-		<td><?= $item['has_js'] ? $item['screen_width'].'x'.$item['screen_height'] : '-'; ?></td>
+		<td style="white-space: nowrap;"><a href="<?= href('admin/users/view/'.$item['uid']); ?>"><?= $item['login']; ?></a></td>
+		<td style="text-align: left;" class="grey"><?= $item['user_ip']; ?></td>
+		<? if ($item['has_js']): ?>
+			<td><?= $item['has_js'] ? $item['browser_name'].'&nbsp;'.$item['browser_version'] : '-'; ?></td>
+			<td><?= $item['has_js'] ? $item['screen_width'].'x'.$item['screen_height'] : '-'; ?></td>
+		<? else: ?>
+			<td colspan="2" class="grey"><?= $item['user_agent_raw']; ?></td>
+		<? endif; ?>
 		<td rowspan="4" class="detail">
 			<a href="<?= href('admin/manage/user-statistics/view/'.$item['id']); ?>">Подробней</a>
 		</td>
@@ -118,7 +159,7 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 		</td>
 	</tr>
 	<tr class="urls" style="">
-		<td class="grey"><?= $item['pages_info']['last_page_time']; ?></td>
+		<td><?= $item['pages_info']['last_page_time']; ?></td>
 		<td class="grey" style="text-align: right;">Последняя</td>
 		<td colspan="4">
 			<? if (strlen($item['pages_info']['last_page']) > 80): ?>

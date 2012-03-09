@@ -1,4 +1,9 @@
 
+<Files db.pdo_sqlite>
+	order allow,deny
+	deny from all
+</Files>
+ 
 Options -Indexes
 
 RewriteEngine On

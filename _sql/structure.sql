@@ -8,12 +8,13 @@ CREATE TABLE `users` (
 	`surname`		VARCHAR(255),
 	`name`			VARCHAR(255),
 	`patronymic`	VARCHAR(255),
-	`sex`			VARCHAR(10),
-	`birthdate` 	VARCHAR(15),
+	`gender`		CHAR(1),
+	`birthdate` 	DATE,
 	`country` 		VARCHAR(255),
 	`city`		 	VARCHAR(255),
-	`level`			SMALLINT,
-	`active` 		CHAR(1),
+	`role_id`		SMALLINT,
+	`profile`		TEXT,
+	`last_login`	INT(10) UNSIGNED,
 	`regdate`		INT(10) UNSIGNED
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -23,12 +24,13 @@ CREATE TABLE `user_roles` (
 	`id` 			INTEGER UNSIGNED PRIMARY KEY AUTO_INCREMENT,
 	`title`			VARCHAR(255) NOT NULL,
 	`level`			SMALLINT NOT NULL,
-	`description`	TEXT
+	`flag`			INT,
+	`data`			TEXT
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /* ТАБЛИЦА УПРАВЛЕНИЯ ДОСТУПОМ */
-DROP TABLE IF EXISTS `user_access`;
-CREATE TABLE `user_access` (
+DROP TABLE IF EXISTS `user_acl`;
+CREATE TABLE `user_acl` (
 	`role_id`		INTEGER UNSIGNED NOT NULL,
 	`module` 		CHAR(30),
 	`resource` 		CHAR(30)
@@ -92,7 +94,9 @@ CREATE TABLE `user_stat_pages` (
   `session_id`		INT(10) UNSIGNED,
   `url`				TEXT,
   `is_ajax`			BOOLEAN,
+  `is_post`			BOOLEAN,
   `post_data`		TEXT,
+  `post_action`		TEXT,
   `date`			INT(10) UNSIGNED
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 

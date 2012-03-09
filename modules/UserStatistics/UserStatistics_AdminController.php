@@ -37,14 +37,15 @@ class UserStatistics_AdminController extends Controller{
 	// DISPLAY LIST (ADMIN)
 	public function display_list($params = array()){
 		
-		$collection = new UserStatistics_Collection();
+		$collection = new UserStatistics_Collection($_GET);
 		$variables = array(
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
 			'sorters' => $collection->getSortableLinks(),
-			'sortArr' => $collection->getSortArray(),
+			'filters' => $collection->getFiltersLists(),
 		);
 		
+		// echo '<pre>'; print_r($variables['collection']); die;
 		BackendLayout::get()
 			->setLinkTags($collection->getLinkTags())
 			->setContentPhpFile(self::TPL_PATH.'admin_list.php', $variables)

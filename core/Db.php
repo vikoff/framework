@@ -1,4 +1,4 @@
-<?
+<?php
 
 /**
  * класс для работы с базой данных
@@ -399,6 +399,24 @@ abstract class DbAdapter {
 	public function truncate($table){
 		
 		$this->query('TRUNCATE TABLE '.$table);
+	}
+	
+	/** НАЧАТЬ ТРАНЗАКЦИЮ */
+	public function beginTransaction(){
+		
+		$this->query('BEGIN');
+	}
+	
+	/** ПРИМЕНИТЬ ТРАНЗАКЦИЮ */
+	public function commit(){
+		
+		$this->query('COMMIT');
+	}
+	
+	/** ОТКАТИТЬ ТРАНЗАКЦИЮ */
+	public function rollBack(){
+		
+		$this->query('ROLLBACK');
 	}
 	
 	/**

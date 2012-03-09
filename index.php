@@ -1,4 +1,4 @@
-<?
+<?php
 session_start();
 
 // обозначение корня ресурса
@@ -10,14 +10,12 @@ define('FS_ROOT', realpath('.').DIRECTORY_SEPARATOR);
 /** определение ajax-запроса */
 define('AJAX_MODE', isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 
-/** контроллер отображения по умолчанию */
-define('DEFAULT_CONTROLLER', 'page');
-
 /** индекс файл */
 define('INDEX_FILE', basename(__FILE__));
 
 /** режим работы сайта */
 define('RUN_MODE', 'dev');
+// define('RUN_MODE', 'production');
 
 // отправка Content-type заголовка
 header('Content-Type: text/html; charset=utf-8');
@@ -30,6 +28,9 @@ Request::get();
 
 // сохранение статистики
 UserStatistics_Model::get()->savePrimaryStatistics();
+
+/** контроллер отображения по умолчанию */
+define('DEFAULT_CONTROLLER', 'page');
 
 // выполнение приложения
 if(AJAX_MODE)

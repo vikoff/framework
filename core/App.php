@@ -1,4 +1,5 @@
-<?
+<?php
+
 /**
  * Фронт-контроллер приложения. 
  * 
@@ -70,7 +71,7 @@ class App {
 		if($this->_checkDisplay())
 			exit;
 		
-		$this->error404();
+		$this->error404('Страница '.Request::get()->getString().' не найдена');
 	}
 	
 	/** ЗАПУСК ПРИЛОЖЕНИЯ В AJAX-РЕЖИМЕ */
@@ -85,7 +86,7 @@ class App {
 		if($this->_checkDisplay())
 			exit;
 		
-		$this->error404($this->_requestModuleName);
+		$this->error404('Страница '.Request::get()->getString().' не найдена');
 	}
 	
 	/**
@@ -304,11 +305,9 @@ class App {
 		// сформировать валидный URL
 		$r = isset($copyOfGet['r']) ? $copyOfGet['r'] : '';
 		unset($copyOfGet['r']);
-		$qs = array();
-		foreach($copyOfGet as $k => $v)
-			$qs[] = $k.'='.$v;
+		$qs = http_build_query($copyOfGet);
 		
-		return App::href($r.(count($qs) ? '?'.implode('&', $qs) : ''));
+		return App::href($r.($qs ? '?'.$qs : ''));
 	}
 
 	#### ПРОЧЕЕ ####

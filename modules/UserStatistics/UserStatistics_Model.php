@@ -109,14 +109,19 @@ class UserStatistics_Model {
 			
 		}
 		
+		$action = !empty($_POST['action'])
+			? strtolower(is_array($_POST['action']) ? YArray::getFirstKey($_POST['action']) : $_POST['action'])
+			: null;
+		
 		// сохранение запрошенной страницы
 		$db->insert('user_stat_pages', array(
-			'session_id' => $_SESSION['vik-off-user-statistics']['session-id'],
-			'url'        => $requestUrl,
-			'is_ajax'    => AJAX_MODE ? TRUE : FALSE,
-			'is_post'    => !empty($_POST),
-			'post_data'  => null,
-			'date'       => time(),
+			'session_id'  => $_SESSION['vik-off-user-statistics']['session-id'],
+			'url'         => $requestUrl,
+			'is_ajax'     => AJAX_MODE ? TRUE : FALSE,
+			'is_post'     => !empty($_POST),
+			'post_data'   => null,
+			'post_action' => $action,
+			'date'        => time(),
 		));
 		
 		// сохраняем запрашиваемый URL
@@ -271,14 +276,33 @@ class UserStatistics_Collection extends ARCollection {
 	
 	
 	// ТОЧКА ВХОДА В КЛАСС
-	public static function load(){
+	public static function load($filters = array()){
 			
-		$instance = new UserStatistics_Collection();
+		$instance = new UserStatistics_Collection($filters);
 		return $instance;
 	}
 
+	public function __construct($filters = array()){
+	
+		$this->_filters = array();
+		
+		if (!empty($filters['users'][0]))
+			$this->_filters['uid'] = $filters['users'];
+		if (!empty($filters['ips'][0]))
+			$this->_filters['user_ip'] = $filters['ips'];
+		if (!empty($filters['browsers'][0]))
+			$this->_filters['browser_name'] = $filters['browsers'];
+		
+		if (!empty($this->_filters['uid']) && ($key = array_search(-1, $this->_filters['uid'])) !== FALSE)
+			$this->_filters['uid'][$key] = 0;
+			
+	}
+	
 	// ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ
 	public function getPaginated(){
+		
+		$where = $this->_getSqlFilter();
+		// echo $where; die;
 		
 		$sorter = new Sorter('last_date', 'DESC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array(
@@ -286,8 +310,9 @@ class UserStatistics_Collection extends ARCollection {
 			(SELECT MAX(date) FROM user_stat_pages WHERE session_id=s.id) AS last_date,
 			(SELECT COUNT(1) FROM user_stat_pages WHERE session_id=s.id) AS num_pages',
 			'FROM '.UserStatistics_Model::TABLE.' s
-			 LEFT JOIN '.User_Model::TABLE.' u ON u.id=s.uid
-			 ORDER BY '.$sorter->getOrderBy()), '~50');
+			LEFT JOIN '.User_Model::TABLE.' u ON u.id=s.uid
+			'.$where.'
+			ORDER BY '.$sorter->getOrderBy()), '~50');
 		
 		$db = db::get();
 		$data = $db->getAllIndexed($paginator->getSql(), 'id', array());
@@ -316,6 +341,22 @@ class UserStatistics_Collection extends ARCollection {
 	public function getSortArray(){
 		
 		return $this->_sortArray;
+	}
+	
+	public function getFiltersLists(){
+		
+		$db = db::get();
+		$filters = array();
+		
+		$filters['users'] = $db->getColIndexed('
+			SELECT DISTINCT uid, u.'.CurUser::LOGIN_FIELD.' AS login
+			FROM user_stat s
+			JOIN '.User_Model::TABLE.' u ON u.id=s.uid ORDER BY login', 'uid');
+		
+		$filters['ips'] = $db->getColIndexed('SELECT DISTINCT(user_ip), user_ip FROM user_stat ORDER BY user_ip');
+		$filters['browsers'] = $db->getColIndexed('SELECT DISTINCT(browser_name), browser_name FROM user_stat WHERE LENGTH(browser_name) > 0 ORDER BY browser_name');
+		
+		return $filters;
 	}
 	
 }

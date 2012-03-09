@@ -1,11 +1,10 @@
-<?
+<?php
 	
 class CurUser extends User_Model {
 	
 	private $_authPrefix = 'v1k0ff';
 	
 	/** Поле в таблице пользователей, служащее логином (идентификатором) пользователя */
-	const LOGIN_FIELD = 'login';
 	const ROOT_LEVEL = 50;
 	
 	const HASH_LR = 'dc76e9f0c0006e8f919e0c515c66dbba3982f785';
@@ -46,14 +45,24 @@ class CurUser extends User_Model {
 		
 		if(!$this->isSessionInited())
 			$this->initSession();
+
+
+		define('USER_AUTH_ID', $this->getAuthData('id'));
 		
 		$this->_rootMode = $this->getAuthData('root');
 		
 		if($this->_rootMode){
 			parent::__construct($this->getAuthData('id'), self::INIT_EXISTS_FORCE, array('name' => 'root'));
+			$this->_afterLoad($this->_dbFieldValues);
 		}else{
 			parent::__construct($this->getAuthData('id'), self::INIT_ANY);
 		}
+		
+		$roleId = $this->isLogged()
+			? $this->role_id
+			: User_RoleCollection::load()->getGuestRole('id');
+		define('USER_AUTH_LEVEL', User_RoleCollection::load()->getRole($roleId, 'level'));
+		define('USER_AUTH_ROLE_ID', $roleId);
 	}
 	
 	/** ИНИЦИАЛИЗИРОВАНА ЛИ СЕССИЯ */
@@ -185,14 +194,31 @@ class CurUser extends User_Model {
 			: $_SESSION[$this->_authPrefix.'userAuthData'][$key];
 	}
 	
+	/**
+	 * ДОЗАГРУЗКА ДАННЫХ
+	 * выполняется после основной загрузки данных из БД
+	 * и только для существующих объектов
+	 * @param array &$data - данные полученные основным запросом
+	 * @return void
+	 */
+	protected function _afterLoad(&$data){
+		
+		parent::_afterLoad($data);
+		
+		if ($this->_rootMode)
+			$data = array_merge($data, $this->_rootData);
+	}
+	
 	public function __get($key){
 		
 		if ($this->isNewObj)
 			return '';
 		
-		return $this->_rootMode
-			? (isset($this->_rootData[$key]) ? $this->_rootData[$key] : '')
-			: parent::__get($key);
+		try {
+			return parent::__get($key);
+		} catch (Exception $e) {
+			return '';
+		}
 	}
 
 }

@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Validator {
 	
@@ -485,8 +485,14 @@ class Validator {
 	// ПРАВИЛО DB DATE
 	public function rule_dbDate($field, $execute){
 		
-		if(!isset($this->validData[$field]) || !$execute)
+		if (!$execute)
 			return;
+			
+		if(empty($this->validData[$field])) {
+			$this->validData[$field] = null;
+			return;
+		}
+	
 		$this->validData[$field] = substr($this->validData[$field], 0, 10);
 		$result = preg_match('/^\d{4}\-\d{2}\-\d{2}$/', $this->validData[$field]);
 		if(!$result)
@@ -496,8 +502,14 @@ class Validator {
 	// ПРАВИЛО DB TIME
 	public function rule_dbTime($field, $execute){
 		
-		if(!isset($this->validData[$field]) || !$execute)
+		if (!$execute)
 			return;
+			
+		if(empty($this->validData[$field])) {
+			$this->validData[$field] = null;
+			return;
+		}
+		
 		$result = preg_match('/^\d{2}\-\d{2}\-\d{2}$/', $this->validData[$field]);
 		if(!$result)
 			$this->setError($this->getErrorText($field, 'dbTime'));

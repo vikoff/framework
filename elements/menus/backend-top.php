@@ -12,7 +12,7 @@ return array (
 		array(
 			'title' => 'Контент',
 			'href' => 'admin/content',
-			'active' => $r->getParts(array(0, 1)) == 'admin/content',
+			'active' => in_array($r->getParts(array(0, 1)), array('admin', 'admin/content')),
 			'display' => $acl->isResourceAllowed('admin', 'content'),
 		),
 	

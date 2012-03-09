@@ -18,6 +18,8 @@ class Layout{
 	protected $_useAutoBreadcrumbs = FALSE;
 	protected $_manualBreadcrumbs = array();
 	
+	protected $_contentLinks = array();
+	
 	protected $_htmlContent = '';
 	
 	protected $_layoutRender = 'auto';
@@ -98,6 +100,12 @@ class Layout{
 		? $url
 		// http://site.com/index.php?r=controller/method&param=value
 		: 'index.php'.(!empty($url) ? '?r='.str_replace('?', '&', $url) : ''));
+	}
+	
+	public function addContentLink($href, $title){
+		
+		$this->_contentLinks[] = '<a href="'.$this->href($href).'">'.$title.'</a>';
+		return $this;
 	}
 	
 	/** ОЧИСТИТЬ КОНТЕНТ */
@@ -185,6 +193,14 @@ class Layout{
 	protected function _getUserMessagesHTML(){
 	
 		return Messenger::get()->getAll();
+	}
+	
+	/** GET CONTENT LINKS HTML */
+	protected function _getContentLinksHTML($separator = ' '){
+		
+		return !empty($this->_contentLinks)
+			? '<div class="content-links">'.implode($separator, $this->_contentLinks).'</div>'
+			: '';
 	}
 	
 	/** GET HTML CONTENT */

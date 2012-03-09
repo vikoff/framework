@@ -1,6 +1,8 @@
-<?
+<?php
 
-class User_Model extends ActiveRecord{
+class User_Model extends ActiveRecord {
+	
+	const LOGIN_FIELD = 'login';
 	
 	const SAVE_ADMIN_CREATE = 'adm-create';
 	const SAVE_ADMIN_EDIT   = 'adm-edit';
@@ -137,8 +139,16 @@ class User_Model extends ActiveRecord{
 		
 	}
 	
+	public function getLogin(){
+		
+		return $this->{self::LOGIN_FIELD};
+	}
+	
 	/** ПОЛУЧИТЬ ИМЯ ПОЛЬЗОВАТЕЛЯ */
 	public function getName($name = null){
+		
+		// :STUB
+		return $this->getLogin();
 		
 		$outputArr = array();
 		
@@ -151,7 +161,7 @@ class User_Model extends ActiveRecord{
 			elseif($name{$i} == 'i')
 				$outputArr[] = $this->name;
 			elseif($name{$i} == 'o')
-				$outputArr[] = ''; //$this->patronymic;
+				$outputArr[] = $this->patronymic;
 			else
 				trigger_error('Неизвестный код имени: "'.$name{$i}.'"', E_USER_ERROR);
 		}
