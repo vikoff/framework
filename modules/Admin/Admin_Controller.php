@@ -188,7 +188,7 @@ class Admin_Controller extends Controller{
 	public function snippet_config_modules(){
 		
 		BackendLayout::get()
-			->setContentPhpFile(self::TPL_PATH.'manage_modules.php')
+			->setContentPhpFile(self::TPL_PATH.'config_modules.php')
 			->render();
 	}
 	
