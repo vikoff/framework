@@ -395,7 +395,7 @@ class ActiveRecord {
 	//// ОПЕРАЦИИ С БАЗОЙ ДАННЫХ ////
 	
 	public function dbGetRow(){
-		return db::get()->getRow("SELECT * FROM ".$this->tableName." WHERE ".$this->pkField."='".$this->id."'");
+		return db::get()->getRow('SELECT * FROM '.$this->tableName.' WHERE '.$this->pkField.'='.$this->id);
 	}
 	
 	public function dbInsert($fields){
