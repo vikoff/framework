@@ -383,7 +383,7 @@ class DbAdapter_postgres extends DbAdapter{
 	 */
 	public function escape($str){
 		
-		return gettype($str) == 'string'
+		return is_string($str)
 			? pg_escape_string($this->_dbrs, $str)
 			: $str;
 	}

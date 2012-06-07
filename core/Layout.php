@@ -345,7 +345,7 @@ class Layout{
 			return ob_get_clean();
 	}
 	
-	/** АКСЕССОР ДЛЯ ШАБЛОНОВ */
+	/** аксессор для шаблонов */
 	public function __get($name){
 		
 		return isset($this->$name) ? $this->$name : '';
@@ -356,13 +356,13 @@ class Layout{
 		return isset($this->$name);
 	}
 	
-	/** ПОЛУЧИТЬ СОДЕРЖИМОЕ HTML ФАЙЛА */
+	/** получить содержимое html файла */
 	public function getContentHtmlFile($file){
 		
 		return file_get_contents($file);
 	}
 	
-	/** ПОЛУЧИТЬ ПРОИНТЕРПРЕТИРОВАННОЕ СОДЕРЖИМОЕ PHP ФАЙЛА */
+	/** получить проинтерпретированное содержимое php файла */
 	public function getContentPhpFile($file, $variables = array()){
 		
 		foreach($variables as $k => $v)

@@ -432,6 +432,8 @@ abstract class DbAdapter {
 				return $cell ? 'TRUE' : 'FALSE';
 			case 'null':
 				return 'NULL';
+			case 'object':
+				return $cell;
 			default:
 				return "'".$cell."'";
 		}

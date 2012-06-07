@@ -241,7 +241,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 */
 	public function escape($str){
 		
-		return gettype($str) == 'string'
+		return is_string($str)
 			? sqlite_escape_string($str)
 			: $str;
 	}

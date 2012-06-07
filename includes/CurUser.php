@@ -1,5 +1,5 @@
 <?php
-	
+
 class CurUser extends User_Model {
 	
 	private $_authPrefix = 'v1k0ff';
@@ -61,6 +61,7 @@ class CurUser extends User_Model {
 		$roleId = $this->isLogged()
 			? $this->role_id
 			: User_RoleCollection::load()->getGuestRole('id');
+			
 		define('USER_AUTH_LEVEL', User_RoleCollection::load()->getRole($roleId, 'level'));
 		define('USER_AUTH_ROLE_ID', $roleId);
 	}

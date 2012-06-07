@@ -329,7 +329,7 @@ class DbAdapter_mysqli implements DbAdapter{
 	// ESCAPE
 	public function escape($str){
 		
-		return gettype($str) == 'string'
+		return is_string($str)
 			? mysql_real_escape_string($str, $this->_dbrs)
 			: $str;
 	}
