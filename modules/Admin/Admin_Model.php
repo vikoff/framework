@@ -27,6 +27,18 @@ class Admin_Model {
 		return $results;
 	}
 	
+	public function getTableData($table){
+
+		$db = db::get();
+		$paginator = new Paginator('sql', array('*', 'FROM '.$table), '~50');
+		
+		return array(
+			'structure' => $db->describe($table),
+			'rows' => $db->getAll($paginator->getSql()),
+			'pagination' => $paginator->getButtons(),
+		);
+	}
+
 	public function makeFsSnapshot($scandir, $collapseDirs, $base = '/'){
 		
 		$dirs = array();

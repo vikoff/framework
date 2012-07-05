@@ -72,6 +72,8 @@
 			
 			<?=$this->_getUserMessagesHTML();?>
 			
+			<?=$this->_getContentLinksHTML(' | ');?>
+			
 			<?=$this->_getContentHTML();?>
 	
 		</td>

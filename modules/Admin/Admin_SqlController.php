@@ -9,8 +9,8 @@ class Admin_SqlController extends Controller {
 	
 	public $methodResources = array(
 	
-		'display_index' => 'sql',
 		'display_console' => 'sql',
+		'display_tables' => 'sql',
 		'display_make_dump' => 'sql',
 		'display_load_dump' => 'sql',
 		
@@ -36,13 +36,6 @@ class Admin_SqlController extends Controller {
 	////// DISPLAY //////
 	/////////////////////
 	
-	public function display_index($params = array()){
-		
-		BackendLayout::get()
-			->setContentPhpFile(self::TPL_PATH.'index.php')
-			->render();
-	}
-	
 	public function display_console($params = array()){
 		
 		$variables = array();
@@ -60,6 +53,39 @@ class Admin_SqlController extends Controller {
 		BackendLayout::get()
 			->setContentPhpFile(self::TPL_PATH.'console.php', $variables)
 			->render();
+	}
+	
+	public function display_tables($params = array()){
+		
+		$db = db::get();
+		$table = isset($params[0]) ? $params[0] : null;
+		
+		if ($table) {
+
+			$model = new Admin_Model();
+
+			$variables = array(
+				'table' => $table,
+				'tableData' => $model->getTableData($table),
+			);
+			
+			// echo '<pre>'; print_r($variables); die;
+			BackendLayout::get()
+				->addBreadcrumb('Просмотр таблицы '.$table)
+				->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
+				->setContentPhpFile(self::TPL_PATH.'table_view.php', $variables)
+				->render();
+
+		} else {
+
+			$variables = array(
+				'tables' => $db->showTables(),
+			);
+			
+			BackendLayout::get()
+				->setContentPhpFile(self::TPL_PATH.'tables.php', $variables)
+				->render();
+		}
 	}
 	
 	public function display_make_dump($params = array()){

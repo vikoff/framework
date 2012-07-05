@@ -98,6 +98,12 @@ switch($topMenuHref){
 				'href' => $topMenuHref.'/console',
 				'active' => in_array($r->getParts(2), array('', 'console')),
 			),
+
+			array(
+				'title' => 'Просмотр таблиц',
+				'href' => $topMenuHref.'/tables',
+				'active' => in_array($r->getParts(2), array('', 'tables')),
+			),
 		
 			array(
 				'title' => 'Создание дампа БД',
