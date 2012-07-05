@@ -14,8 +14,9 @@
 
 <?=$this->_getLinkTagsHTML();?>
 
-	<link rel="stylesheet" href="css/common.css" type="text/css" />
-	<link rel="stylesheet" href="css/frontend.css" type="text/css" />
+	<link rel="stylesheet" href="<?= WWW_ROOT; ?>css/common.css" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="<?= WWW_ROOT; ?>css/frontend.css" type="text/css" media="screen, projection" />
+	<!--[if lte IE 6]><link rel="stylesheet" href="css/frontend_ie.css" type="text/css" media="screen, projection" /><![endif]-->
 	
 	<script type="text/javascript">
 		var WWW_ROOT = '<?= WWW_ROOT; ?>';
@@ -33,25 +34,48 @@
 </head>
 <body>
 
-<div id="top-menu">
-	<?= $this->_getTopMenuHTML(); ?>
+<div id="wrapper">
+
+	<div id="header">
+		
+		<div id="top-menu">
+			<?= $this->_getTopMenuHTML(); ?>
+		</div>
+		
+	</div>
+
+	<div id="middle">
+
+		<div id="container">
+
+			<div id="content">
+			
+				<?=$this->_getUserMessagesHTML();?>
+				
+				<?=$this->_getContentLinksHTML(' | ');?>
+			
+				<?=$this->_getContentHTML();?>
+				
+			</div>
+		</div>
+
+		<div class="sidebar" id="sideLeft">
+			<?= $this->_getProfileBlockHTML(); ?>
+		</div>
+
+		<div class="sidebar" id="sideRight">
+			vik-off framework
+		</div>
+
+	</div>
+
 </div>
 
-<div class="paragraph">
-	<?= $this->_getLoginBlockHTML(); ?>
-</div>
+<div id="footer"></div>
 
-<div id="page-content" style="text-align: center;">
-
-	<?=$this->_getContentHTML();?>
-	
-</div>
-
-<div id="footer">
-	<?=$this->_getClientStatisticsLoaderHTML();?>
-</div>
-
-<?= Debugger::get()->getPageInfoHTML();?>
+<?= $this->_getClientStatisticsLoaderHTML(); ?>
+<?= Debugger::get()->getPageInfoHTML(); ?>
+<?= Debugger::get()->getLog(); ?>
 
 </body>
 </html>

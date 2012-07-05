@@ -39,10 +39,10 @@ UserStatistics_Model::disable();
 ########## РАЗНОЕ ##########
 
 // использовать красивые url
-define('CFG_USE_SEF', 1);
+define('CFG_USE_SEF', 0);
 
 // отсеивать дублируемые формы
-define('CHECK_FORM_DUPLICATION', 0);
+define('CHECK_FORM_DUPLICATION', 1);
 
 // производить ли редирект на дефолтные display методы
 define('CFG_REDIRECT_DEFAULT_DISPLAY', 0);

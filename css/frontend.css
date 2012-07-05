@@ -1,6 +1,141 @@
 
 /* ФРЕЙМ */
 
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+:focus {
+	outline: 0;
+}
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+html {
+	height: 100%;
+}
+body {
+	font: 12px/18px Verdana, Tahoma, Arial, sans-serif;
+	height: 100%;
+}
+p {
+	margin: 1em 0;
+}
+img {
+	border: none;
+}
+input {
+	vertical-align: middle;
+}
+h1{
+	margin: 15px 0 10px;
+	font-size: 16px;
+}
+h2{
+	margin: 15px 0 10px;
+	font-size: 15px;
+}
+td, th{
+	padding: 5px;
+}
+
+#wrapper {
+	width: 100%;
+	min-width: 1000px;
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+}
+
+/* header */
+#header {
+}
+
+/* content */
+#middle {
+	width: 100%;
+	padding: 0 0 50px;
+	height: 1%;
+	position: relative;
+}
+#middle:after {
+	content: '.';
+	display: block;
+	clear: both;
+	visibility: hidden;
+	height: 0;
+}
+#container {
+	width: 100%;
+	float: left;
+	overflow: hidden;
+}
+#content {
+	padding: 10px 220px 0 220px;
+	text-align: center;
+}
+
+/* left-col */
+#sideLeft {
+	float: left;
+	width: 179px;
+	margin-left: -100%;
+	padding: 10px;
+	position: relative;
+	border-right: solid 1px #E8E8E8;
+	border-bottom: solid 1px #E8E8E8;
+}
+
+/* right-col */
+#sideRight {
+	float: left;
+	margin-right: -3px;
+	width: 179px;
+	margin-left: -200px;
+	padding: 10px;
+	position: relative;
+	border-left: solid 1px #E8E8E8;
+	border-bottom: solid 1px #E8E8E8;
+}
+
+/* footer */
+#footer {
+	margin: -51px auto 0;
+	min-width: 1000px;
+	height: 50px;
+	position: relative;
+	border-top: solid 1px #E8E8E8;
+	line-height: 50px;
+	text-align: center;
+}
+
+/* top-menu */
 #top-menu{
 	border-bottom: solid 1px #E8E8E8;
 	text-align: center;
@@ -21,6 +156,10 @@
 	border-bottom: solid 3px #3763fb;
 }
 
+#login-block{
+	float: right;
+	border: solid 1px red;
+}
 /* ССЫЛКИ НОМЕРОВ СТРАНИЦ */
 
 .pagination{
@@ -51,6 +190,8 @@ input.button, button.button, a.button{
 	-moz-border-radius: 3px; -webkit-border-radius: 3px; border-radius: 3px;
 	text-decoration: none;
 	color: #000;
+	font-size: 12px;
+	line-height: 14px;
 }
 input.button:hover, button.button:hover, a.button:hover{
 	border-style: outset;
@@ -70,7 +211,7 @@ table.reg-box{
 }
 table.reg-box td{
 	padding: 5px 5px;
-	border-style: none;
+	border: solid 1px #E0E0E0;
 	vertical-align: bottom;
 }
 table.reg-box td.left{
@@ -78,6 +219,11 @@ table.reg-box td.left{
 }
 table.reg-box .required{
 	color: red;
+}
+table.reg-box  div.description{
+	font-weight: normal;
+	font-style: italic;
+	font-size: 11px;
 }
 table.reg-box .input{
 	width: 100%;
@@ -97,7 +243,7 @@ table.reg-box input.valid{
 	background-color: #F2FFF2;
 }
 div.captcha-box{
-	float: left;
+	display: inline-block;
 	border: solid 1px #c0c0c0;
 	background-color: #f7f8fa;
 	text-align: center;
@@ -114,7 +260,25 @@ div.captcha-box a{
 	
 }
 div.captcha-input{
-	float: left;
-	margin-left: 10px;
-	margin-top: 53px;
+	margin-top: 5px;
+}
+
+a.internal{
+	border-bottom: dashed 1px #3763FB;
+}
+a.internal:hover{
+	text-decoration: none;
+}
+
+.login-form *{
+	font-size: 11px;
+	line-height: 14px;
+}
+.login-form .input{
+	width: 100%;
+	margin: 0;
+	margin-bottom: 4px;
+}
+.login-form .submit{
+	margin: 1px 0;
 }

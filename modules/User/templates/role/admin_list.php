@@ -10,12 +10,14 @@
 	<tr>
 		<th><?= $this->sorters['title']; ?></th>
 		<th><?= $this->sorters['level']; ?></th>
+		<th><?= $this->sorters['flag']; ?></th>
 		<th>Опции</th>
 	</tr>
 	<? foreach($this->collection as $item): ?>	
 	<tr>
 		<td><?= $item['title']; ?></td>
 		<td><?= $item['level']; ?></td>
+		<td><?= $item['flag_str']; ?></td>
 			
 		<td class="center">
 			<a href="<?= href('admin/users/roles/edit/'.$item['id']); ?>">редактировать</a>

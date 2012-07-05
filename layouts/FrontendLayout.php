@@ -26,7 +26,7 @@ class FrontendLayout extends Layout {
 		$this->_topMenu = new Html_Menu('frontend-top', array('layout' => $this));
 	}
 	
-	public function _getLoginBlockHTML(){
+	public function _getProfileBlockHTML(){
 		
 		if(CurUser::get()->isLogged()){
 			

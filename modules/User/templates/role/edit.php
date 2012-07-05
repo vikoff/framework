@@ -20,6 +20,20 @@
 		<label class="title">Описание</label>
 		<?= Html_Form::textarea(array('name' => 'description', 'value' => $this->description, 'style' => 'width: 200px; height: 50px;')); ?>
 	</div>
+	<div class="paragraph">
+		<label class="title">Флаги</label>
+		<label>
+			<?= Html_Form::radio(array('name' => 'flag', 'value' => '0', 'checked' => $this->flag == 0)); ?> Нет
+		</label><br />
+		<label>
+			<?= Html_Form::radio(array('name' => 'flag', 'value' => User_RoleModel::FLAG_GUEST, 'checked' => $this->flag == User_RoleModel::FLAG_GUEST )); ?>
+			Роль, присваиваемая гостю
+		</label><br />
+		<label>
+			<?= Html_Form::radio(array('name' => 'flag', 'value' => User_RoleModel::FLAG_REG, 'checked' => $this->flag == User_RoleModel::FLAG_REG)); ?>
+			Роль, присваиваемая зарегистрировавшемуся пользователю
+		</label><br />
+	</div>
 	
 	<? if(!$this->instanceId): ?>
 	<div class="paragraph">

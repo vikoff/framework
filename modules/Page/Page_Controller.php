@@ -15,7 +15,7 @@ class Page_Controller extends Controller{
 	
 	/** ассоциация методов контроллера с ресурсами */
 	public $methodResources = array(
-		'display_view' => 'view',
+		'display_view' => 'public',
 	);
 	
 	

@@ -157,11 +157,11 @@ class User_Model extends ActiveRecord {
 		
 		for($i = 0; $i < strlen($name); $i++){
 			if($name{$i} == 'f')
-				$outputArr[] = $this->surname;
+				$outputArr[] = isset($this->_dbFieldValues['surname']) ? $this->_dbFieldValues['surname'] : '';
 			elseif($name{$i} == 'i')
-				$outputArr[] = $this->name;
+				$outputArr[] = isset($this->_dbFieldValues['name']) ? $this->_dbFieldValues['name'] : '';
 			elseif($name{$i} == 'o')
-				$outputArr[] = $this->patronymic;
+				$outputArr[] = isset($this->_dbFieldValues['patronymic']) ? $this->_dbFieldValues['patronymic'] : '';
 			else
 				trigger_error('Неизвестный код имени: "'.$name{$i}.'"', E_USER_ERROR);
 		}

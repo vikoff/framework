@@ -8,7 +8,7 @@ class CurUser extends User_Model {
 	const ROOT_LEVEL = 50;
 	
 	const HASH_LR = 'dc76e9f0c0006e8f919e0c515c66dbba3982f785';
-	const HASH_PR = 'c776f7b86a4701a3e3a94c253901006cf31e6d32';
+	const HASH_PR = 'b1a838a7ee5413752554941c22926a1615866622';
 	
 	private static $_instance = null;
 	

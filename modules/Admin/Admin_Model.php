@@ -57,10 +57,21 @@ class Admin_Model {
 	
 	public function readModulesConfig(){
 		
+		$globalConfigFile = FS_ROOT.'config/modules.php';
 		$modulesDir = FS_ROOT.'modules/';
 		$modulesConfig = array();
-		$log = array('error' => array(), 'success' => array());
+		$log = array('error' => array(), 'info' => array());
 		
+		if (!file_exists($globalConfigFile)) {
+			array_unshift($log['error'], '<b>Файл глобальной конфигурации отсутствует</b>');
+			return $log;
+		}
+
+		if (!is_writeable($globalConfigFile)) {
+			array_unshift($log['error'], '<span style="color: red; font-weight: bold;">Файл глобальной конфигурации не доступен для записи</span>');
+			return $log;
+		}
+
 		foreach(scandir($modulesDir) as $elm){
 			
 			if($elm == '.' || $elm == '..' || !is_dir($modulesDir.$elm))
@@ -77,19 +88,11 @@ class Admin_Model {
 			}
 		}
 		
-		$globalConfigFile = FS_ROOT.'config/modules.php';
-		
-		if (!file_exists($globalConfigFile)) {
-			array_unshift($log['error'], '<b>Файл глобальной конфигурации отсутствует</b>');
-			return $log;
-		}
-		
-		if (!is_writeable($globalConfigFile)) {
-			array_unshift($log['error'], '<span style="color: red; font-weight: bold;">Файл глобальной конфигурации не доступен для записи</span>');
-			return $log;
-		}
-		
-		file_put_contents($globalConfigFile, "<?php\n\nreturn ".var_export($modulesConfig, 1).";\n\n?>");
+		if (file_put_contents($globalConfigFile, "<?php\n\nreturn ".var_export($modulesConfig, 1).";\n\n?>"))
+			$log['info'][] = 'Главный конфигурационный файл обновлен';
+		else
+			$log['error'][] = 'Не удалось обновить главный конфигурационный файл';
+
 		return $log;
 		// echo '<pre>'; print_r($modulesConfig); die;
 			

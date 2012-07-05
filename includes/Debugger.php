@@ -3,12 +3,13 @@
 class Debugger {
 	
 	private static $_config = array(
-		
+		'displayLog' => FALSE,
 		'displayPageStatistics' => FALSE,
 	);
 	
 	private static $_instance = null;
-	
+
+	private $_log = array();
 	
 	/**
 	 * Задать конфигурацию класса
@@ -51,7 +52,8 @@ class Debugger {
 	}
 	
 	public function log($string){
-	
+		
+		$this->_log[] = array('message' => $string);
 	}
 	
 	/**
@@ -97,6 +99,21 @@ class Debugger {
 				VikDebug.print(\''.self::jsEscape(print_r($_POST, 1)).'\', "$_POST", {activateTab: false, onPrintAction: "none"});
 				VikDebug.print(\''.self::jsEscape(print_r($_SERVER, 1)).'\', "$_SERVER", {activateTab: false, onPrintAction: "none"});
 				VikDebug.print(\''.self::jsEscape(print_r($_SESSION, 1)).'\', "$_SESSION", {activateTab: false, onPrintAction: "none"});
+			});
+			</script>';
+		return $output;
+	}
+
+	public function getLog(){
+
+		$log = '';
+		foreach ($this->_log as $row)
+			$log .= '<div>'.$row['message'].'</div>';
+
+		$output = '
+			<script type="text/javascript">
+			$(function(){
+				VikDebug.print(\''.self::jsEscape($log).'\', "Debug Log", {activateTab: false, onPrintAction: "none"});
 			});
 			</script>';
 		return $output;

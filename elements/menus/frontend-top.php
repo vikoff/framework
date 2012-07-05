@@ -25,30 +25,35 @@ return array (
 	'items' => array(
 	
 		array(
+			'id' => 'main',
 			'title' => 'Главная',
 			'href' => href($paths['page/main']),
 			'active' => in_array($r->getParts(array(0, 1)), array('', 'page', 'page/main')),
 		),
 	
 		array(
+			'id' => 'test',
 			'title' => 'Тест',
 			'href' => href($paths['page/test']),
 			'active' => $r->getParts(array(0, 1)) == 'page/test',
 		),
 	
 		array(
+			'id' => 'about',
 			'title' => 'О Сайте',
 			'href' => href($paths['page/about']),
 			'active' => $r->getParts(array(0, 1)) == 'page/about',
 		),
 	
 		array(
+			'id' => 'feedback',
 			'title' => 'Обратная связь',
 			'href' => href($paths['page/feedback']),
 			'active' => $r->getParts(array(0, 1)) == 'page/feedback',
 		),
 	
 		array(
+			'id' => 'registration',
 			'title' => 'Регистрация',
 			'href' => href($paths['user/profile/registration']),
 			'display' => !$user->isLogged(),
@@ -56,6 +61,7 @@ return array (
 		),
 	
 		array(
+			'id' => 'profile',
 			'title' => 'Профиль',
 			'href' => href($paths['user/profile/edit']),
 			'display' => $user->isLogged(),
@@ -63,6 +69,7 @@ return array (
 		),
 	
 		array(
+			'id' => 'admin',
 			'title' => 'Адм. панель',
 			'href' => href('admin'),
 			'attrs' => 'class="external-link"',

@@ -52,7 +52,7 @@ class BackendLayout extends Layout {
 		
 		$html = '';
 		foreach($this->_topMenu->getItems() as $item)
-			$html .= '<a href="'.$item['href'].'" '.($item['active'] ? 'class="active"' : '').'>'.$item['title'].'</a>';
+			$html .= '<a href="'.$this->href($item['href']).'" '.($item['active'] ? 'class="active"' : '').'>'.$item['title'].'</a>';
 		
 		return $html;
 	}
@@ -61,7 +61,7 @@ class BackendLayout extends Layout {
 		
 		$html = '';
 		foreach($this->_leftMenu->getItems() as $item)
-			$html .= '<a href="'.$item['href'].'" '.($item['active'] ? 'class="active"' : '').'>'.$item['title'].'</a>';
+			$html .= '<a href="'.$this->href($item['href']).'" '.($item['active'] ? 'class="active"' : '').'>'.$item['title'].'</a>';
 		
 		return $html;
 	}

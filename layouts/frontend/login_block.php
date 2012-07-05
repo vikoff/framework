@@ -1,1 +1,28 @@
-<div id="login-block">		<form action="" method="post">		<?=FORMCODE;?>		<table>		<? if($error): ?>		<tr>			<td colspan="3" style="color: red; text-align: center;"><?=$error;?></td>		</tr>		<? endif; ?>		<tr>			<td>Email</td>			<td><input type="text" class="text" name="login" value="" /></td>			<td></td>		</tr><tr>			<td>Пароль</td>			<td><input type="password" class="text" name="pass" value="" /></td>			<td></td>		</tr><tr>			<td></td>			<td>				<input type="checkbox" name="remember" id="rememberme-checkbox" value="1" />				<label for="rememberme-checkbox">Запомнить меня</label>			</td>			<td><input class="button" type="submit" class="submit" name="action[user/profile/login]" value="Войти" style="position: relative; top: -32px;"></td>		</tr>		</table>	</form>		<div class="bottom-text">		<div class="left-text"><a href="<?=href('user/profile/registration');?>">Регистрация</a></div>		<div class="right-text"><a href="<?=href('user/profile/forget-password');?>">Напомнить пароль</a></div>		<div class="clear"></div>	</div>	</div>
+	<?= $this->error; ?>
+	
+	<form class="login-form" action="" method="post">
+		<?=FORMCODE;?>
+		<div>
+			<label>email</label><br />
+			<input type="text" class="input" name="login" value="" />
+		</div>
+		<div>
+			<label>пароль</label>
+			<input type="password" class="input" name="pass" value="" />
+		</div>
+		<div style="overflow: hidden; margin-top: 5px;">
+			<div style="float: left;">
+				<label><input type="checkbox" name="remember" value="1" />запомнить меня</label>
+			</div>
+			<div style="float: right;">
+				<input type="submit" class="button submit" name="action[user/profile/login]" value="Войти">
+			</div>
+		</div>
+	
+		<div style="text-align: center; margin-top: 5px;">
+			<? if ($this->_topMenu->activeItem['id'] != 'registration'): ?>
+				<a href="<?= href('user/profile/registration'); ?>">Регистрация</a><br />
+			<? endif; ?>
+			<a href="<?= href('user/profile/forget-password'); ?>">Напомнить пароль</a>
+		</div>
+	</form>

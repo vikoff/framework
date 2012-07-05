@@ -30,7 +30,7 @@ class Alias_AdminController extends Controller {
 	/** ПРОВЕРКА ПРАВ НА ВЫПОЛНЕНИЕ РЕСУРСА */
 	public function checkResourcePermission($resource){
 		
-		return Acl_Manager::get()->isResourceAllowed(self::MODULE, $resource);
+		return User_Acl::get()->isResourceAllowed(self::MODULE, $resource);
 	}
 	
 	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
