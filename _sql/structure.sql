@@ -100,50 +100,6 @@ CREATE TABLE `user_stat_pages` (
   `date`			INT(10) UNSIGNED
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-/* ТЕСТОВЫЕ РАЗДЕЛЫ */
-DROP TABLE IF EXISTS `test_sections`;
-CREATE TABLE `test_sections` (
-  `id`			int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `name`		VARCHAR(255),
-  `alias`		VARCHAR(255),
-  `published`	CHAR(1),
-  `date` 		INT(10) UNSIGNED DEFAULT NULL
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-/* ТЕСТОВЫЕ КАТЕГОРИИ */
-DROP TABLE IF EXISTS `test_categories`;
-CREATE TABLE `test_categories` (
-  `id`			int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `section_id`	INT,
-  `name`		VARCHAR(255),
-  `alias`		VARCHAR(255),
-  `published`	CHAR(1),
-  `date` 		INT(10) UNSIGNED DEFAULT NULL
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-/* ТЕСТОВЫЕ ОБЪЕКТЫ */
-DROP TABLE IF EXISTS `test_items`;
-CREATE TABLE `test_items` (
-  `id`			int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `category_id`	INT,
-  `item_name`	VARCHAR(255),
-  `item_text`	TEXT,
-  `published`	CHAR(1),
-  `date` 		INT(10) UNSIGNED DEFAULT NULL
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-
-/* ТЕСТОВЫЕ СУЩНОСТИ */
-DROP TABLE IF EXISTS `test_items`;
-CREATE TABLE `test_items` (
-  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `login`			VARCHAR(255),
-  `password`		VARCHAR(255),
-  `text`			TEXT,
-  `type`			SMALLINT UNSIGNED,
-  `is_active`		BOOLEAN
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
 /* ПСЕВДОНИМЫ */
 DROP TABLE IF EXISTS `aliases`;
 CREATE TABLE `aliases` (
@@ -151,36 +107,6 @@ CREATE TABLE `aliases` (
   `alias`			VARCHAR(255),
   `path`			VARCHAR(255),
   `is_bound`		BOOLEAN /* флаг о том, что псевдоним связан с элементом по alias.id */
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-/* FIELDS ПОЛЯ */
-DROP TABLE IF EXISTS `fields_names`;
-CREATE TABLE `fields_names` (
-  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `module`			VARCHAR(100),
-  `name`			VARCHAR(255),
-  `title`			VARCHAR(255),
-  `type`			VARCHAR(100),
-  `description`		TEXT
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-/* FIELDS ЗНАЧЕНИЯ */
-DROP TABLE IF EXISTS `fields_values`;
-CREATE TABLE `fields_values` (
-  `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `item_id`			INT(10) UNSIGNED,
-  `field_id`		INT(10) UNSIGNED,
-  `value`			TEXT
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-/* FIELDS ПОЛЯ */
-DROP TABLE IF EXISTS `meta`;
-CREATE TABLE `meta` (
-  `id`					INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `path`				VARCHAR(255),
-  `meta_keywords`		TEXT,
-  `meta_description`	TEXT,
-  `description`			TEXT
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /*

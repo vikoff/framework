@@ -73,7 +73,7 @@ class TestItem_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->addBreadcrumb(array(null, $pageTitle))
+			->addBreadcrumb($pageTitle)
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -94,7 +94,7 @@ class TestItem_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle('Редактирование записи')
-			->addBreadcrumb(array(null, 'Редактирование записи'))
+			->addBreadcrumb('Редактирование записи')
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -115,7 +115,7 @@ class TestItem_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->addBreadcrumb(array(null, $pageTitle))
+			->addBreadcrumb($pageTitle)
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -132,7 +132,7 @@ class TestItem_AdminController extends Controller {
 		
 		BackendLayout::get()
 			->prependTitle('Удаление записи')
-			->addBreadcrumb(array(null, 'Удаление записи'))
+			->addBreadcrumb('Удаление записи'))
 			->setContentPhpFile(self::TPL_PATH.'delete.php', $variables)
 			->render();
 	}

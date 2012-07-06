@@ -16,6 +16,7 @@ class Admin_SqlController extends Controller {
 		
 		'ajax_get_tables' => 'sql',
 		
+		'action_drop_table' => 'sql',
 		'action_make_dump' => 'sql',
 		'action_load_dump' => 'sql',
 	);
@@ -59,23 +60,47 @@ class Admin_SqlController extends Controller {
 		
 		$db = db::get();
 		$table = isset($params[0]) ? $params[0] : null;
-		
+		$action = isset($params[1]) ? $params[1] : null;
+
 		if ($table) {
 
-			$model = new Admin_Model();
+			if ($action) {
+				switch ($action) {
+					case 'delete':
+						$variables = array('table' => $table);
+						BackendLayout::get()
+							->addBreadcrumb('Удаление таблицы '.$table)
+							->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
+							->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
+							->setContentPhpFile(self::TPL_PATH.'table_delete.php', $variables)
+							->render();
+						break;
+					case 'show-create':
+						$variables = array('table' => $table);
+						BackendLayout::get()
+							->prependTitle('show create table '.$table)
+							->addBreadcrumb('show create table '.$table)
+							->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
+							->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
+							->setContent('<p><pre style="-o-tab-size: 4;">'.$db->showCreateTable($table).'</pre></p>')
+							->render();
+						break;
+				}
+			} else {
+				$model = new Admin_Model();
 
-			$variables = array(
-				'table' => $table,
-				'tableData' => $model->getTableData($table),
-			);
-			
-			// echo '<pre>'; print_r($variables); die;
-			BackendLayout::get()
-				->addBreadcrumb('Просмотр таблицы '.$table)
-				->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
-				->setContentPhpFile(self::TPL_PATH.'table_view.php', $variables)
-				->render();
-
+				$variables = array(
+					'table' => $table,
+					'tableData' => $model->getTableData($table),
+				);
+				
+				// echo '<pre>'; print_r($variables); die;
+				BackendLayout::get()
+					->addBreadcrumb('Просмотр таблицы '.$table)
+					->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
+					->setContentPhpFile(self::TPL_PATH.'table_view.php', $variables)
+					->render();
+			}
 		} else {
 
 			$variables = array(
@@ -114,6 +139,20 @@ class Admin_SqlController extends Controller {
 	////// ACTION //////
 	////////////////////
 	
+	public function action_drop_table($params = array()){
+
+		$table = getVar($_POST['table']);
+		if (!$table) {
+			Messenger::get()->addError('Таблица не найдена');
+			return false;
+		} else {
+			db::get()->query('DROP TABLE '.$table);
+			$this->setRedirectUrl('admin/sql/tables');
+			Messenger::get()->addSuccess('Таблица '.$table.' удалена');
+			return TRUE;
+		}
+	}
+
 	public function action_make_dump($params = array()){
 		
 		$tblInputType = $_POST['tables-input-type'];

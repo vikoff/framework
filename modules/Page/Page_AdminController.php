@@ -73,7 +73,7 @@ class Page_AdminController extends Controller{
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->addBreadcrumb(array(null, $pageTitle))
+			->addBreadcrumb($pageTitle)
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -96,7 +96,7 @@ class Page_AdminController extends Controller{
 		
 		BackendLayout::get()
 			->prependTitle('Редактирование страницы')
-			->addBreadcrumb(array(null, 'Редактирование страницы'))
+			->addBreadcrumb('Редактирование страницы')
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 		
@@ -118,7 +118,7 @@ class Page_AdminController extends Controller{
 		
 		BackendLayout::get()
 			->prependTitle($pageTitle)
-			->addBreadcrumb(array(null, $pageTitle))
+			->addBreadcrumb($pageTitle)
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -133,7 +133,7 @@ class Page_AdminController extends Controller{
 		
 		BackendLayout::get()
 			->prependTitle('Удаление записи')
-			->addBreadcrumb(array(null, 'Удаление страницы'))
+			->addBreadcrumb('Удаление страницы')
 			->setContentPhpFile(self::TPL_PATH.'delete.php', $variables)
 			->render();
 		

@@ -4,6 +4,8 @@ class User_Model extends ActiveRecord {
 	
 	const LOGIN_FIELD = 'login';
 	
+	const TABLE = 'users';
+	
 	const SAVE_ADMIN_CREATE = 'adm-create';
 	const SAVE_ADMIN_EDIT   = 'adm-edit';
 	const SAVE_ADMIN_PASS   = 'adm-pass';
@@ -14,8 +16,6 @@ class User_Model extends ActiveRecord {
 	// пол
 	const GENDER_FEMALE 	= 'f';
 	const GENDER_MALE		= 'm';
-	
-	const TABLE = 'users';
 	
 	const NOT_FOUND_MESSAGE = 'Пользователь не найден';
 
@@ -49,6 +49,13 @@ class User_Model extends ActiveRecord {
 		$data['fio'] = $this->getName();
 		$data['role_str'] = User_RoleCollection::load()->getTitle(getVar($data['role_id']));
 		$data['regdate'] = YDate::loadTimestamp(getVar($data['regdate']))->getStrDateShortTime();
+		
+		if ($this instanceof CurUser && $this->isRoot()) {
+			$data['level'] = 50;
+		} else {
+			$role = User_RoleCollection::load()->getRole($data['role_id']);
+			$data['level'] = $role['level'];
+		}
 		
 		return $data;
 	}

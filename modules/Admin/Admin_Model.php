@@ -30,10 +30,21 @@ class Admin_Model {
 	public function getTableData($table){
 
 		$db = db::get();
-		$paginator = new Paginator('sql', array('*', 'FROM '.$table), '~50');
+		$structure = $db->describe($table);
+
+		if (!$structure)
+			return FALSE;
+		
+		$sortCols = array();
+		foreach ($structure as $col)
+			$sortCols[ $col['name'] ] = $col['name'];
+
+		$sorter = new Sorter($structure[0]['name'], 'DESC', $sortCols);
+		$paginator = new Paginator('sql', array('*', 'FROM '.$table.' ORDER BY '.$sorter->getOrderBy()), '~50');
 		
 		return array(
-			'structure' => $db->describe($table),
+			'sortableLinks' => $sorter->getSortableLinks(),
+			'structure' => $structure,
 			'rows' => $db->getAll($paginator->getSql()),
 			'pagination' => $paginator->getButtons(),
 		);
