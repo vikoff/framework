@@ -42,6 +42,7 @@ class Messenger {
 	public function ns($ns){
 		
 		$this->_ns = $ns;
+		return $this;
 	}
 	
 	public function addSuccess($msg, $detail = ''){
