@@ -44,7 +44,7 @@ class BackendLayout extends Layout {
 	public function showLoginPage(){
 		
 		$this->isLogged = CurUser::get()->isLogged();
-		$this->errorMessage = Messenger::get()->ns('login')->getAll();
+		$this->errorMessage = Messenger::get('login')->getAll();
 		include($this->_layoutDir.'login.php');
 	}
 	

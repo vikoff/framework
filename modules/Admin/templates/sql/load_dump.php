@@ -6,6 +6,6 @@
 	
 	<p>
 	<input type="file" name="dump" />
-	<input type="submit" value="Загрузить" />
+	<input type="submit" class="button" value="Загрузить" />
 
 </form>

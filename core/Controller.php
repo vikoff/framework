@@ -175,15 +175,16 @@ abstract class Controller {
 				
 				// выполнение редиректа (если надо)
 				if(!empty($this->_redirectUrl))
-					$this->redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
+					$this->redirect($this->_redirectUrl);
+
 			} else {
 				if($this->_forceRedirect && !empty($this->_redirectUrl))
-					$this->redirect(Messenger::get()->qsAppendFutureKey($this->_redirectUrl));
+					$this->redirect($this->_redirectUrl);
 			}
 		}
-		catch(Exception404 $e){$this->error404handler($e->getMessage());}
-		catch(Exception403 $e){$this->error403handler($e->getMessage());}
-		catch(Exception $e){$this->errorHandler($e->getMessage());}
+		catch(Exception404 $e){ $this->error404handler($e->getMessage()); }
+		catch(Exception403 $e){ $this->error403handler($e->getMessage()); }
+		catch(Exception $e){ $this->errorHandler($e->getMessage()); }
 		
 		return TRUE;
 	}

@@ -15,7 +15,7 @@
 		style="width: 98%; height: 150px; font-size: 14px; font-family: monospace;"><?=$this->query;?></textarea>
 		
 	<div style="text-align: right; margin-top: 10px;">
-		<input type="submit" name="" value="Выполнить запрос" />
+		<input type="submit" class="button" value="Выполнить запрос" />
 	</div>
 </form>
 

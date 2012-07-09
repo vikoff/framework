@@ -57,30 +57,44 @@
 	-moz-border-radius-topright: 7px;
 	border-top-left-radius: 7px;
 	border-top-right-radius: 7px;
-	
-background-image: linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
-background-image: -o-linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
-background-image: -moz-linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
-background-image: -webkit-linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
-background-image: -ms-linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
 
-background-image: -webkit-gradient(
-	linear,
-	left bottom,
-	left top,
-	color-stop(0.35, rgb(255,245,213)),
-	color-stop(1, rgb(250,248,240))
-);
+	background-image: linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(255,245,213) 35%, rgb(250,248,240) 100%);
 
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.35, rgb(255,245,213)),
+		color-stop(1, rgb(250,248,240))
+	);
+
+}
+#top-menu-list a:hover{
+
+	background-image: linear-gradient(bottom, rgb(255,240,194) 35%, rgb(250,246,226) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(255,240,194) 35%, rgb(250,246,226) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(255,240,194) 35%, rgb(250,246,226) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(255,240,194) 35%, rgb(250,246,226) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(255,240,194) 35%, rgb(250,246,226) 100%);
+
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0.35, rgb(255,240,194)),
+		color-stop(1, rgb(250,246,226))
+	);
 }
 #top-menu-list a.active{
 	position: relative;
 	padding-top: -30px;
 	background-color: #FFF;
+	background-image: none;
 	border-bottom-color: #FFF;
-}
-#top-menu-list a:hover{
-	background-color: #FFF;
 }
 table#body-frame{
 	width: 100%;

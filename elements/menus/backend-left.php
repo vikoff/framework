@@ -93,16 +93,17 @@ switch($topMenuHref){
 	// SQL //
 	case 'admin/sql':
 		$items = array(
-			array(
-				'title' => 'Консоль',
-				'href' => $topMenuHref.'/console',
-				'active' => in_array($r->getParts(2), array('', 'console')),
-			),
 
 			array(
 				'title' => 'Просмотр таблиц',
 				'href' => $topMenuHref.'/tables',
 				'active' => in_array($r->getParts(2), array('', 'tables')),
+			),
+
+			array(
+				'title' => 'Консоль',
+				'href' => $topMenuHref.'/console',
+				'active' => in_array($r->getParts(2), array('console')),
 			),
 		
 			array(
