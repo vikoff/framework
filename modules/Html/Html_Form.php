@@ -5,24 +5,29 @@ class Html_Form {
 	/** имя модуля */
 	const MODULE = 'html';
 	
-	/** путь к шаблонам (относительно FS_ROOT) */
-	const TPL_PATH = 'modules/Html/templates/';
 	
-	private $_template = null;
-	
-	
-	public static function create($template){
-		
-		return new Html_Form($template);
+	public static function openTag($attrs){
+
+		$method = isset($attrs['method']) ? strtolower($attrs['method']) : 'get';
+		$action = isset($attrs['action']) ? strtolower($attrs['action']) : '';
+		$r = '';
+		if ($method == 'get' && !empty($action) && !CFG_USE_SEF) {
+			$r = "\n".'<input type="hidden" name="r" value="'.$action.'" />';
+			$action = '';
+		}
+		$formcode = $method == 'post' ? "\n".FORMCODE : '';
+		unset($attrs['method']);
+		unset($attrs['action']);
+
+		$attrsStr = '';
+		foreach ($attrs as $k => $v)
+			$attrsStr .= ' '.$k.'="'.$v.'"';
+
+		return '<form action="'.$action.'" method="'.$method.'"'.$attrsStr.'>'.$r.$formcode;
 	}
-	
-	public function __construct($template){
-		
-		$this->_template = $template;
-	}
-	
+
 	/**
-	 * СГЕГЕРИРОВАТЬ HTML INPUT
+	 * сгегерировать html input
 	 * @param array $attrs - все параметры инпута вида 'параметр' => 'значение'
 	 * @return string html input
 	 */
@@ -39,7 +44,7 @@ class Html_Form {
 	}
 	
 	/**
-	 * СГЕГЕРИРОВАТЬ HTML INPUT type="text"
+	 * сгегерировать html input type="text"
 	 * @param array $attrs - все параметры инпута вида 'параметр' => 'значение'
 	 * @return string html input type=text
 	 */
@@ -56,7 +61,7 @@ class Html_Form {
 	}
 	
 	/**
-	 * СГЕГЕРИРОВАТЬ HTML INPUT type="checkbox"
+	 * сгегерировать html input type="checkbox"
 	 * @param array $attrs - все параметры чекбокса вида 'параметр' => 'значение'
 	 *                       ВАЖНО: параметр 'checked' нужно передавать в виде bool
 	 * @return string html input type=checkbox
@@ -76,7 +81,7 @@ class Html_Form {
 	}
 	
 	/**
-	 * СГЕГЕРИРОВАТЬ HTML INPUT type="radio"
+	 * сгегерировать html input type="radio"
 	 * @param array $attrs - все параметры радио-кнопки вида 'параметр' => 'значение'
 	 *                       ВАЖНО: параметр 'checked' нужно передавать в виде bool
 	 * @return string html input type=radio
@@ -96,7 +101,7 @@ class Html_Form {
 	}
 	
 	/**
-	 * СГЕНЕРИРОВАТЬ HTML SELECT
+	 * сгенерировать html select
 	 * @param array|false $selectAttrs - атрибуты тега selelect. Если FALSE, тогда генерируются только опции
 	 * @param array $optionsArr - ассоциативный массив, $value => $title
 	 *              или массив-список $title, $title
@@ -130,7 +135,7 @@ class Html_Form {
 	}
 	
 	/**
-	 * СГЕГЕРИРОВАТЬ HTML TEXTAREA
+	 * сгегерировать html textarea
 	 * @param array $attrs - все параметры инпута вида 'параметр' => 'значение', включая 'value'
 	 * @return string html textarea
 	 */

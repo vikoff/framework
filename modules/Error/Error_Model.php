@@ -6,7 +6,8 @@ class Error_Model{
 	const DISPLAY_MODE = 2;
 	
 	const MODULE = 'error';
-	
+	const FATAL_ERROR_MSG = 'Sorry, there was a mistake! Our experts are already working on a fix.';
+
 	/** путь к шаблонам (относительно FS_ROOT) */
 	const TPL_PATH = 'modules/Error/templates/';
 	
@@ -45,6 +46,7 @@ class Error_Model{
 		'dbTableName' => '',			// имя таблицы в БД
 		'keepDbSessionDump' => FALSE,	// сохранять дамп сессии пользователя (только при включенном DB-логе)
 		'keepEmailLog' => FALSE,		// отправлять сообщения об ошибках на email
+		'emailForLog' => 'yurijnovikov@gmail.com', // email, на который отправлять лог ошибок
 	);
 	
 	private static $_errorLevels = array(
@@ -60,6 +62,7 @@ class Error_Model{
 		E_USER_WARNING => 'E_USER_WARNING',
 		E_USER_NOTICE => 'E_USER_NOTICE',
 		E_STRICT => 'E_STRICT',
+		'EXCEPTION' => 'UNCAUGHT EXCEPTION',
 	);
 	
 	/**
@@ -100,7 +103,16 @@ class Error_Model{
 			unset($row['object']);
 		$instance = new Error_Model($errlevel, $errstr, $errfile, $errline, $errcontext, $backtrace, self::HANDLER_MODE);
 	}
-	
+
+	public static function exception_handler(Exception $e){
+
+		$backtrace = $e->getTrace();
+		array_shift($backtrace);
+		foreach($backtrace as &$row)
+			unset($row['object']);
+		$instance = new Error_Model('EXCEPTION', $e->getMessage(), $e->getFile(), $e->getLine(), null, $backtrace, self::HANDLER_MODE);
+	}
+
 	// ЗАГРУЗКА ОШИБКИ - МЕТОД САМОСТОЯТЛЬНО ИЗВЛЕКАЕТ ДАННЫЕ ИЗ БД (ТОЧКА ВХОДА В КЛАСС)
 	public static function load($id){
 		
@@ -170,7 +182,7 @@ class Error_Model{
 			$this->printHTML();
 		
 		if($this->_errlevel & (E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR)){
-			echo 'Извините, произошла ошибка! Наши специалисты уже работают над ее устранением.';
+			echo self::FATAL_ERROR_MSG;
 			exit();
 		}
 		
@@ -234,7 +246,7 @@ class Error_Model{
 		
 		$args = array();
 		foreach($rawArgs as $arg){
-			$type = gettype($arg);
+			$type = strtolower(gettype($arg));
 			$string = $type;
 			switch($type){
 				case 'boolean': $string .= '['.($arg ? 'TRUE' : 'FALSE').']'; break;
@@ -252,7 +264,7 @@ class Error_Model{
 		
 		$args = array();
 		foreach($rawArgs as $arg){
-			$type = gettype($arg);
+			$type = strtolower(gettype($arg));
 			$string = $type;
 			switch($type){
 				case 'boolean': $string .= '['.($arg ? 'TRUE' : 'FALSE').']'; break;
@@ -260,6 +272,9 @@ class Error_Model{
 				case 'double': $string .= '['.$arg.']'; break;
 				case 'string': $string .= '[len: '.mb_strlen($arg, 'UTF-8').']'; break;
 				case 'array': $string .= '[size: '.count($arg).']'; break;
+				case 'object': $string .= '['.get_class($arg).']'; break;
+				case 'resource': $string .= '[RESOURCE]'; break;
+				case 'null': $string .= '[NULL]'; break;
 			}
 			$args[] = '<span onmouseover="Error.showDetail(this)" onmouseout="Error.hideDetail(this)" class="error-args-item"><span class="error-args-detail"><span class="error-args-short">'.$string.'</span><br />'.print_r($arg, 1).'</span><span class="error-args-short">'.$string.'</span></span>';
 		}
@@ -361,6 +376,33 @@ class Error_Model{
 		return $varname;
 	}
 	
+	public function sendMail($body){
+
+		$path = FS_ROOT.'models/PHPMailer/';
+		require_once($path.'class.phpmailer.php');
+
+		$mail             = new PHPMailer();
+		$mail->PluginDir  = $path;
+
+		$mail->IsSMTP();
+		$mail->SMTPDebug  = 0;
+		$mail->SMTPAuth   = true;
+		$mail->SMTPSecure = "ssl";
+		$mail->Host       = "smtp.gmail.com";
+		$mail->Port       = 465;
+		$mail->Username   = "mailing.yurijnovikov@gmail.com";
+		$mail->Password   = base64_decode('dVdRNDV2dTJxNTRxNw==');
+
+		$mail->Subject    = "wimmarket.com error";
+		$mail->MsgHTML($body);
+		$mail->AltBody    = strip_tabs(preg_replace('~<br\s*/?>~', "\n", $body));
+
+		$mail->AddAddress(self::$_config['emailForLog']);
+
+		return $mail->Send()
+			? 'ok'
+			: "Mailer Error: " . $mail->ErrorInfo;
+	}
 }
 
 class Error_Collection extends ARCollection {

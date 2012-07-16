@@ -129,7 +129,11 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 			<? endif; ?>
 		</td>
 		<td style="white-space: nowrap;"><a href="<?= href('admin/users/view/'.$item['uid']); ?>"><?= $item['login']; ?></a></td>
-		<td style="text-align: left;" class="grey"><?= $item['user_ip']; ?></td>
+		<td style="text-align: left;">
+			<a href="<?= $this->href('admin/manage/user-statistics?ips[]='.$item['user_ip']); ?>" style="color: grey;">
+				<?= $item['user_ip']; ?>
+			</a>
+		</td>
 		<? if ($item['has_js']): ?>
 			<td><?= $item['has_js'] ? $item['browser_name'].'&nbsp;'.$item['browser_version'] : '-'; ?></td>
 			<td><?= $item['has_js'] ? $item['screen_width'].'x'.$item['screen_height'] : '-'; ?></td>

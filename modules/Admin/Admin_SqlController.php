@@ -5,7 +5,7 @@ class Admin_SqlController extends Controller {
 	const TPL_PATH = 'modules/Admin/templates/sql/';
 	const MODULE = 'admin';
 	
-	protected $_displayIndex = 'console';
+	protected $_displayIndex = 'tables';
 	
 	public $methodResources = array(
 	
@@ -60,46 +60,46 @@ class Admin_SqlController extends Controller {
 		
 		$db = db::get();
 		$table = isset($params[0]) ? $params[0] : null;
-		$action = isset($params[1]) ? $params[1] : null;
+		$action = isset($params[1]) ? $params[1] : 'view';
 
 		if ($table) {
 
-			if ($action) {
-				switch ($action) {
-					case 'delete':
-						$variables = array('table' => $table);
-						BackendLayout::get()
-							->addBreadcrumb('Удаление таблицы '.$table)
-							->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
-							->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
-							->setContentPhpFile(self::TPL_PATH.'table_delete.php', $variables)
-							->render();
-						break;
-					case 'show-create':
-						$variables = array('table' => $table);
-						BackendLayout::get()
-							->prependTitle('show create table '.$table)
-							->addBreadcrumb('show create table '.$table)
-							->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
-							->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
-							->setContent('<p><pre style="-o-tab-size: 4;">'.$db->showCreateTable($table).'</pre></p>')
-							->render();
-						break;
-				}
-			} else {
-				$model = new Admin_Model();
+			switch ($action) {
+				case 'delete':
+					$variables = array('table' => $table);
+					BackendLayout::get()
+						->addBreadcrumb('Удаление таблицы '.$table)
+						->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
+						->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
+						->setContentPhpFile(self::TPL_PATH.'table_delete.php', $variables)
+						->render();
+					break;
+				case 'show-create':
+					$variables = array('table' => $table);
+					BackendLayout::get()
+						->prependTitle('show create table '.$table)
+						->addBreadcrumb('show create table '.$table)
+						->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
+						->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
+						->setContent('<p><pre style="-o-tab-size: 4;">'.$db->showCreateTable($table).'</pre></p>')
+						->render();
+					break;
+				case 'view':
+					$model = new Admin_Model();
 
-				$variables = array(
-					'table' => $table,
-					'tableData' => $model->getTableData($table),
-				);
-				
-				// echo '<pre>'; print_r($variables); die;
-				BackendLayout::get()
-					->addBreadcrumb('Просмотр таблицы '.$table)
-					->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
-					->setContentPhpFile(self::TPL_PATH.'table_view.php', $variables)
-					->render();
+					$variables = array(
+						'table' => $table,
+						'tableData' => $model->getTableData($table),
+						'tags' => isset($_GET['tags']) ? $_GET['tags'] : 'strip',
+						'len' => isset($_GET['len']) ? $_GET['len'] : '500',
+					);
+					
+					// echo '<pre>'; print_r($variables); die;
+					BackendLayout::get()
+						->addBreadcrumb('Просмотр таблицы '.$table)
+						->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
+						->setContentPhpFile(self::TPL_PATH.'table_view.php', $variables)
+						->render();
 			}
 		} else {
 

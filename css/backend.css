@@ -474,6 +474,9 @@ table.small-grid td{
 	padding: 2px 5px;
 	border: solid 1px #EEE;
 }
+table.no-border td{
+	border: none !important;
+}
 
 table.form-admin-edit-user th{
 	border: solid 1px #FFF;
@@ -639,4 +642,15 @@ table.user-stat-pages th{
 .table-data .col-type{
 	font-size: 10px;
 	color: #999;
+}
+
+.table-view-options{
+	float: left;
+	background-color: #FFFFF5;
+	border: solid 1px #F1F1E8;
+	padding: 10px;
+	margin-bottom: 1em;
+}
+.table-view-options table{
+	margin: 0;
 }
