@@ -23,7 +23,7 @@ class Html_Form {
 		foreach ($attrs as $k => $v)
 			$attrsStr .= ' '.$k.'="'.$v.'"';
 
-		return '<form action="'.$action.'" method="'.$method.'"'.$attrsStr.'>'.$r.$formcode;
+		return '<form action="'.Layout::get()->href($action).'" method="'.$method.'"'.$attrsStr.'>'.$r.$formcode;
 	}
 
 	/**

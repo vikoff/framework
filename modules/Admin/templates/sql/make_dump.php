@@ -11,7 +11,7 @@
 			<table class="grid">
 				<tr>
 					<th>База данных</th>
-					<td><?= HtmlForm::select(array('id'=>'input-database', 'name'=>'database'), $this->databases, $this->curDatabase, array('keyEqVal' => TRUE)); ?></td>
+					<td><?= Html_Form::select(array('id'=>'input-database', 'name'=>'database'), $this->databases, $this->curDatabase, array('keyEqVal' => TRUE)); ?></td>
 				</tr>
 				<tr>
 					<th>Таблицы</th>

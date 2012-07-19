@@ -63,7 +63,7 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 }
 </style>
 
-<form method="get" action="" class="paragraph">
+<?= Html_Form::openTag(array('class' => 'paragraph', 'action' => 'admin/manage/user-statistics')); ?>
 	
 	<? if (!empty($_GET['sort'])): ?>
 		<input type="hidden" name="sort" value="<?= $_GET['sort'] ?>" />

@@ -110,7 +110,7 @@
 		
 		<div class="paragraph">
 			<label class="title-inline">Формат:</label>
-			<?= HtmlForm::select(
+			<?= Html_Form::select(
 				array('name' => 'format'),
 				array('html', 'php'),
 				$this->format,
