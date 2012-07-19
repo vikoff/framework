@@ -11,6 +11,10 @@ class CurUser extends User_Model {
 	const HASH_PR = 'b1a838a7ee5413752554941c22926a1615866622';
 	
 	private static $_instance = null;
+
+	private static $_id = null;
+	private static $_roleId = null;
+	private static $_level = null;
 	
 	private $_rootMode = FALSE;
 	
@@ -24,7 +28,7 @@ class CurUser extends User_Model {
 	);
 	
 	
-	/** ИНИЦИАЛИЗАЦИЯ ЭКЗЕМПЛЯРА КЛАССА */
+	/** инициализация экземпляра класса */
 	public static function init(){
 		
 		if(!is_null(self::$_instance))
@@ -34,21 +38,36 @@ class CurUser extends User_Model {
 		return self::$_instance;
 	}
 	
-	/** ПОЛУЧЕНИЕ ЭКЗЕМПЛЯРА КЛАССА */
+	/** получение экземпляра класса */
 	public static function get(){
 		
 		return self::$_instance;
 	}
+
+	/** аксессор получения id текущего пользователя */
+	public static function id(){
+
+		return self::$_id;
+	}
+
+	/** аксессор получения roleId текущего пользователя */
+	public static function roleId(){
+
+		return self::$_roleId;
+	}
+
+	/** аксессор получения level текущего пользователя */
+	public static function level(){
+
+		return self::$_level;
+	}
 	
-	/** КОНСТРУКТОР */
+	/** конструктор */
 	public function __construct(){
 		
 		if(!$this->isSessionInited())
 			$this->initSession();
 
-
-		define('USER_AUTH_ID', $this->getAuthData('id'));
-		
 		$this->_rootMode = $this->getAuthData('root');
 		
 		if($this->_rootMode){
@@ -58,21 +77,20 @@ class CurUser extends User_Model {
 			parent::__construct($this->getAuthData('id'), self::INIT_ANY);
 		}
 		
-		$roleId = $this->isLogged()
+		self::$_id = $this->id;
+		self::$_roleId = $this->isLogged()
 			? $this->role_id
 			: User_RoleCollection::load()->getGuestRole('id');
-			
-		define('USER_AUTH_LEVEL', User_RoleCollection::load()->getRole($roleId, 'level'));
-		define('USER_AUTH_ROLE_ID', $roleId);
+		self::$_level = User_RoleCollection::load()->getRole(self::$_roleId, 'level');
 	}
 	
-	/** ИНИЦИАЛИЗИРОВАНА ЛИ СЕССИЯ */
+	/** инициализирована ли сессия */
 	public function isSessionInited(){
 	
 		return isset($_SESSION[$this->_authPrefix.'userAuthData']);
 	}
 	
-	/** ИНИЦИАЛИЗАЦИЯ СЕССИИ */
+	/** инициализация сессии */
 	public function initSession(){
 	
 		$this->setEmptyAuthData();
@@ -80,7 +98,7 @@ class CurUser extends User_Model {
 			App::reload();
 	}
 	
-	/** АВТОРИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ */
+	/** авторизация пользователя */
 	public function login($login, $pass, $remember = FALSE){
 		
 		if($this->isLogged())
@@ -116,7 +134,7 @@ class CurUser extends User_Model {
 		
 	}
 	
-	/** АВТОРИЗАЦИЯ С ПОМОЩЬЮ КУКИ */
+	/** авторизация с помощью куки */
 	public function autoLogin(){
 
 		if(empty($_COOKIE[$this->_authPrefix.'uid']) || empty($_COOKIE[$this->_authPrefix.'access']))
@@ -141,7 +159,7 @@ class CurUser extends User_Model {
 		}
 	}
 
-	/** ВЫХОД ИЗ АККАУНТА */
+	/** выход из аккаунта */
 	public function logout(){
 		
 		UserStatistics_Model::get()->reset();
@@ -149,7 +167,7 @@ class CurUser extends User_Model {
 		$this->_setEmptyCookie();
 	}
 	
-	/** УСТАНОВИТЬ КУКИ ДЛЯ ПОСЛЕДУЮЩЕЙ АВТОРИЗАЦИИ */
+	/** установить куки для последующей авторизации */
 	private function _setLoginCookie($id, $login, $password){
 	
 		$expire = time() + 60 * 60 * 24 * 365;
@@ -157,14 +175,14 @@ class CurUser extends User_Model {
 		setcookie($this->_authPrefix."access", md5('yurijnovikovproject'.$id."_".$login."_".$password), $expire);
 	}
 	
-	/** УСТАНОВИТЬ ПУСТЫЕ КУКИ */
+	/** установить пустые куки */
 	private function _setEmptyCookie(){
 	
 		setcookie($this->_authPrefix."uid", "");
 		setcookie($this->_authPrefix."access", "");
 	}
 	
-	/** ПРОВЕРКА АВТОРИЗОВАН ЛИ ПОЛЬЗОВАТЕЛЬ */
+	/** проверка авторизован ли пользователь */
 	public function isLogged(){
 		
 		return !empty($_SESSION[$this->_authPrefix.'userAuthData']['id']);
@@ -175,14 +193,14 @@ class CurUser extends User_Model {
 		return $this->_rootMode;
 	}
 	
-	/** УСТАНОВИТЬ ПОЛЗЬОВАТЕЛЬСКИЕ ДАННЫЕ */
+	/** установить ползьовательские данные */
 	 private function setLoggedAuthData($id, $perms, $root = FALSE){
 		
 		$_SESSION[$this->_authPrefix.'userAuthData'] = array('id' => $id, 'perms' => $perms, 'root' => $root ? TRUE : FALSE);
 		UserStatistics_Model::get()->saveAuthStatistics($id);
 	}
 	
-	/** УСТАНОВИТЬ ПУСТЫЕ ПОЛЬЗОВАТЕЛЬСКИЕ ДАННЫЕ */
+	/** установить пустые пользовательские данные */
 	 private function setEmptyAuthData(){
 	 
 		$_SESSION[$this->_authPrefix.'userAuthData'] = array('id' => 0, 'perms' => 0, 'root' => FALSE);
@@ -196,7 +214,7 @@ class CurUser extends User_Model {
 	}
 	
 	/**
-	 * ДОЗАГРУЗКА ДАННЫХ
+	 * дозагрузка данных
 	 * выполняется после основной загрузки данных из БД
 	 * и только для существующих объектов
 	 * @param array &$data - данные полученные основным запросом

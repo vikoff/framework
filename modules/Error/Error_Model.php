@@ -223,7 +223,7 @@ class Error_Model{
 		$ERROR_FILE = $this->_errfile;
 		$ERROR_LINE = $this->_errline;
 		$BACKTRACE  = $_backtrace;
-		$UID        = USER_AUTH_ID;
+		$UID        = CurUser::id();
 		$ERROR_FIRST_TIME = date('Y-m-d H:i:s', $this->firstTime);
 		$ERROR_TIME = date('Y-m-d H:i:s', $this->time);
 		$ERROR_URL  = $this->url;
@@ -331,7 +331,7 @@ class Error_Model{
 		if(self::$_config['keepDbSessionDump'])
 			$fields['session_dump'] = base64_encode(serialize($_SESSION));
 		
-		$fields['uid'] = USER_AUTH_ID;
+		$fields['uid'] = CurUser::id();
 		$fields['lastdate'] = time();
 		$db = db::get();
 		

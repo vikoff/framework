@@ -123,7 +123,7 @@ class Page_Model extends ActiveRecord{
 		$data['modif_date'] = time();
 		
 		if($this->isNewObj){
-			$data['author'] = USER_AUTH_ID;
+			$data['author'] = CurUser::id();
 			$data['create_date'] = time();
 		}
 	}

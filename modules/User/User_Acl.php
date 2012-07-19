@@ -25,7 +25,7 @@ class User_Acl {
 	private function _loadUserPermissions(){
 		
 		$db = db::get();
-		$_data = $db->getAll('SELECT module, resource FROM '.self::TABLE.' WHERE role_id='.USER_AUTH_ROLE_ID);
+		$_data = $db->getAll('SELECT module, resource FROM '.self::TABLE.' WHERE role_id='.CurUser::roleId());
 		
 		foreach($_data as $row)
 			$this->_userPermissions[ $row['module'] ][ $row['resource'] ] = 1;

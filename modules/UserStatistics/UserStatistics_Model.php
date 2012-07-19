@@ -90,10 +90,6 @@ class UserStatistics_Model {
 		// определение запришиваемого URL
 		$requestUrl = getVar($_SERVER['SERVER_NAME']).getVar($_SERVER['REQUEST_URI']);
 		
-		// если запрашиваемый URL совпадает с предыдущим, ничего не сохраняем
-		if($requestUrl == $_SESSION['vik-off-user-statistics']['last-url'] && empty($_POST))
-			return;
-		
 		$db = db::get();
 		
 		// создание сессии
@@ -113,19 +109,34 @@ class UserStatistics_Model {
 			? strtolower(is_array($_POST['action']) ? YArray::getFirstKey($_POST['action']) : $_POST['action'])
 			: null;
 		
+		// инкремент запроса страницы (если запрошена та же страница)
+		if($requestUrl === $_SESSION['vik-off-user-statistics']['last-url'] && empty($_POST)
+		   && !empty($_SESSION['vik-off-user-statistics']['last-page-id']))
+		{
+			$db->update('user_stat_pages', array(
+				'num_requests' => $db->raw('num_requests + 1'),
+				'last_date' => time(),
+			), 'id='.$_SESSION['vik-off-user-statistics']['last-page-id']);
+		}
 		// сохранение запрошенной страницы
-		$db->insert('user_stat_pages', array(
-			'session_id'  => $_SESSION['vik-off-user-statistics']['session-id'],
-			'url'         => $requestUrl,
-			'is_ajax'     => AJAX_MODE ? TRUE : FALSE,
-			'is_post'     => !empty($_POST),
-			'post_data'   => null,
-			'post_action' => $action,
-			'date'        => time(),
-		));
+		else {
+
+			$pid = $db->insert('user_stat_pages', array(
+				'session_id'  => $_SESSION['vik-off-user-statistics']['session-id'],
+				'url'         => $requestUrl,
+				'is_ajax'     => AJAX_MODE ? TRUE : FALSE,
+				'is_post'     => !empty($_POST),
+				'post_data'   => null,
+				'post_action' => $action,
+				'first_date'  => time(),
+				'last_date' => time(),
+				'num_requests'=> 1,
+			));
 		
-		// сохраняем запрашиваемый URL
-		$_SESSION['vik-off-user-statistics']['last-url'] = $requestUrl;
+			// сохраняем запрашиваемый URL
+			$_SESSION['vik-off-user-statistics']['last-url'] = $requestUrl;
+			$_SESSION['vik-off-user-statistics']['last-page-id'] = $pid;
+		}
 	}
 	
 	// ПРОВЕРКА НЕОБХОДИМОСТИ СОХРАНЕНИЯ КЛИЕНТСКОЙ СТАТИСТИКИ
@@ -218,14 +229,20 @@ class UserStatistics_Model {
 			$data['num_pages'] = $num;
 			
 			if ($detail)
-				foreach($data['pages'] as &$p)
-					$p['date'] = YDate::loadTimestamp($p['date'])->getStrDateTime();
+				foreach($data['pages'] as &$p) {
+					$p['first_date'] = YDate::loadTimestamp($p['first_date'])->getStrDateTime();
+					$p['last_date'] = YDate::loadTimestamp($p['last_date'])->getStrDateTime();
+				}
 					
 			$data['pages_info'] = array(
 				'first_page' => $data['pages'][0]['url'],
 				'last_page' => $data['pages'][ $num - 1 ]['url'],
-				'first_page_time' => $detail ? $data['pages'][0]['date'] : YDate::loadTimestamp($data['pages'][0]['date'])->getStrDateTime(),
-				'last_page_time' => $detail ? $data['pages'][ $num - 1 ]['date']: YDate::loadTimestamp($data['pages'][ $num - 1 ]['date'])->getStrDateTime(),
+				'first_page_time' => $detail
+					? $data['pages'][0]['last_date']
+					: YDate::loadTimestamp($data['pages'][0]['last_date'])->getStrDateTime(),
+				'last_page_time' => $detail
+					? $data['pages'][ $num - 1 ]['last_date']
+					: YDate::loadTimestamp($data['pages'][ $num - 1 ]['last_date'])->getStrDateTime(),
 			);
 		} else {
 			$data['pages'] = null;
@@ -241,7 +258,8 @@ class UserStatistics_Model {
 		$data['has_js_text'] = $data['has_js']
 			? '<span class="green">✔</span>'
 			: '<span class="red">✘</span>';
-			
+		
+		// echo '<pre>'; print_r($data); die;
 		return $data;
 	}
 	
@@ -265,7 +283,7 @@ class UserStatistics_Collection extends ARCollection {
 		'id' => array('s.id _DIR_', 'id'),
 		'uid' => array('uid _DIR_', 'uid'),
 		'login' => 'Логин',
-		'last_date' => array('(SELECT MAX(date) FROM user_stat_pages WHERE session_id=s.id) _DIR_', 'Последняя дата'),
+		'last_date' => array('(SELECT MAX(last_date) FROM user_stat_pages WHERE session_id=s.id) _DIR_', 'Последняя дата'),
 		'num_pages' => array('(SELECT COUNT(1) FROM user_stat_pages WHERE session_id=s.id) _DIR_', 'Кол-во страниц'),
 		'user_ip' => 'IP',
 		'referer' => 'referer',
@@ -307,7 +325,7 @@ class UserStatistics_Collection extends ARCollection {
 		$sorter = new Sorter('last_date', 'DESC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array(
 			's.*, u.'.CurUser::LOGIN_FIELD.' AS login,
-			(SELECT MAX(date) FROM user_stat_pages WHERE session_id=s.id) AS last_date,
+			(SELECT MAX(last_date) FROM user_stat_pages WHERE session_id=s.id) AS last_date,
 			(SELECT COUNT(1) FROM user_stat_pages WHERE session_id=s.id) AS num_pages',
 			'FROM '.UserStatistics_Model::TABLE.' s
 			LEFT JOIN '.User_Model::TABLE.' u ON u.id=s.uid

@@ -110,7 +110,7 @@ class TestItem_Model extends ActiveRecord {
 	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
 	public function postValidation(&$data){
 		
-		// $data['author'] = USER_AUTH_ID;
+		// $data['author'] = CurUser::id();
 		// $data['modif_date'] = time();
 		// if($this->isNewObj)
 			// $data['create_date'] = time();
