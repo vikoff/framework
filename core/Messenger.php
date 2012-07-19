@@ -92,10 +92,10 @@ class Messenger {
 				foreach ($messages[$this->_ns] as $m)
 					$html .= '<div class="item">'.$m.'</div>';
 				$htmls[$type] = '<div class="vik-user-message '.$type.'">'.$html.'</div>';
+				unset($this->_messages[$type][$this->_ns]);
 			}
 		}
 
-		$this->_messages = array('error' => array(), 'info' => array(), 'success' => array());
 		return implode('', $htmls);
 	}
 

@@ -2,11 +2,15 @@
 
 function printCell($text, $tags, $len) {
 
-	switch ($tags) {
 
+	switch ($tags) {
+		case 'htmlspecialchars': $text = htmlspecialchars($text); break;
+		case 'strip': $text = strip_tags($text); break;
 	}
-	if ($len != 'all');
-		$text = substr_replace($text, '...', $len);
+	if ($len != 'all') {
+		$len = (int)$len;
+		$text = mb_strlen($text) > $len ? mb_substr($text, 0, $len).'...' : $text;
+	}
 
 	return $text;
 }
@@ -17,6 +21,8 @@ function printCell($text, $tags, $len) {
 	<h3>
 		Просмотр таблицы <?= $this->table; ?>
 		<sup>
+			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'/truncate'); ?>" class="simple-text small">очистить</a>
+			<span class="simple-text small">|</span>
 			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'/delete'); ?>" class="simple-text small">удалить</a>
 			<span class="simple-text small">|</span>
 			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'/show-create'); ?>" class="simple-text small">show-create-table</a>
@@ -30,8 +36,8 @@ function printCell($text, $tags, $len) {
 			<td>
 				<?= Html_Form::select(array('name' => 'tags', 'style' => "width: 100%;"), array(
 					'html' => 'выводить html',
-					'escape' => 'htmlspecialchars',
-					'strip' => 'stip_tags',
+					'htmlspecialchars' => 'htmlspecialchars',
+					'strip' => 'strip_tags',
 				), $this->tags); ?>
 			</td>
 		</tr>

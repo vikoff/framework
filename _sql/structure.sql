@@ -74,30 +74,30 @@ CREATE TABLE `error_log` (
 /* ПОЛЬЗОВАТЕЛЬСКАЯ СТАТИСТИКА */
 DROP TABLE IF EXISTS `user_stat`;
 CREATE TABLE `user_stat` (
-  `id` 				INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `uid` 			INT(10) UNSIGNED DEFAULT 0,
-  `user_ip`			VARCHAR(255),
-  `referer`			VARCHAR(255),
-  `user_agent_raw`	VARCHAR(255),
-  `has_js`			BOOLEAN,
-  `browser_name`	VARCHAR(50),
-  `browser_version`	VARCHAR(50),
-  `screen_width`	SMALLINT UNSIGNED,
-  `screen_height`	SMALLINT UNSIGNED,
-  `date`			INT(10) UNSIGNED
+  `id`        INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `uid`       INT(10) UNSIGNED DEFAULT 0,
+  `user_ip`     VARCHAR(255),
+  `referer`     VARCHAR(255),
+  `user_agent_raw`  VARCHAR(255),
+  `has_js`      BOOLEAN,
+  `browser_name`  VARCHAR(50),
+  `browser_version` VARCHAR(50),
+  `screen_width`  SMALLINT UNSIGNED,
+  `screen_height` SMALLINT UNSIGNED,
+  `date`      INT(10) UNSIGNED
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /* СТРАНИЦЫ, ПОСЕЩЕННЫЕ ПОЛЬЗОВАТЕЛЯМИ */
 DROP TABLE IF EXISTS `user_stat_pages`;
 CREATE TABLE `user_stat_pages` (
-  `id` 				INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `session_id`		INT(10) UNSIGNED,
-  `url`				TEXT,
-  `is_ajax`			BOOLEAN,
-  `is_post`			BOOLEAN,
-  `post_data`		TEXT,
-  `post_action`		TEXT,
-  `date`			INT(10) UNSIGNED
+  `id`        INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `session_id`    INT(10) UNSIGNED,
+  `url`       TEXT,
+  `is_ajax`     BOOLEAN,
+  `is_post`     BOOLEAN,
+  `post_data`   TEXT,
+  `post_action`   TEXT,
+  `date`      INT(10) UNSIGNED
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /* ПСЕВДОНИМЫ */

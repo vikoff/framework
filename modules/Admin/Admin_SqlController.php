@@ -17,6 +17,7 @@ class Admin_SqlController extends Controller {
 		'ajax_get_tables' => 'sql',
 		
 		'action_drop_table' => 'sql',
+		'action_truncate_table' => 'sql',
 		'action_make_dump' => 'sql',
 		'action_load_dump' => 'sql',
 	);
@@ -65,6 +66,15 @@ class Admin_SqlController extends Controller {
 		if ($table) {
 
 			switch ($action) {
+				case 'truncate':
+					$variables = array('table' => $table);
+					BackendLayout::get()
+						->addBreadcrumb('Очистка таблицы таблицы '.$table)
+						->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
+						->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
+						->setContentPhpFile(self::TPL_PATH.'table_truncate.php', $variables)
+						->render();
+					break;
 				case 'delete':
 					$variables = array('table' => $table);
 					BackendLayout::get()
@@ -138,6 +148,20 @@ class Admin_SqlController extends Controller {
 	////////////////////
 	////// ACTION //////
 	////////////////////
+	
+	public function action_truncate_table($params = array()){
+
+		$table = getVar($_POST['table']);
+		if (!$table) {
+			Messenger::get()->addError('Таблица не найдена');
+			return false;
+		} else {
+			db::get()->truncate($table);
+			$this->setRedirectUrl('admin/sql/tables');
+			Messenger::get()->addSuccess('Таблица '.$table.' очищена');
+			return TRUE;
+		}
+	}
 	
 	public function action_drop_table($params = array()){
 

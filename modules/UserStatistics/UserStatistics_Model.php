@@ -351,7 +351,7 @@ class UserStatistics_Collection extends ARCollection {
 		$filters['users'] = $db->getColIndexed('
 			SELECT DISTINCT uid, u.'.CurUser::LOGIN_FIELD.' AS login
 			FROM user_stat s
-			JOIN '.User_Model::TABLE.' u ON u.id=s.uid ORDER BY login', 'uid');
+			JOIN '.User_Model::TABLE.' u ON u.id=s.uid ORDER BY login');
 		
 		$filters['ips'] = $db->getColIndexed('SELECT DISTINCT(user_ip), user_ip FROM user_stat ORDER BY user_ip');
 		$filters['browsers'] = $db->getColIndexed('SELECT DISTINCT(browser_name), browser_name FROM user_stat WHERE LENGTH(browser_name) > 0 ORDER BY browser_name');

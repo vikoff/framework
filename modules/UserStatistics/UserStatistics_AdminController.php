@@ -45,7 +45,7 @@ class UserStatistics_AdminController extends Controller{
 			'filters' => $collection->getFiltersLists(),
 		);
 		
-		// echo '<pre>'; print_r($variables['collection']); die;
+		// echo '<pre>'; print_r($variables); die;
 		BackendLayout::get()
 			->setLinkTags($collection->getLinkTags())
 			->setContentPhpFile(self::TPL_PATH.'admin_list.php', $variables)

@@ -2,9 +2,13 @@
 
 class User_Model extends ActiveRecord {
 	
-	const LOGIN_FIELD = 'login';
+	/** имя модуля */
+	const MODULE = 'user';
 	
+	/** таблица БД */
 	const TABLE = 'users';
+
+	const LOGIN_FIELD = 'login';
 	
 	const SAVE_ADMIN_CREATE = 'adm-create';
 	const SAVE_ADMIN_EDIT   = 'adm-edit';
@@ -38,9 +42,9 @@ class User_Model extends ActiveRecord {
 		return new User_Model($id, self::INIT_EXISTS_FORCE, $fieldvalues);
 	}
 	
-	/** СЛУЖЕБНЫЙ МЕТОД (получение констант из родителя) */
-	public function getConst($name){
-		return constant(__CLASS__.'::'.$name);
+	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
+	public function getClass(){
+		return __CLASS__;
 	}
 	
 	/** ПОДГОТОВКА ДАННЫХ К ОТОБРАЖЕНИЮ */
