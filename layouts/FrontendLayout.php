@@ -45,7 +45,7 @@ class FrontendLayout extends Layout {
 		
 		$html = '';
 		foreach($this->_topMenu->getItems() as $item)
-			$html .= '<a href="'.$item['href'].'" '.(!empty($item['attrs']) ? $item['attrs'] : '').' '.($item['active'] ? 'class="active"' : '').'>'.$item['title'].'</a>';
+			$html .= '<a href="'.$item['href'].'" '.(!empty($item['attrs']) ? $item['attrs'] : '').' '.(!empty($item['active']) ? 'class="active"' : '').'>'.$item['title'].'</a>';
 		
 		return $html;
 	}

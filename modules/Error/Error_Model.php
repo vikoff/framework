@@ -6,7 +6,7 @@ class Error_Model{
 	const DISPLAY_MODE = 2;
 	
 	const MODULE = 'error';
-	const FATAL_ERROR_MSG = 'Sorry, there was a mistake! Our experts are already working on a fix.';
+	const FATAL_ERROR_MSG = 'Извините, произошла ошибка! Наши специалисты уже работают над ее устранением.';
 
 	/** путь к шаблонам (относительно FS_ROOT) */
 	const TPL_PATH = 'modules/Error/templates/';

@@ -13,10 +13,6 @@ define('AJAX_MODE', isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SER
 /** индекс файл */
 define('INDEX_FILE', basename(__FILE__));
 
-/** режим работы сайта */
-define('RUN_MODE', 'dev');
-// define('RUN_MODE', 'production');
-
 // отправка Content-type заголовка
 header('Content-Type: text/html; charset=utf-8');
 

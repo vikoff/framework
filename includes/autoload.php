@@ -9,7 +9,6 @@ function __autoload($className){
 		'Tools' 			=> 'core/Tools.php',
 		'db' 				=> 'core/Db.php',
 		'Layout'			=> 'core/Layout.php',
-		'Debugger'			=> 'core/Debugger.php',
 		'DbAdapter_mysql'	=> 'core/DbAdapters/mysql.php',
 		'DbAdapter_sqlite'	=> 'core/DbAdapters/sqlite.php',
 		'DbAdapter_pdo_sqlite'	=> 'core/DbAdapters/pdo_sqlite.php',

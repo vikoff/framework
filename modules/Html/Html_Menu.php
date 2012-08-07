@@ -27,7 +27,7 @@ class Html_Menu {
 				
 			$this->items[] = $item;
 			
-			if ($item['active']){
+			if (!empty($item['active'])) {
 				$index = count($this->items) - 1;
 				$this->activeIndex = $index;
 				$this->activeItem = &$this->items[$index];

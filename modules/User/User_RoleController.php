@@ -64,7 +64,7 @@ class User_RoleController extends Controller {
 	/** DISPLAY NEW */
 	public function display_new(){
 		
-		$pageTitle = 'Создание новой страницы';
+		$pageTitle = 'Создание новой роли';
 		
 		$rolesList = array();
 		foreach(User_RoleCollection::load()->getAll() as $id => $role)
@@ -89,7 +89,7 @@ class User_RoleController extends Controller {
 		$instanceId = (int)$uid;
 		$instance = User_RoleModel::load($instanceId);
 		
-		$pageTitle = '<span style="font-size: 14px;">Редактирование элемента</span> #'.$instance->id;
+		$pageTitle = '<span style="font-size: 14px;">Редактирование роли</span> #'.$instance->id;
 	
 		$variables = array_merge($instance->GetAllFieldsPrepared(), array(
 			'instanceId' => $instanceId,
@@ -98,8 +98,8 @@ class User_RoleController extends Controller {
 		));
 		
 		BackendLayout::get()
-			->prependTitle('Редактирование записи')
-			->addBreadcrumb('Редактирование записи')
+			->prependTitle('Редактирование роли')
+			->addBreadcrumb('Редактирование роли')
 			->setContentPhpFile(self::TPL_PATH.'edit.php', $variables)
 			->render();
 	}
@@ -115,8 +115,8 @@ class User_RoleController extends Controller {
 		));
 		
 		BackendLayout::get()
-			->prependTitle('Удаление записи')
-			->addBreadcrumb('Удаление записи')
+			->prependTitle('Удаление роли')
+			->addBreadcrumb('Удаление роли')
 			->setContentPhpFile(self::TPL_PATH.'delete.php', $variables)
 			->render();
 	}
@@ -140,7 +140,7 @@ class User_RoleController extends Controller {
 				: null;
 			return TRUE;
 		} else {
-			Messenger::get()->addError('Не удалось сохранить запись:', $instance->getError());
+			Messenger::get()->addError('Не удалось сохранить роли:', $instance->getError());
 			return FALSE;
 		}
 	}
@@ -152,10 +152,10 @@ class User_RoleController extends Controller {
 		$instance = User_RoleModel::load($instanceId);
 	
 		if ($instance->destroy()) {
-			Messenger::get()->addSuccess('Запись удалена');
+			Messenger::get()->addSuccess('Роль удалена');
 			return TRUE;
 		} else {
-			Messenger::get()->addError('Не удалось удалить запись:', $instance->getError());
+			Messenger::get()->addError('Не удалось удалить роли:', $instance->getError());
 			return FALSE;
 		}
 
