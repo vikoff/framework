@@ -26,6 +26,10 @@ class Html_Form {
 		return '<form action="'.Layout::get()->href($action).'" method="'.$method.'"'.$attrsStr.'>'.$r.$formcode;
 	}
 
+	public static function closeTag(){
+		return '</form>';
+	}
+
 	/**
 	 * сгегерировать html input
 	 * @param array $attrs - все параметры инпута вида 'параметр' => 'значение'

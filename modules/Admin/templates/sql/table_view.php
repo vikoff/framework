@@ -21,15 +21,16 @@ function printCell($text, $tags, $len) {
 	<h3>
 		Просмотр таблицы <?= $this->table; ?>
 		<sup>
-			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'/truncate'); ?>" class="simple-text small">очистить</a>
+			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'/truncate?conn='.$this->conn); ?>" class="simple-text small">очистить</a>
 			<span class="simple-text small">|</span>
-			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'/delete'); ?>" class="simple-text small">удалить</a>
+			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'/delete?conn='.$this->conn); ?>" class="simple-text small">удалить</a>
 			<span class="simple-text small">|</span>
-			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'/show-create'); ?>" class="simple-text small">show-create-table</a>
+			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'/show-create?conn='.$this->conn); ?>" class="simple-text small">show-create-table</a>
 		</sup>
 	</h3>
 
 	<?= Html_Form::openTag(array('class' => "table-view-options", 'action' => 'admin/sql/tables/'.$this->table)); ?>
+		<input type="hidden" name="conn" value="<?= $this->conn; ?>" />
 		<table class="small-grid no-border">
 		<tr>
 			<td>Теги:</td>
@@ -56,7 +57,7 @@ function printCell($text, $tags, $len) {
 		</tr>
 		<tr><td colspan="2" style="text-align: center;">
 			<input type="submit" class="button-small" name="" value="Применить">
-			<a href="<?= $this->href('admin/sql/tables/'.$this->table); ?>" class="button-small">Сброс</a>
+			<a href="<?= $this->href('admin/sql/tables/'.$this->table.'&conn='.$this->conn); ?>" class="button-small">Сброс</a>
 		</td></tr>
 		</table>
 	</form>

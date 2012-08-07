@@ -72,6 +72,8 @@ class Paginator{
 	// номер текущей страницы (начиная с 1)
 	private $_curPage = 1;
 
+	private $_db = null;
+
 	
 	///////////////////////////
 	//////// АКСЕССОРЫ ////////
@@ -89,7 +91,7 @@ class Paginator{
 	//////// МЕТОДЫ ЗАГРУЗКИ ДАННЫХ В КЛАСС ////////
 	////////////////////////////////////////////////
 	
-	public function __construct($type, $data, $itemsPerPage = null){
+	public function __construct($type, $data, $itemsPerPage = null, $addit = array()){
 		
 		if(!in_array($type, array('sql', 'num'), true))
 			trigger_error('Неизвестный тип входных данных ['.$type.']', E_USER_ERROR);
@@ -98,7 +100,9 @@ class Paginator{
 			trigger_error('Тип входных данных [sql] подразумевает передачу данных в виде массива-списка', E_USER_ERROR);
 		
 		$this->setItemsPerPage($itemsPerPage);
-			
+		
+		$this->_db = isset($addit['dbConnection']) ? $addit['dbConnection'] : db::get();
+		
 		if($type == 'sql')
 			$this->_loadSql($data[0], $data[1]);
 		if($type == 'num')
@@ -110,7 +114,7 @@ class Paginator{
 	// ЗАГРУЗИТЬ SQL ВЫРАЖЕНИЕ
 	private function _loadSql($extractPart, $conditionPart){
 	
-		$this->_totalNumItems = db::get()->getOne('SELECT COUNT(1) '.$conditionPart, 0);
+		$this->_totalNumItems = $this->_db->getOne('SELECT COUNT(1) '.$conditionPart, 0);
 		$this->_sql = 'SELECT '.$extractPart.' '.$conditionPart;
 	}
 	

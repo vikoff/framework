@@ -59,9 +59,10 @@ class Admin_SqlController extends Controller {
 	
 	public function display_tables($params = array()){
 		
-		$db = db::get();
 		$table = isset($params[0]) ? $params[0] : null;
 		$action = isset($params[1]) ? $params[1] : 'view';
+		$conn = !empty($_GET['conn']) ? $_GET['conn'] : 'default';
+		$db = db::get($conn);
 
 		if ($table) {
 
@@ -70,8 +71,8 @@ class Admin_SqlController extends Controller {
 					$variables = array('table' => $table);
 					BackendLayout::get()
 						->addBreadcrumb('Очистка таблицы таблицы '.$table)
-						->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
-						->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
+						->addContentLink('admin/sql/tables?conn='.$conn, 'Вернуться к списку таблиц')
+						->addContentLink('admin/sql/tables/'.$table.'?conn='.$conn, 'Вернуться к таблице '.$table)
 						->setContentPhpFile(self::TPL_PATH.'table_truncate.php', $variables)
 						->render();
 					break;
@@ -79,8 +80,8 @@ class Admin_SqlController extends Controller {
 					$variables = array('table' => $table);
 					BackendLayout::get()
 						->addBreadcrumb('Удаление таблицы '.$table)
-						->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
-						->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
+						->addContentLink('admin/sql/tables?conn='.$conn, 'Вернуться к списку таблиц')
+						->addContentLink('admin/sql/tables/'.$table.'?conn='.$conn, 'Вернуться к таблице '.$table)
 						->setContentPhpFile(self::TPL_PATH.'table_delete.php', $variables)
 						->render();
 					break;
@@ -89,8 +90,8 @@ class Admin_SqlController extends Controller {
 					BackendLayout::get()
 						->prependTitle('show create table '.$table)
 						->addBreadcrumb('show create table '.$table)
-						->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
-						->addContentLink('admin/sql/tables/'.$table, 'Вернуться к таблице '.$table)
+						->addContentLink('admin/sql/tables?conn='.$conn, 'Вернуться к списку таблиц')
+						->addContentLink('admin/sql/tables/'.$table.'?conn='.$conn, 'Вернуться к таблице '.$table)
 						->setContent('<p><pre style="-o-tab-size: 4;">'.$db->showCreateTable($table).'</pre></p>')
 						->render();
 					break;
@@ -99,22 +100,25 @@ class Admin_SqlController extends Controller {
 
 					$variables = array(
 						'table' => $table,
-						'tableData' => $model->getTableData($table),
+						'tableData' => $model->getTableData($table, $conn),
 						'tags' => isset($_GET['tags']) ? $_GET['tags'] : 'strip',
 						'len' => isset($_GET['len']) ? $_GET['len'] : '500',
+						'conn' => $conn,
 					);
 					
 					// echo '<pre>'; print_r($variables); die;
 					BackendLayout::get()
 						->addBreadcrumb('Просмотр таблицы '.$table)
-						->addContentLink('admin/sql/tables', 'Вернуться к списку таблиц')
+						->addContentLink('admin/sql/tables?conn='.$conn, 'Вернуться к списку таблиц')
 						->setContentPhpFile(self::TPL_PATH.'table_view.php', $variables)
 						->render();
 			}
 		} else {
 
 			$variables = array(
+				'connections' => array_keys(db::getAllConnections()),
 				'tables' => $db->showTables(),
+				'conn' => $conn,
 			);
 			
 			BackendLayout::get()

@@ -12,12 +12,6 @@ class db {
 	 */
 	private static $_instances = array();
 	
-	/**
-	 * экземпляр дефолтного соединения с БД
-	 * @var null|db
-	 */
-	private static $_defaultInstance = null;
-	
 	
 	/**
 	 * СОЗДАНИЕ ПОДКЛЮЧЕНИЯ К БД
@@ -32,9 +26,9 @@ class db {
 	 *		string 'encoding' optional, устанавливает кодировку соединения
 	 * @param null|string $connIdentifier - идентификатор соединения с БД.
 	 * 		Если null, создается дефолтное соединение.
-	 * @return db instance
+	 * @return DbAdapter
 	 */
-	public static function create($connParams, $connIdentifier = null){
+	public static function create($connParams, $connIdentifier = 'default'){
 		
 		// проверка, переданы ли параметры в виде массива
 		if(!is_array($connParams))
@@ -60,28 +54,11 @@ class db {
 		if(!empty($connParams['keepFileLog']))
 			$db->keepFileLog($connParams['keepFileLog']);
 		
-		// если идентификатор соединения не передан
-		// создаем дефолтное подключение
-		if(is_null($connIdentifier)){
-			
-			if(is_null(self::$_defaultInstance))
-				self::$_defaultInstance = & $db;
-			else
-				trigger_error('Соединение с БД с дефолтным идентификатором уже создано', E_USER_ERROR);
-		}
-		// если идентификатор соединения указан
 		// создаем подключение с указанным идентификатором
-		else{
-			
-			if(strlen($connIdentifier)){
-				if(empty(self::$_instances[$connIdentifier]))
-					self::$_instances[$connIdentifier] = & $db;
-				else
-					trigger_error('Соединение с БД с идентификатором "'.$connIdentifier.'" уже создано', E_USER_ERROR);
-			}else{
-				trigger_error('Идентификатор соединения с БД должен быть числом, строкой или значением null', E_USER_ERROR);
-			}
-		}
+		if(empty(self::$_instances[$connIdentifier]))
+			self::$_instances[$connIdentifier] = & $db;
+		else
+			trigger_error('Соединение с БД с идентификатором "'.$connIdentifier.'" уже создано', E_USER_ERROR);
 		
 		return $db;
 	}
@@ -91,23 +68,26 @@ class db {
 	 * 
 	 * @param null|string $connIdentifier - идентификатор соединения с БД.
 	 * 		Если не указан, возвращается дефолтное соединение.
-	 * @return instance of db
+	 * @return DbAdapter
 	 */
-	public static function get($connIdentifier = null){
+	public static function get($connIdentifier = 'default'){
 		
-		$db = is_null($connIdentifier)
-			? self::$_defaultInstance
-			: (isset(self::$_instances[$connIdentifier])
-				? self::$_instances[$connIdentifier]
-				: null);
+		$db = isset(self::$_instances[$connIdentifier])
+			? self::$_instances[$connIdentifier]
+			: null;
 		
 		if(is_null($db))
-			trigger_error('Соединение с БД с '.(is_null($connIdentifier) ? 'дефолтным идентификатором' : 'идентификатором "'.$connIdentifier.'"').' не создано', E_USER_ERROR);
+			trigger_error('Соединение с БД с '.($connIdentifier == 'default' ? 'дефолтным идентификатором' : 'идентификатором "'.$connIdentifier.'"').' не создано', E_USER_ERROR);
 		
 		if(!$db->isConnected())
 			$db->connect();
 		
 		return $db;
+	}
+
+	public static function getAllConnections(){
+
+		return self::$_instances;
 	}
 	
 }

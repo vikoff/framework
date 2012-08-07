@@ -293,7 +293,14 @@ class DbAdapter_mysql extends DbAdapter{
 	 */
 	public function describe($table){
 		
-		return $this->getAll('DESCRIBE '.$table);
+		$data = $this->getAll('DESCRIBE '.$table);
+		foreach ($data as & $row) {
+			$row['name'] = $row['Field'];
+			$row['type'] = $row['Type'];
+			unset($row['Field'], $row['Type']);
+		}
+
+		return $data;
 	}
 	
 	/**

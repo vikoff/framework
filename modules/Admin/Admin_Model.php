@@ -27,9 +27,9 @@ class Admin_Model {
 		return $results;
 	}
 	
-	public function getTableData($table){
+	public function getTableData($table, $dbConnection = 'default'){
 
-		$db = db::get();
+		$db = db::get($dbConnection);
 		$structure = $db->describe($table);
 
 		if (!$structure)
@@ -40,7 +40,9 @@ class Admin_Model {
 			$sortCols[ $col['name'] ] = $col['name'];
 
 		$sorter = new Sorter($structure[0]['name'], 'DESC', $sortCols);
-		$paginator = new Paginator('sql', array('*', 'FROM '.$table.' ORDER BY '.$sorter->getOrderBy()), '~50');
+		$paginator = new Paginator('sql', array('*', 'FROM '.$table.' ORDER BY '.$sorter->getOrderBy()), '~50', array(
+			'dbConnection' => $db,
+		));
 		
 		return array(
 			'sortableLinks' => $sorter->getSortableLinks(),
