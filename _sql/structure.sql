@@ -54,7 +54,7 @@ CREATE TABLE `pages` (
   `modif_date`		INT(10) UNSIGNED DEFAULT '0',
   `create_date`		INT(10) UNSIGNED DEFAULT '0',
   PRIMARY KEY (`id`),
-  INDEX(`alias`)
+  INDEX(`alias_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 /* СОХРАНЕНИЕ ОШИБОК */
@@ -108,9 +108,11 @@ CREATE TABLE `aliases` (
   `id`				INT(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `alias`			VARCHAR(255),
   `path`			VARCHAR(255),
-  `is_bound`		BOOLEAN /* флаг о том, что псевдоним связан с элементом по alias.id */
+  `is_bound`		BOOLEAN /* флаг о том, что псевдоним связан с элементом по alias.id */,
+  INDEX (`alias`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
+-- some comments
 /*
  * ____
  * таблица зависит от: 

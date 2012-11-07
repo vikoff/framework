@@ -497,7 +497,7 @@ table#user-input-data-box td{
 
 .info-pin{
 	display: inline-block;
-	background: url('../images/backend/icon-info.png') no-repeat center center;
+	background: url('images/backend/icon-info.png') no-repeat center center;
 	width: 13px;
 	height: 13px;
 	position: relative;
@@ -560,19 +560,19 @@ table#user-input-data-box td{
 	border: inset 1px #BBB;
 }
 #submit-box-floating .btn-save{
-	background-image: url('../images/backend/submits/icon-save.png');
+	background-image: url('images/backend/submits/icon-save.png');
 }
 #submit-box-floating .btn-apply{
-	background-image: url('../images/backend/submits/icon-apply.png');
+	background-image: url('images/backend/submits/icon-apply.png');
 }
 #submit-box-floating .btn-cancel{
-	background-image: url('../images/backend/submits/icon-cancel.png');
+	background-image: url('images/backend/submits/icon-cancel.png');
 }
 #submit-box-floating .btn-delete{
-	background-image: url('../images/backend/submits/icon-delete.png');
+	background-image: url('images/backend/submits/icon-delete.png');
 }
 #submit-box-floating .btn-copy{
-	background-image: url('../images/backend/submits/icon-copy.png');
+	background-image: url('images/backend/submits/icon-copy.png');
 }
 
 .order-subgrid{

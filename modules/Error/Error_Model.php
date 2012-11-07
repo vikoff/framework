@@ -233,7 +233,7 @@ class Error_Model{
 			if ($return)
 				return $PLAIN_TEXT;
 			else
-				echo $PLAIN_TEXT
+				echo $PLAIN_TEXT;
 		} else {
 			if($return){
 				ob_start();

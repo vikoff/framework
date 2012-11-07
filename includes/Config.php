@@ -28,9 +28,10 @@ class Config {
 	private function __construct(){
 		
 		// определение окружения
-		$env = file_exists(FS_ROOT.'config/env.php')
-			? include(FS_ROOT.'config/env.php')
-			: array('host' => 'default', 'mode' => 'production');
+		if (!file_exists(FS_ROOT.'config/env.php'))
+			trigger_error('Enviroment file not found', E_USER_ERROR);
+
+		$env = include(FS_ROOT.'config/env.php');
 		
 		$this->_envMode = $env['mode'];
 		$this->_envHost = $env['host'];
