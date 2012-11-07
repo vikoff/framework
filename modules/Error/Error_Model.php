@@ -229,17 +229,23 @@ class Error_Model{
 		$ERROR_URL  = $this->url;
 		$OCCUR_NUM  = $this->occurNum;
 		
-		if($return){
-			ob_start();
-			echo $this->_getHtmlCssJs();
-			include(FS_ROOT.self::TPL_PATH.'view.php');
-			return ob_get_clean();
-		}else{
-			echo $this->_getHtmlCssJs();
-			include(FS_ROOT.self::TPL_PATH.'view.php');
-			return null;
+		if (PHP_SAPI == 'cli') {
+			if ($return)
+				return $PLAIN_TEXT;
+			else
+				echo $PLAIN_TEXT
+		} else {
+			if($return){
+				ob_start();
+				echo $this->_getHtmlCssJs();
+				include(FS_ROOT.self::TPL_PATH.'view.php');
+				return ob_get_clean();
+			}else{
+				echo $this->_getHtmlCssJs();
+				include(FS_ROOT.self::TPL_PATH.'view.php');
+				return null;
+			}
 		}
-	
 	}
 	
 	private function _getArgsShort($rawArgs){

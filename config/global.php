@@ -1,7 +1,7 @@
 <?
 
-if(!defined('WWW_ROOT'))
-	die("access denided (config file)");
+if(!defined('FS_ROOT'))
+	die("access denided (global config file)");
 
 // установить текущий часовой пояс
 date_default_timezone_set('Europe/Kiev');
