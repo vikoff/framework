@@ -1,8 +1,10 @@
 <?php
 session_start();
 
-define('WWW_ROOT', 'http://'.$_SERVER['SERVER_NAME'].(strlen(dirname($_SERVER['SCRIPT_NAME'])) > 1 ? dirname($_SERVER['SCRIPT_NAME']) : '').'/');
-define('FS_ROOT', realpath('.').DIRECTORY_SEPARATOR);
+if (PHP_SAPI != 'cli')
+	exit("command line run only!<br />");
+
+define('FS_ROOT', realpath('.').'/');
 define('YNPROJECT', 1);
 define('AJAX_MODE', 0);
 
@@ -10,143 +12,100 @@ define('AJAX_MODE', 0);
 define('RUN_MODE', 'dev');
 
 header('Content-Type: text/html; charset=utf-8');
+
+$cfgNoUserInit = true;
 require_once('setup.php');
 
-// db::get()->query('DROP TABLE page');
-// echo'<pre>'; print_r(db::get()->getAll('SELECT * FROM users')); die;
-$tables = db::get()->showTables();
 
-echo"<pre>";
-print_r($tables);
-echo"</pre>";
-
-if(!in_array("users", $tables)){
-
-	db::get()->query("
-			CREATE TABLE 'users' (
-				'id' 			INTEGER PRIMARY KEY,
-				'login'			VARCHAR(100) NOT NULL,
-				'password'		VARCHAR(100) NOT NULL,
-				'surname'		VARCHAR(255),
-				'name'			VARCHAR(255),
-				'patronymic'	VARCHAR(255),
-				'sex'			VARCHAR(10),
-				'birthdate' 	VARCHAR(15),
-				'country' 		VARCHAR(255),
-				'city'		 	VARCHAR(255),
-				'level'			SMALLINT,
-				'active' 		CHAR(1),
-				'regdate'		INTEGER
-			)
-	");
-	
-	echo"<div>таблица <b>users</b> создана</div>";
+if ($argc == 1) {
+	exit("USAGE: php ".basename(__FILE__)." path/to/structure.sql 'comma-separated tables to recreate (drop, create)'\n");
 }
 
-if(!in_array("pages", $tables)){
-
-	db::get()->query("
-			CREATE TABLE 'pages' (
-			  'id' 				INTEGER PRIMARY KEY,
-			  'title' 			TEXT NOT NULL,
-			  'alias' 			VARCHAR(255) NOT NULL,
-			  'body' 			TEXT,
-			  'author' 			INTEGER NOT NULL,
-			  'published' 		BOOLEAN DEFAULT FALSE,
-			  'type'			CHAR(10),
-			  'meta_description' TEXT,
-			  'meta_keywords'	TEXT,
-			  'modif_date'		INTEGER DEFAULT '0',
-			  'create_date'		INTEGER DEFAULT '0'
-			)
-	");
+function convert($sql){
 	
-	echo"<div>таблица <b>pages</b> создана</div>";
+	$sql = preg_replace(
+		array('/\s+/', '/`/', '/UNSIGNED/i', '/AUTO_INCREMENT/i', '/IF\s+(NOT)?\s+EXISTS/'),
+		array(' ',     '',    '',            '',                  ''),
+		$sql
+	);
+
+	if (!preg_match('/CREATE TABLE(?: IF NOT EXISTS)? [\'"]?(\w+)[\'"]?\s*\((.+)\)/mi', $sql, $matches))
+		exit("could not parse create table string: $sql\n");
+
+	$name = $matches[1];
+	$columns = preg_split('/\s*,\s*/', trim($matches[2]));
+	foreach ($columns as $index => $column) {
+		if (preg_match('/^INDEX\W/i', $column))
+			unset($columns[$index]);
+	}
+
+	$sql = "CREATE TABLE '$name' (\n\t".implode(",\n\t", $columns)."\n)\n";
+	
+	$sql = preg_replace('/\)[^)]*$/', ')', $sql);
+	$sql = preg_replace('/int\(\d+\)/i', 'INTEGER', $sql);
+	$sql = preg_replace('/NOT NULL\s+PRIMARY KEY/i', 'PRIMARY KEY', $sql);
+	$sql = preg_replace('/\)\s*ENGINE[^;]*;/i', ');', $sql);
+	return $sql;
 }
 
-if(!in_array("error_log", $tables)){
 
-	db::get()->query("
-			CREATE TABLE 'error_log' (
-			  'id' 			INTEGER PRIMARY KEY,
-			  'url'			TEXT,
-			  'description' TEXT,
-			  'session_dump' TEXT,
-			  'hash'		CHAR(32),
-			  'lastdate' 	INTEGER DEFAULT NULL
-			)
-	");
-	
-	echo"<div>таблица <b>error_log</b> создана</div>";
+$sqlFile = $argv[1];
+$tablesToRecreate = isset($argv[2]) ? explode(',', $argv[2]) : array();
+
+if (!file_exists($sqlFile))
+	exit("ERROR: file $sqlFile not found\n");
+
+$sqlData = file_get_contents($sqlFile);
+$sqlData = preg_replace('~/\*.+?\*/~ms', '', $sqlData);
+$sqlData = preg_replace('~--.*~', '', $sqlData);
+
+$sqlsArrRaw = preg_split('/;\r?\n/', $sqlData);
+$newTables = array();
+foreach ($sqlsArrRaw as $sql) {
+	$sql = trim($sql);
+	if (preg_match('/CREATE TABLE\s+[`\'"]?(\w+)[`\'"]?/i', $sql, $matches)) {
+		if (preg_match('/^_+$/', $matches[1])) continue;
+		$newTables[] = array(
+			'name' => $matches[1],
+			'sql'   => $sql,
+		);
+	}
 }
 
-if(!in_array("user_statistics", $tables)){
 
-	db::get()->query("
-			CREATE TABLE 'user_statistics' (
-			  'id' 				INTEGER PRIMARY KEY,
-			  'uid' 			INTEGER DEFAULT 0,
-			  'request_urls'	TEXT,
-			  'user_ip'			VARCHAR(255),
-			  'referer'			VARCHAR(255),
-			  'user_agent_raw'	VARCHAR(255),
-			  'has_js'			BOOLEAN,
-			  'browser_name'	VARCHAR(50),
-			  'browser_version'	VARCHAR(50),
-			  'screen_width'	SMALLINT,
-			  'screen_height'	SMALLINT,
-			  'date'			INTEGER
-			)
-	");
-	
-	echo"<div>таблица <b>user_statistics</b> создана</div>";
+$db = db::get();
+$existTables = $db->showTables();
+
+echo "EXISTING TABLES:\n\t".implode("\n\t", $existTables)."\n";
+echo "TABLES TO CREATE:\n";
+foreach ($newTables as $t) echo "\t{$t['name']}\n";
+
+echo "\nContinue? [Y/n]: ";
+$ans = mb_strtolower(trim(fread(STDIN, 1)));
+if ($ans !== 'y' && $ans !== '')
+	exit("Aborted\n");
+
+$counters = array('skipped' => 0, 'created' => 0, 'drop-created' => 0);
+
+foreach ($newTables as $table) {
+	if (in_array($table['name'], $existTables)) {
+		if (in_array($table['name'], $tablesToRecreate)) {
+			$db->query('DROP TABLE '.$table['name']);
+			$db->query(convert($table['sql']));
+			echo "table {$table['name']} drop, create\n";
+			$counters['drop-created']++;
+		} else {
+			echo "table {$table['name']} already exists, skip\n";
+			$counters['skipped']++;
+		}
+	} else {
+		$db->query(convert($table['sql']));
+		echo "table {$table['name']} created\n";
+		$counters['created']++;
+	}
 }
 
-if(!in_array("test_sections", $tables)){
-
-	db::get()->query("
-			CREATE TABLE 'test_sections' (
-			  'id'			INTEGER PRIMARY KEY,
-			  'name'		VARCHAR(255),
-			  'alias'		VARCHAR(255),
-			  'published'	CHAR(1),
-			  'date' 		INTEGER DEFAULT NULL
-			)
-	");
-	
-	echo"<div>таблица <b>test_sections</b> создана</div>";
-}
-
-if(!in_array("test_categories", $tables)){
-
-	db::get()->query("
-			CREATE TABLE 'test_categories' (
-			  'id'			INTEGER PRIMARY KEY,
-			  'section_id'	INT,
-			  'name'		VARCHAR(255),
-			  'alias'		VARCHAR(255),
-			  'published'	CHAR(1),
-			  'date' 		INTEGER DEFAULT NULL
-			)
-	");
-	
-	echo"<div>таблица <b>test_categories</b> создана</div>";
-}
-
-if(!in_array("test_items", $tables)){
-
-	db::get()->query("
-			CREATE TABLE 'test_items' (
-			  'id'			INTEGER PRIMARY KEY,
-			  'category_id'	INT,
-			  'item_name'	VARCHAR(255),
-			  'item_text'	TEXT,
-			  'published'	CHAR(1),
-			  'date' 		INTEGER DEFAULT NULL
-			)
-	");
-	
-	echo"<div>таблица <b>test_items</b> создана</div>";
-}
-
-?>
+echo "\nTOTAL\n"
+	."\t{$counters['created']} tables created\n"
+	."\t{$counters['skipped']} tables skipped\n"
+	."\t{$counters['drop-created']} tables dropped and created\n";
