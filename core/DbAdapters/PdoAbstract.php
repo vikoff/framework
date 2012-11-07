@@ -1,13 +1,19 @@
 <?php
 
-abstract class DbAdapter_pdoAbstract extends DbAdapter {
-	
-	/** ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ */
+abstract class DbAdapter_PdoAbstract extends DbAdapter {
+
+	/** @var PDO */
+	protected $_dbrs = null;
+
+	/** @return PDO */
+	abstract protected function _getPdoInstance();
+
+	/** подключение к базе данных */
 	public function connect(){
 		
 		$start = microtime(1);
 		try {
-			$this->_dbrs = new PDO('sqlite:'.$this->connDatabase);
+			$this->_dbrs = $this->_getPdoInstance();
 			$this->_connected = TRUE;
 		} catch (PDOException $e) {
 			$this->error('Невозможно подключиться к базе данных: '.$e->getMessage());
@@ -15,28 +21,26 @@ abstract class DbAdapter_pdoAbstract extends DbAdapter {
 		$this->_saveConnectTime(microtime(1) - $start);
 	}
 
-	/** УСТАНОВИТЬ КОДИРОВКУ СОЕДИНЕНИЯ */
+	/** установить кодировку соединения */
 	public function setEncoding($encoding){}
-	
-	/** ВЫБРАТЬ БАЗУ ДАННЫХ */
-	public function selectDb($db){}
-	
-	/** ПОЛУЧИТЬ ПОСЛЕДНИЙ ВСТАВЛЕННЫЙ PRIMARY KEY */
+
+	/** получить последний вставленный primary key */
 	public function getLastId(){
 	
 		return $this->_dbrs->lastInsertId();
 	}
 	
-	/** ПОЛУЧИТЬ КОЛИЧЕСТВО СТРОК, ЗАТРОНУТЫХ ПОСЛЕДНЕЙ ОПЕРАЦИЕЙ */
+	/** получить количество строк, затронутых последней операцией */
 	public function getAffectedNum(){
 		
 		trigger_error('function is not available in PDO', E_USER_ERROR);
 	}
 
 	/**
-	 * ВЫПОЛНИТЬ ЗАПРОС
-	 * @param string $query - SQL-запрос
-	 * @return resource - ресурс ответа базы данных
+	 * выполнить запрос
+	 * @param string $sql - SQL-запрос
+	 * @param array|string $bind - параметры для SQL запроса
+	 * @return PDOStatement - объект ответа базы данных
 	 */
 	public function query($sql, $bind = array()){
 		
@@ -56,15 +60,30 @@ abstract class DbAdapter_pdoAbstract extends DbAdapter {
 	 * GET ONE
 	 * выполнить запрос и вернуть единственное значение (первая строка, первый столбец)
 	 * @param string $sql - SQL-запрос
+	 * @param array|string $bind - параметры для SQL запроса
 	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
-	 * @return mixed|$default
+	 * @return mixed|null
 	 */
-	public function getOne($sql, $default = null){
-		
-		$data = $this->query($sql)->fetchColumn();
+	public function getOne($sql, $bind = array(), $default = null){
+
+		$data = $this->query($sql, (array)$bind)->fetchColumn();
 		return $data !== FALSE ? $data : $default;
 	}
-	
+
+	/**
+	 * GET ROW
+	 * выполнить запрос и вернуть единственную строку (первую)
+	 * @param string $sql - SQL-запрос
+	 * @param array|string $bind - параметры для SQL запроса
+	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
+	 * @return mixed|null
+	 */
+	public function getRow($sql, $bind = array(), $default = null){
+
+		$data = $this->query($sql, $bind)->fetch(PDO::FETCH_ASSOC);
+		return $data ? $data : $default;
+	}
+
 	/**
 	 * GET COL
 	 * выполнить запрос и вернуть единственный столбец (первый)
@@ -95,19 +114,6 @@ abstract class DbAdapter_pdoAbstract extends DbAdapter {
 		return $data ? $data : $default;
 	}
 
-	/**
-	 * GET ROW
-	 * выполнить запрос и вернуть единственную строку (первую)
-	 * @param string $sql - SQL-запрос
-	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
-	 * @return array|$default
-	 */
-	public function getRow($sql, $default = null){
-		
-		$data = $this->query($sql)->fetch(PDO::FETCH_ASSOC);
-		return $data ? $data : $default;
-	}
-	
 	/**
 	 * GET ALL
 	 * выполнить запрос и вернуть многомерный ассоциативный массив данных

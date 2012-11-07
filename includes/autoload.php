@@ -12,6 +12,7 @@ function _vikoffAutoload($className){
 		'DbAdapter_mysql'       => 'core/DbAdapters/mysql.php',
 		'DbAdapter_PdoAbstract' => 'core/DbAdapters/PdoAbstract.php',
 		'DbAdapter_PdoSqlite'   => 'core/DbAdapters/PdoSqlite.php',
+		'DbAdapter_PdoMysql'    => 'core/DbAdapters/PdoMysql.php',
 		'DbAdapter_sqlite'      => 'core/DbAdapters/sqlite.php',
 		'Controller'            => 'core/Controller.php',
 		'ActiveRecord'          => 'core/ActiveRecord.php',
@@ -72,7 +73,8 @@ function _vikoffAutoload($className){
 		}
 		
 		// echo $path.'<hr>';
-		require(FS_ROOT.$path);
+		if (file_exists(FS_ROOT.$path))
+			require(FS_ROOT.$path);
 	}
 	
 }

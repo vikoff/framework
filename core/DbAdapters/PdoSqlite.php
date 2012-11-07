@@ -1,6 +1,13 @@
 <?php
 
-class DbAdapter_pdoSqlite extends DbAdapter_PdoAbstract {
+class DbAdapter_PdoSqlite extends DbAdapter_PdoAbstract {
+
+	protected function _getPdoInstance() {
+		return new PDO("sqlite:{$this->connDatabase}");
+	}
+
+	/** выбрать базу данных */
+	public function selectDb($db){}
 
 }
 

@@ -46,6 +46,7 @@ class db {
 
 		// создание экземпляра класса db
 		$adapterClass = 'DbAdapter_'.$adapter;
+		/** @var Db_Adapter $db */
 		$db = new $adapterClass($connParams['host'], $connParams['user'], $connParams['pass'], $connParams['database']);
 		
 		if(!empty($connParams['encoding']))
@@ -140,15 +141,16 @@ abstract class DbAdapter {
 
 	abstract public function connect();
 	abstract public function setEncoding($encoding);
+	abstract public function selectDb($db);
 	abstract public function getLastId();
 	abstract public function getAffectedNum();
 	abstract public function query($query);
-	abstract public function getOne($query, $default_value = null);
-	abstract public function getCol($query, $default_value = array());
-	abstract public function getColIndexed($query, $default_value = 0);
-	abstract public function getRow($query, $default_value = array());
-	abstract public function getAll($query, $default_value = array());
-	abstract public function getAllIndexed($query, $index, $default_value = 0);
+	abstract public function getOne($query, $bind = array());
+	abstract public function getCol($query, $bind = array());
+	abstract public function getColIndexed($query, $bind = array());
+	abstract public function getRow($query, $bind = array());
+	abstract public function getAll($query, $bind = array());
+	abstract public function getAllIndexed($query, $index, $bind = array());
 	abstract public function escape($str);
 	
 	/**
@@ -422,7 +424,7 @@ abstract class DbAdapter {
 	/**
 	 * ЭСКЕЙПИРОВАНИЕ И ЗАКЛЮЧЕНИЕ СТРОКИ В КОВЫЧКИ
 	 * замена последовательному вызову функций db::escape и db::quote
-	 * @param variant $cell - исходная строка
+	 * @param mixed $cell - исходная строка
 	 * @return string эскейпированая и заключенная в нужный тип ковычек строка
 	 */
 	public function qe($cell){
