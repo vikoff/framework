@@ -1,43 +1,40 @@
 <?php
 
-/** ФУНКЦИЯ AUTOLOAD */
-function __autoload($className){
+/** функция autoload */
+function _vikoffAutoload($className){
 	
 	// индекс всех элементов из CORE (кроме App и Func),
 	// а так же всех компонентов.
 	static $filesIndex = array(
-		'Tools' 			=> 'core/Tools.php',
-		'db' 				=> 'core/Db.php',
-		'Layout'			=> 'core/Layout.php',
-		'DbAdapter_mysql'	=> 'core/DbAdapters/mysql.php',
-		'DbAdapter_sqlite'	=> 'core/DbAdapters/sqlite.php',
-		'DbAdapter_pdo_sqlite'	=> 'core/DbAdapters/pdo_sqlite.php',
-		'Controller' 		=> 'core/Controller.php',
-		'ActiveRecord' 		=> 'core/ActiveRecord.php',
-		'ARCollection' 		=> 'core/ActiveRecord.php',
-		'ImageMaster'		=> 'core/ImageMaster.php',
-		'Messenger' 		=> 'core/Messenger.php',
-		'Paginator' 		=> 'core/Paginator.php',
-		'Validator' 		=> 'core/Validator.php',
-		'YDate' 			=> 'core/YDate.php',
-		'CsvParser' 		=> 'core/CsvParser.php',
-		'YArray' 			=> 'core/YArray.php',
-		'Sorter'			=> 'core/Sorter.php',
-		'Exception403'		=> 'core/Exception.php',
-		'Exception404'		=> 'core/Exception.php',
-		'HtmlForm'			=> 'core/HtmlForm.php',
+		'Tools'                 => 'core/Tools.php',
+		'db'                    => 'core/Db.php',
+		'Layout'                => 'core/Layout.php',
+		'DbAdapter_mysql'       => 'core/DbAdapters/mysql.php',
+		'DbAdapter_PdoAbstract' => 'core/DbAdapters/PdoAbstract.php',
+		'DbAdapter_PdoSqlite'   => 'core/DbAdapters/PdoSqlite.php',
+		'DbAdapter_sqlite'      => 'core/DbAdapters/sqlite.php',
+		'Controller'            => 'core/Controller.php',
+		'ActiveRecord'          => 'core/ActiveRecord.php',
+		'ARCollection'          => 'core/ActiveRecord.php',
+		'ImageMaster'           => 'core/ImageMaster.php',
+		'Messenger'             => 'core/Messenger.php',
+		'Paginator'             => 'core/Paginator.php',
+		'Validator'             => 'core/Validator.php',
+		'YDate'                 => 'core/YDate.php',
+		'CsvParser'             => 'core/CsvParser.php',
+		'YArray'                => 'core/YArray.php',
+		'Sorter'                => 'core/Sorter.php',
+		'Exception403'          => 'core/Exception.php',
+		'Exception404'          => 'core/Exception.php',
+		'HtmlForm'              => 'core/HtmlForm.php',
 		
-		'Def'				=> 'components/Def.component.php',
+		'Config'                => 'includes/Config.php',
+		'CurUser'               => 'includes/CurUser.php',
+		'Request'               => 'includes/Request.php',
+		'Debugger'              => 'includes/Debugger.php',
 		
-		/* NEW */
-		
-		'Config'			=> 'includes/Config.php',
-		'CurUser' 			=> 'includes/CurUser.php',
-		'Request' 			=> 'includes/Request.php',
-		'Debugger'			=> 'includes/Debugger.php',
-		
-		'FrontendLayout' 	=> 'layouts/FrontendLayout.php',
-		'BackendLayout' 	=> 'layouts/BackendLayout.php',
+		'FrontendLayout'        => 'layouts/FrontendLayout.php',
+		'BackendLayout'         => 'layouts/BackendLayout.php',
 		
 	);
 	
@@ -80,4 +77,4 @@ function __autoload($className){
 	
 }
 
-?>
+spl_autoload_register('_vikoffAutoload');

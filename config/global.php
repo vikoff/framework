@@ -22,7 +22,7 @@ define('CFG_ADMIN_EMAIL', 'yurijnovikov@gmail.com');
 ########## СОЗДАНИЕ СОЕДИНЕНИЯ С БД ##########
 
 db::create(array(
-	'adapter' => 'pdo_sqlite',
+	'adapter' => 'PdoSqlite',
 	'host' => '',
 	'user' => '',
 	'pass' => '',
