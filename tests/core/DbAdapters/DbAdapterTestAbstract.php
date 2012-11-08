@@ -143,7 +143,7 @@ abstract class DbAdapterTestAbstract extends PHPUnit_Framework_TestCase {
 			'SELECT '.$db->quoteFieldName('field').', '.$db->quoteFieldName('num').', '.$db->quoteFieldName('select').'
 			 FROM '.self::$_table.' WHERE id=?', 7);
 		$this->assertEquals($dataSet, $fetchedRow);
-die;
+
 		$fetchedDate = $db->fetchOne('SELECT '.$db->quoteFieldName('date').' FROM '.self::$_table.' WHERE id=?', 7);
 		$this->assertRegExp('/^\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}$/', $fetchedDate);
 	}
