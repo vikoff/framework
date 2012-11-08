@@ -391,7 +391,7 @@ class DbAdapter_mysqli implements DbAdapter{
 	private function error($msg, $sql = ''){
 
 		if($this->_errorHandlingMode)
-			$this->setError('"'.$sql.'"<br />'.$msg);
+			$this->_setError('"'.$sql.'"<br />'.$msg);
 		else
 			trigger_error('<hr />'.$sql.'<hr /><br />'.$msg.'<br />', E_USER_ERROR);
 	}
@@ -518,11 +518,11 @@ class DbAdapter_mysqli implements DbAdapter{
 	public function loadDump($fileName){
 	
 		if(!$fileName){
-			$this->setError('Файл дампа не загружен');
+			$this->_setError('Файл дампа не загружен');
 			return FALSE;
 		}
 		if(!file_exists($fileName)){
-			$this->setError('Файл дампа не найден');
+			$this->_setError('Файл дампа не найден');
 			return FALSE;
 		}
 		
@@ -554,7 +554,7 @@ class DbAdapter_mysqli implements DbAdapter{
 		return TRUE;
 	}
 	
-	public function setError($error){
+	public function _setError($error){
 		$this->_error[] = $error;
 	}
 	

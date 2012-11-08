@@ -22,6 +22,8 @@ class DbAdapter_PdoMysql extends DbAdapter_PdoAbstract {
 		$this->query('USE '.$db);
 	}
 
-}
+    public function quoteFieldName($field){
+        return "`$field`";
+    }
 
-?>
+}

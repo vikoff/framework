@@ -43,14 +43,20 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 	 * @return PDOStatement - объект ответа базы данных
 	 */
 	public function query($sql, $bind = array()){
-		
+
 		$bind = (array)$bind;
-		$this->_saveQuery($sql.($bind ? '; BIND ['.implode('; ', $bind).']' : ''));
+
+		$sqlForLog = $sql.($bind ? '; BIND ['.implode('; ', $bind).']' : '');
+		$this->_saveQuery($sqlForLog);
 		$this->_queriesNum++;
 		
 		$start = microtime(1);
-		$stmt = $this->_dbrs->prepare($sql) or $this->error($this->_dbrs->errorInfo(), $sql);
-		$stmt->execute($bind) or $this->error($stmt->errorInfo(), $sql);
+
+		$stmt = $this->_dbrs->prepare($sql) or $this->error($this->_dbrs->errorInfo(), $sqlForLog);
+		try {
+			$stmt->execute($bind) or $this->error($stmt->errorInfo(), $sqlForLog);
+		} catch (Exception $e) { $this->error($e->getMessage(), $sql); }
+
 		$this->_saveQueryTime(microtime(1) - $start);
 		
 		return $stmt;
@@ -212,8 +218,24 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 		$this->query($sql, $values);
 		return $this->getLastId();
 	}
-	
-	/**
+
+    public function insertMulti($table, $fields, $valuesArrArr){
+
+        $valuesArrStr = array();
+        foreach($fields as $index => $field)
+            $fields[$index] = $this->quoteFieldName($field);
+        foreach($valuesArrArr as $_rowArr){
+            $rowArr = array();
+            foreach($_rowArr as $cell)
+                $rowArr[] = $this->qe($cell);
+            $valuesArrStr[] = '('.implode(',', $rowArr).')';
+        }
+
+        $sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES '.implode(',', $valuesArrStr);
+        return $this->getOne($sql);
+    }
+
+    /**
 	 * UPDATE
 	 * обновление записей в таблице
 	 * @param string $table - имя таблицы
@@ -295,17 +317,7 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 			? $this->_dbrs->quote($str)
 			: $str;
 	}
-	
-	/**
-	 * ЗАКЛЮЧЕНИЕ ИМЕНИ ПОЛЯ В КАВЫЧКИ
-	 * для полей, имена которых совпадают с ключевыми словами
-	 * @param string $fieldname - имя поля
-	 * @param string - имя поля, заключенное в кавычки
-	 */
-	public function quoteFieldName($field){
-		return '"'.$field.'"';
-	}
-	
+
 	/**
 	 * ЗАКЛЮЧЕНИЕ СТРОК В КОВЫЧКИ И ЭКРАНИРОВАНИЕ
 	 * в зависимости от типа данных

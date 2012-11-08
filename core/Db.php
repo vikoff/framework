@@ -46,7 +46,7 @@ class db {
 
 		// создание экземпляра класса db
 		$adapterClass = 'DbAdapter_'.$adapter;
-		/** @var Db_Adapter $db */
+		/** @var DbAdapter $db */
 		$db = new $adapterClass($connParams['host'], $connParams['user'], $connParams['pass'], $connParams['database']);
 		
 		if(!empty($connParams['encoding']))
@@ -72,13 +72,16 @@ class db {
 	 * @return DbAdapter
 	 */
 	public static function get($connIdentifier = 'default'){
-		
+
+        /** @var $db DbAdapter */
 		$db = isset(self::$_instances[$connIdentifier])
 			? self::$_instances[$connIdentifier]
 			: null;
 		
-		if(is_null($db))
+		if($db === null) {
 			trigger_error('Соединение с БД с '.($connIdentifier == 'default' ? 'дефолтным идентификатором' : 'идентификатором "'.$connIdentifier.'"').' не создано', E_USER_ERROR);
+            exit;
+        }
 		
 		if(!$db->isConnected())
 			$db->connect();
@@ -94,7 +97,12 @@ class db {
 }
 
 abstract class DbAdapter {
-	
+
+	const ERROR_TRIGGER  = 1;
+	const ERROR_THROW    = 2;
+	const ERROR_STORE    = 3;
+	const ERROR_CALLBACK = 4;
+
 	/** флаг, что соединение установлено */
 	protected $_connected = FALSE;
 	
@@ -117,12 +125,12 @@ abstract class DbAdapter {
 	protected $_error = array();
 	
 	/** режим накопления сообщений об ошибках */
-	protected $_errorHandlingMode = FALSE;
+	protected $_errorHandlingMode = 1;
 	
 	/**
 	 * пользовательский обработчик ошибок
-	 * если null, то ошибки складываются в стандартный контейнер (setError, hasError, getError)
-	 * @var null|callback
+	 * если null, то ошибки складываются в стандартный контейнер (_setError, hasError, getError)
+	 * @var null|callable
 	 */
 	private $_errorHandler = null;
 	
@@ -154,9 +162,9 @@ abstract class DbAdapter {
 	abstract public function escape($str);
 	
 	/**
-	 * ЗАКЛЮЧЕНИЕ ИМЕН ПОЛЕЙ В НУЖНЫЙ ТИП КОВЫЧЕК
+	 * заключение имен полей в нужный тип ковычек
 	 * метод индивидуален для каждого db-адапрета
-	 * @param variant $field - строка имени поля
+	 * @param string $field - строка имени поля
 	 * @return string заключенная в нужный тип ковычек строка
 	 */
 	abstract function quoteFieldName($field);
@@ -164,7 +172,7 @@ abstract class DbAdapter {
 	abstract public function showTables();
 	abstract public function showCreateTable($table);
 	
-	/** КОНСТРУКТОР */
+	/** конструктор */
 	public function __construct($host, $user, $pass, $database){
 		
 		$this->connHost = $host;
@@ -173,66 +181,65 @@ abstract class DbAdapter {
 		$this->connDatabase = $database;
 	}
 	
-	/** ВКЛЮЧИТЬ РЕЖИМ ОТЛОВА ОШИБОК */
-	public function enableErrorHandlingMode(){
-		debug_print_backtrace();
-		$this->_errorHandlingMode = TRUE;
-	}
-	
-	/** ОТКЛЮЧИТЬ РЕЖИМ ОТЛОВА ОШИБОК */
-	public function disableErrorHandlingMode(){
-		$this->_errorHandlingMode = TRUE;
-	}
-	
 	/**
-	 * УСТАНОВИТЬ ОБРАБОТЧИК ОШИБОК
-	 * @param null|callback $handler - функция обработки ошибок
-	 * @return void
+	 * Установить режим обработки ошибок адаптера
+	 * @param int $mode
+	 * @param null|callable $callback
 	 */
-	public function setErrorHandler($handler){
-		$this->_errorHandlingMode = !is_null($handler);
-		$this->_errorHandler = $handler;
+	public function setErrorHandlingMode($mode, $callback = null) {
+		$all = array(self::ERROR_CALLBACK, self::ERROR_STORE, self::ERROR_THROW, self::ERROR_TRIGGER);
+		if (!in_array($mode, $all)) {
+			trigger_error("invalid sql error handling mode '$mode'", E_USER_ERROR);
+			exit;
+		}
+
+		if ($mode == self::ERROR_CALLBACK && !is_callable($callback)) {
+			trigger_error("db error mode 'callback' need real callback, passed - '".gettype($callback)."'", E_USER_ERROR);
+			exit;
+		}
+
+		$this->_errorHandlingMode = $mode;
+		$this->_errorHandler = $mode == self::ERROR_CALLBACK ? $callback : null;
 	}
 	
-	/** ВЫПОЛНЕНО ЛИ ПОДКЛЮЧЕНИЕ К БД */
+	/** выполнено ли подключение к бд */
 	public function isConnected(){
 		
 		return $this->_connected;
 	}
 	
-	/** ВЕСТИ ЛОГ SQL ЗАПРОСОВ */
+	/** вести лог sql запросов */
 	public function keepFileLog($boolEnable){
 		
 		$this->_keepFileLog = $boolEnable;
 	}
 	
-	/** ПОЛУЧИТЬ ХОСТ БД */
+	/** получить хост бд */
 	public function getConnHost(){
 		return $this->connHost;
 	}
 	
-	/** ПОЛУЧИТЬ ИМЯ ПОЛЬЗОВАТЕЛЯ БД */
+	/** получить имя пользователя бд */
 	public function getConnUser(){
 		return $this->connUser;
 	}
 	
-	/** ПОЛУЧИТЬ ПАРОЛЬ ПОЛЬЗОВАТЕЛЯ БД */
+	/** получить пароль пользователя бд */
 	public function getConnPassword(){
 		return $this->connPass;
 	}
 	
-	/** ПОЛУЧИТЬ ИМЯ ТЕКУЩЕЙ БД */
+	/** получить имя текущей бд */
 	public function getDatabase(){
 		return $this->connDatabase;
 	}
 	
-	/** ПОЛУЧИТЬ ТЕКУЩУЮ КОДИРОВКУ СОЕДИНЕНИЯ */
+	/** получить текущую кодировку соединения */
 	public function getEncoding(){
 		return $this->_encoding;
 	}
 	
 	/**
-	 * INSERT
 	 * вставка данных в таблицу
 	 * @param string $table - имя таблицы
 	 * @param array $fieldsValues - массив пар (поле => значение) для вставки
@@ -254,7 +261,6 @@ abstract class DbAdapter {
 	}
 
 	/**
-	 * INSERT MULTI
 	 * вставка в таблицу нескольких строк за раз
 	 * @param string $table - имя таблицы
 	 * @param array $fields - массив-список полей таблиц. Например: array('field1', 'field2')
@@ -265,8 +271,8 @@ abstract class DbAdapter {
 	public function insertMulti($table, $fields, $valuesArrArr){
 		
 		$valuesArrStr = array();
-		foreach($fields as &$field)
-			$field = $this->quoteFieldName($field);
+		foreach($fields as $index => $field)
+            $fields[$index] = $this->quoteFieldName($field);
 		foreach($valuesArrArr as $_rowArr){
 			$rowArr = array();
 			foreach($_rowArr as $cell)
@@ -338,7 +344,7 @@ abstract class DbAdapter {
 		// если не было изменено ни одной строки, смотрим внимательно
 		if($affected == 0){
 			// если такая запись присутствует в таблице, то все хорошо
-			if($this->getOne('SELECT COUNT(1) FROM '.$table.' WHERE '.implode(' AND ',$conditionArr), 0))
+			if($this->getOne('SELECT COUNT(1) FROM '.$table.' WHERE '.implode(' AND ',$conditionArr)))
 				return 0;
 			// если же нет, то создаем ее
 			else
@@ -354,7 +360,6 @@ abstract class DbAdapter {
 	 * DELETE
 	 * удаление записей из таблицы
 	 * @param string $table - имя таблицы
-	 * @param array $fieldsValues - массив пар (поле => значение) для обновления
 	 * @param string $conditions - SQL строка условия (без слова WHERE). Не должно быть пустой строкой.
 	 * @return integer количество затронутых строк
 	 */
@@ -404,7 +409,7 @@ abstract class DbAdapter {
 	/**
 	 * ЗАКЛЮЧЕНИЕ СТРОК В КОВЫЧКИ
 	 * в зависимости от типа данных
-	 * @param variant $cell - исходная строка
+	 * @param mixed $cell - исходная строка
 	 * @return string заключенная в нужный тип ковычек строка
 	 */
 	public function quote($cell){
@@ -533,34 +538,37 @@ abstract class DbAdapter {
 			."\n\n[ERROR] ".str_repeat('-', 80)."\n\n"
 			.$msg
 			."\n\n--------".str_repeat('-', 80)."\n\n";
-		
-		// улавливание ошибок
-		if($this->_errorHandlingMode){
-			
-			if(!is_null($this->_errorHandler))
+
+		switch ($this->_errorHandlingMode) {
+			case self::ERROR_TRIGGER:
+				trigger_error(PHP_SAPI == 'cli' ? $fullmsg : '<pre>'.$fullmsg.'</pre>', E_USER_ERROR);
+				break;
+			case self::ERROR_THROW:
+				throw new ExceptionDB($fullmsg);
+				break;
+			case self::ERROR_STORE:
+				$this->_setError($fullmsg);
+				break;
+			case self::ERROR_CALLBACK:
 				call_user_func($this->_errorHandler, $msg, $sql, $fullmsg);
-			else
-				$this->setError($fullmsg);
-			
-		}
-		// выброс ошибок
-		else{
-			
-			if(PHP_SAPI != 'cli')
-				$fullmsg = '<pre>'.$fullmsg.'</pre>';
-			
-			trigger_error($fullmsg, E_USER_ERROR);
+				break;
 		}
 	}
 	
 	/** СОХРАНИТЬ ОШИБКУ */
-	public function setError($error){
+	protected function _setError($error){
 		$this->_error[] = $error;
 	}
 	
 	/** ПОЛУЧИТЬ ВСЕ ОШИБКИ */
-	public function getError(){
-		return implode('<br />', $this->_error);
+	public function getError($clear = false) {
+
+		$separator = PHP_SAPI == 'cli' ? "\n" : '<br />';
+		$output = implode($separator, $this->_error);
+
+		if ($clear) $this->resetError();
+
+		return $output;
 	}
 	
 	/** ПРОВЕРИТЬ, ЕСТЬ ЛИ ОШИБКИ */
@@ -577,20 +585,18 @@ abstract class DbAdapter {
 	public function loadDump($fileName){
 	
 		if(!$fileName){
-			$this->setError('Файл дампа не загружен');
+			$this->_setError('Файл дампа не загружен');
 			return FALSE;
 		}
 		
 		if(!file_exists($fileName)){
-			$this->setError('Файл дампа не найден');
+			$this->_setError('Файл дампа не найден');
 			return FALSE;
 		}
 		
 		$singleQuery = '';
 		$numCommands = 0;
-		$completeCommands = 0;
-		$failedCommands = 0;
-		
+
 		$rs = fopen($fileName, "r");
 		while(!feof($rs)){
 		
@@ -664,4 +670,7 @@ class DbStatement {
 	}
 }
 
-?>
+/**
+ * Класс исключений для Адаптера БД
+ */
+class ExceptionDB extends Exception {}

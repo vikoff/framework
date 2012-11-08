@@ -9,6 +9,8 @@ class DbAdapter_PdoSqlite extends DbAdapter_PdoAbstract {
 	/** выбрать базу данных */
 	public function selectDb($db){}
 
-}
+    public function quoteFieldName($field){
+        return '"'.$field.'"';
+    }
 
-?>
+}
