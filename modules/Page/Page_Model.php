@@ -37,7 +37,7 @@ class Page_Model extends ActiveRecord{
 	/** ТОЧКА ВХОДА В КЛАСС (ЗАГРУЗКА СУЩЕСТВУЮЩЕГО ОБЪЕКТА ПО ПСЕВДОНИМУ) */
 	public static function loadByAlias($alias){
 		
-		$data = db::get()->fetchRow("SELECT * FROM ".self::TABLE." WHERE alias=".db::get()->qe($alias)." LIMIT 1", FALSE);
+		$data = db::get()->fetchRow("SELECT * FROM ".self::TABLE." WHERE alias=".db::get()->qe($alias)." LIMIT 1");
 		if(!$data)
 			throw new Exception404(self::NOT_FOUND_MESSAGE);
 		

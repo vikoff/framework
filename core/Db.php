@@ -540,7 +540,7 @@ abstract class DbAdapter {
 	 * @return void
 	 */
 	public function truncate($table) {
-		
+
 		$this->query('TRUNCATE TABLE '.$table);
 	}
 	

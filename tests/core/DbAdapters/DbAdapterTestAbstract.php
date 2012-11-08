@@ -11,7 +11,7 @@ abstract class DbAdapterTestAbstract extends PHPUnit_Framework_TestCase {
 
 	public static function setUpBeforeClass() {
 
-		self::$_db->setErrorHandlingMode(DbAdapter::ERROR_STORE);
+		self::$_db->setErrorHandlingMode(DbAdapter::ERROR_TRIGGER);
 	}
 
 	public static function tearDownAfterClass() {}
@@ -30,6 +30,7 @@ abstract class DbAdapterTestAbstract extends PHPUnit_Framework_TestCase {
 			array(6, "\\", 3, TRUE, '2001-02-03 00:00:00'),
 		);
 
+		$db->truncate(self::$_table);
 		$db->insertMulti(self::$_table, $dataColuns, $dataRows);
 	}
 
@@ -130,32 +131,24 @@ abstract class DbAdapterTestAbstract extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expectedFirstRow, $assoc[2]);
 	}
 
-	public function testDescribe() {
-
-		$db = self::$_db;
-	}
-
-	public function testShowTables() {
-
-		$db = self::$_db;
-	}
-
-	public function testIsConnected() {
-
-		$db = self::$_db;
-	}
-
 	public function testInsert() {
-
 		$db = self::$_db;
+
+		$dataSet = array('field' => 'new \\\row ?!#$%^&*() \'with\' "spec" \symbols/', 'num' => 100500, 'select' => true);
+		$db->insert(self::$_table, $dataSet);
+
+		$this->assertEquals(7, $db->fetchOne('SELECT COUNT(1) FROM '.self::$_table));
+
+		$fetchedRow = $db->fetchRow(
+			'SELECT '.$db->quoteFieldName('field').', '.$db->quoteFieldName('num').', '.$db->quoteFieldName('select').'
+			 FROM '.self::$_table.' WHERE id=?', 7);
+		$this->assertEquals($dataSet, $fetchedRow);
+die;
+		$fetchedDate = $db->fetchOne('SELECT '.$db->quoteFieldName('date').' FROM '.self::$_table.' WHERE id=?', 7);
+		$this->assertRegExp('/^\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}$/', $fetchedDate);
 	}
 
 	public function testInsertMulti() {
-
-		$db = self::$_db;
-	}
-
-	public function testGetLastId () {
 
 		$db = self::$_db;
 	}
@@ -171,6 +164,26 @@ abstract class DbAdapterTestAbstract extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testTruncate() {
+
+		$db = self::$_db;
+	}
+
+	public function testGetLastId () {
+
+		$db = self::$_db;
+	}
+
+	public function testDescribe() {
+
+		$db = self::$_db;
+	}
+
+	public function testShowTables() {
+
+		$db = self::$_db;
+	}
+
+	public function testIsConnected() {
 
 		$db = self::$_db;
 	}

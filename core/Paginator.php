@@ -114,7 +114,7 @@ class Paginator{
 	// ЗАГРУЗИТЬ SQL ВЫРАЖЕНИЕ
 	private function _loadSql($extractPart, $conditionPart){
 	
-		$this->_totalNumItems = $this->_db->fetchOne('SELECT COUNT(1) '.$conditionPart, 0);
+		$this->_totalNumItems = $this->_db->fetchOne('SELECT COUNT(1) '.$conditionPart);
 		$this->_sql = 'SELECT '.$extractPart.' '.$conditionPart;
 	}
 	
