@@ -37,7 +37,7 @@ class Page_Model extends ActiveRecord{
 	/** ТОЧКА ВХОДА В КЛАСС (ЗАГРУЗКА СУЩЕСТВУЮЩЕГО ОБЪЕКТА ПО ПСЕВДОНИМУ) */
 	public static function loadByAlias($alias){
 		
-		$data = db::get()->getRow("SELECT * FROM ".self::TABLE." WHERE alias=".db::get()->qe($alias)." LIMIT 1", FALSE);
+		$data = db::get()->fetchRow("SELECT * FROM ".self::TABLE." WHERE alias=".db::get()->qe($alias)." LIMIT 1", FALSE);
 		if(!$data)
 			throw new Exception404(self::NOT_FOUND_MESSAGE);
 		
@@ -132,7 +132,7 @@ class Page_Model extends ActiveRecord{
 	private function _checkAlias($data){
 	
 		// проверка псевдонима на уникальность (если задан)
-		if(strlen($data['alias']) && db::get()->getOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE alias='.db::get()->qe($data['alias']).' '.($this->isExistsObj ? ' AND id!='.$this->id : ''), 0)){
+		if(strlen($data['alias']) && db::get()->fetchOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE alias='.db::get()->qe($data['alias']).' '.($this->isExistsObj ? ' AND id!='.$this->id : ''), 0)){
 			$this->setError('Запись с таким псевдонимом уже существует');
 			return FALSE;
 		}
@@ -262,7 +262,7 @@ class Page_Collection extends ARCollection{
 		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array('*', 'FROM '.Page_Model::TABLE.' ORDER BY '.$sorter->getOrderBy()), 50);
 		
-		$data = db::get()->getAll($paginator->getSql(), array());
+		$data = db::get()->fetchAll($paginator->getSql(), array());
 		
 		foreach($data as &$row){
 			$row['preventAfterForceLoad'] = true;

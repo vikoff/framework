@@ -52,12 +52,12 @@ class UserStatistics_Model {
 		
 		$id = (int)$id;
 		$db = db::get();
-		$data = $db->getRow('SELECT * FROM '.self::TABLE.' WHERE id='.$id);
+		$data = $db->fetchRow('SELECT * FROM '.self::TABLE.' WHERE id='.$id);
 		
 		if(!$data)
 			throw new Exception('Данные не найдены');
 		
-		$data['pages'] = $db->getAll('SELECT * FROM user_stat_pages WHERE session_id='.$id);
+		$data['pages'] = $db->fetchAll('SELECT * FROM user_stat_pages WHERE session_id='.$id);
 		return self::beforeDisplay($data, TRUE);
 	}
 	
@@ -333,13 +333,13 @@ class UserStatistics_Collection extends ARCollection {
 			ORDER BY '.$sorter->getOrderBy()), '~50');
 		
 		$db = db::get();
-		$data = $db->getAllIndexed($paginator->getSql(), 'id', array());
+		$data = $db->fetchAssoc($paginator->getSql(), 'id', array());
 		
 		// echo '<pre>'; print_r($data); die;
 		
 		// получение посещенных страниц
 		if (!empty($data)){
-			$pages = $db->getAll('SELECT * FROM user_stat_pages WHERE session_id IN('.implode(',', array_keys($data)).')');
+			$pages = $db->fetchAll('SELECT * FROM user_stat_pages WHERE session_id IN('.implode(',', array_keys($data)).')');
 			foreach($pages as $p)
 				$data[ $p['session_id'] ]['pages'][] = $p;
 		}
@@ -366,13 +366,13 @@ class UserStatistics_Collection extends ARCollection {
 		$db = db::get();
 		$filters = array();
 		
-		$filters['users'] = $db->getColIndexed('
+		$filters['users'] = $db->fetchPairs('
 			SELECT DISTINCT uid, u.'.CurUser::LOGIN_FIELD.' AS login
 			FROM user_stat s
 			JOIN '.User_Model::TABLE.' u ON u.id=s.uid ORDER BY login');
 		
-		$filters['ips'] = $db->getColIndexed('SELECT DISTINCT(user_ip), user_ip FROM user_stat ORDER BY user_ip');
-		$filters['browsers'] = $db->getColIndexed('SELECT DISTINCT(browser_name), browser_name FROM user_stat WHERE LENGTH(browser_name) > 0 ORDER BY browser_name');
+		$filters['ips'] = $db->fetchPairs('SELECT DISTINCT(user_ip), user_ip FROM user_stat ORDER BY user_ip');
+		$filters['browsers'] = $db->fetchPairs('SELECT DISTINCT(browser_name), browser_name FROM user_stat WHERE LENGTH(browser_name) > 0 ORDER BY browser_name');
 		
 		return $filters;
 	}

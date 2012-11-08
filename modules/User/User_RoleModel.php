@@ -176,7 +176,7 @@ class User_RoleCollection extends ARCollection{
 		$sorter = new Sorter('level', 'ASC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array('*', 'FROM '.User_RoleModel::TABLE.' ORDER BY '.$sorter->getOrderBy()), 50);
 		
-		$data = db::get()->getAll($paginator->getSql(), array());
+		$data = db::get()->fetchAll($paginator->getSql(), array());
 		
 		foreach($data as &$row)
 			$row = User_RoleModel::forceLoad($row['id'], $row)->getAllFieldsPrepared();
@@ -190,7 +190,7 @@ class User_RoleCollection extends ARCollection{
 	
 	private function _getAll(){
 		
-		$data = db::get()->getAllIndexed('SELECT * FROM '.User_RoleModel::TABLE.' ORDER BY level', 'id', array());
+		$data = db::get()->fetchAssoc('SELECT * FROM '.User_RoleModel::TABLE.' ORDER BY level', 'id', array());
 		
 		foreach($data as &$row)
 			$row = User_RoleModel::forceLoad($row['id'], $row)->getAllFieldsPrepared();
@@ -253,7 +253,7 @@ class User_RoleCollection extends ARCollection{
 	/** ПОЛУЧИТЬ СПИСОК РОЛЕЙ ВИДА array(id => title) */
 	public function getList(){
 		
-		return db::get()->getColIndexed('SELECT id, title FROM '.User_RoleModel::TABLE.' ORDER BY level', 'id', array());
+		return db::get()->fetchPairs('SELECT id, title FROM '.User_RoleModel::TABLE.' ORDER BY level', 'id', array());
 	}
 }
 

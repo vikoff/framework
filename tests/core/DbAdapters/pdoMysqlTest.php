@@ -24,11 +24,6 @@ class PdoMysqlTest extends DbAdapterTestAbstract {
 		self::$_db->query("CREATE DATABASE ".self::$_dbName);
 		self::$_db->query("USE ".self::$_dbName);
 
-		parent::setUpBeforeClass();
-	}
-
-	public function setUp() {
-
 		$db = self::$_db;
 		$db->query("CREATE TABLE `".self::$_table."` (
 			`id`            INT(10) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
@@ -39,12 +34,21 @@ class PdoMysqlTest extends DbAdapterTestAbstract {
 		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 		");
 
+		parent::setUpBeforeClass();
+	}
+	public static function tearDownAfterClass() {
+
+		self::$_db->query("DROP TABLE ".self::$_table);
+		parent::tearDownAfterClass();
+	}
+
+	public function setUp() {
+
 		parent::setUp();
 	}
 
 	public function tearDown() {
 
-		self::$_db->query("DROP TABLE ".self::$_table);
 	}
 
 	// TEST METHODS //

@@ -28,7 +28,7 @@ class db {
 	 * 		Если null, создается дефолтное соединение.
 	 * @return DbAdapter
 	 */
-	public static function create($connParams, $connIdentifier = 'default'){
+	public static function create($connParams, $connIdentifier = 'default') {
 		
 		// проверка, переданы ли параметры в виде массива
 		if(!is_array($connParams))
@@ -71,7 +71,7 @@ class db {
 	 * 		Если не указан, возвращается дефолтное соединение.
 	 * @return DbAdapter
 	 */
-	public static function get($connIdentifier = 'default'){
+	public static function get($connIdentifier = 'default') {
 
         /** @var $db DbAdapter */
 		$db = isset(self::$_instances[$connIdentifier])
@@ -89,7 +89,7 @@ class db {
 		return $db;
 	}
 
-	public static function getAllConnections(){
+	public static function getAllConnections() {
 
 		return self::$_instances;
 	}
@@ -145,20 +145,106 @@ abstract class DbAdapter {
 	
 	/** кодировка соединения */
 	protected $_encoding = null;
-	
 
+
+	/** подключение к базе данных */
 	abstract public function connect();
-	abstract public function setEncoding($encoding);
+
+	/** выбрать базу данных */
 	abstract public function selectDb($db);
+
+	/** установить кодировку соединения */
+	abstract public function setEncoding($encoding);
+
+	/** получить последний вставленный primary key */
 	abstract public function getLastId();
+
+	/** получить количество строк, затронутых последней операцией */
 	abstract public function getAffectedNum();
-	abstract public function query($query);
-	abstract public function getOne($query, $bind = array());
-	abstract public function getCol($query, $bind = array());
-	abstract public function getColIndexed($query, $bind = array());
-	abstract public function getRow($query, $bind = array());
-	abstract public function getAll($query, $bind = array());
-	abstract public function getAllIndexed($query, $index, $bind = array());
+
+	/**
+	 * выполнить запрос
+	 * @param string $sql - SQL-запрос
+	 * @param mixed $bind - параметры для SQL запроса
+	 * @return resource|PDOStatement - объект ответа базы данных
+	 */
+	abstract public function query($sql, $bind = array());
+
+	/**
+	 * выполнить запрос и вернуть единственное значение (первая строка, первый столбец)
+	 * @param string $sql - SQL-запрос
+	 * @param mixed $bind - параметры для SQL запроса
+	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
+	 * @return mixed|null
+	 */
+	abstract public function fetchOne($sql, $bind = array(), $default = null);
+
+	/**
+	 * выполнить запрос и вернуть единственное значение (первая строка, указанный индекс столбца)
+	 * @param string $sql - SQL-запрос
+	 * @param    int $col - индекс колонки (начиная с 0)
+	 * @param  mixed $bind - параметры для SQL запроса
+	 * @param  mixed $default - значение, возвращаемое если запрос ничего не вернул
+	 * @return mixed|null
+	 */
+	abstract public function fetchCell($sql, $col, $bind = array(), $default = null);
+
+	/**
+	 * выполнить запрос и вернуть единственную строку (первую)
+	 * @param string $sql - SQL-запрос
+	 * @param mixed $bind - параметры для SQL запроса
+	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
+	 * @return mixed|null
+	 */
+	abstract public function fetchRow($sql, $bind = array(), $default = null);
+
+	/**
+	 * выполнить запрос и вернуть единственный столбец (первый)
+	 * @param string $sql - SQL-запрос
+	 * @param mixed $bind - параметры для SQL запроса
+	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
+	 * @return array|$default
+	 */
+	abstract public function fetchCol($sql, $bind = array(), $default = array());
+
+	/**
+	 * возвращает одномерный ассоциативный массив.
+	 * Для каждой пары ключ массива - значение первого столбца, извлекаемого из БД
+	 * значение массива - значение второго столбца, извлекаемого из БД
+	 * @param string $sql
+	 * @param mixed $bind - параметры для SQL запроса
+	 * @param mixed $default
+	 * @return array|$default
+	 */
+	abstract public function fetchPairs($sql, $bind = array(), $default = array());
+
+	/**
+	 * выполнить запрос и вернуть многомерный ассоциативный массив данных
+	 * @param string $sql - SQL-запрос
+	 * @param mixed $bind - параметры для SQL запроса
+	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
+	 * @return array|$default
+	 */
+	abstract public function fetchAll($sql, $bind = array(), $default = array());
+
+	/**
+	 * выполнить запрос и вернуть многомерный индексированных ассоциативный массив данных
+	 * @param string $sql - SQL-запрос
+	 * @param string $index - имя поля, по которому будет индексироваться массив результатов.
+	 *        Важно проследить, чтобы значение у индекса было уникальным у каждой строки,
+	 *        иначе дублирующиеся строки будут затерты.
+	 * @param mixed $bind - параметры для SQL запроса
+	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
+	 * @return array|$default
+	 */
+	abstract public function fetchAssoc($sql, $index, $bind = array(), $default = array());
+
+	/**
+	 * экранирование данных
+	 * выполняется с учетом типа данных для предотвращения SQL-инъекций
+	 * @param mixed строка для экранирования
+	 * @param mixed - безопасная строка
+	 */
 	abstract public function escape($str);
 	
 	/**
@@ -168,12 +254,35 @@ abstract class DbAdapter {
 	 * @return string заключенная в нужный тип ковычек строка
 	 */
 	abstract function quoteFieldName($field);
+
+	/**
+	 * получить массив, описывающий структуру таблицы
+	 * @param string $table - имя таблицы
+	 * @return array - структура таблицы
+	 */
 	abstract public function describe($table);
+
+	/**
+	 * получить список бд
+	 * @return array - массив-список баз данных
+	 */
+	abstract public function showDatabases();
+
+	/**
+	 * получить список таблиц в текущей базе данных
+	 * @return array - массив-список таблиц
+	 */
 	abstract public function showTables();
+
+	/**
+	 * показать строку create table
+	 * @param string $table - имя таблицы
+	 * @return string - строка CREATE TABLE
+	 */
 	abstract public function showCreateTable($table);
 	
 	/** конструктор */
-	public function __construct($host, $user, $pass, $database){
+	public function __construct($host, $user, $pass, $database) {
 		
 		$this->connHost = $host;
 		$this->connUser = $user;
@@ -203,39 +312,39 @@ abstract class DbAdapter {
 	}
 	
 	/** выполнено ли подключение к бд */
-	public function isConnected(){
+	public function isConnected() {
 		
 		return $this->_connected;
 	}
 	
 	/** вести лог sql запросов */
-	public function keepFileLog($boolEnable){
+	public function keepFileLog($boolEnable) {
 		
 		$this->_keepFileLog = $boolEnable;
 	}
 	
 	/** получить хост бд */
-	public function getConnHost(){
+	public function getConnHost() {
 		return $this->connHost;
 	}
 	
 	/** получить имя пользователя бд */
-	public function getConnUser(){
+	public function getConnUser() {
 		return $this->connUser;
 	}
 	
 	/** получить пароль пользователя бд */
-	public function getConnPassword(){
+	public function getConnPassword() {
 		return $this->connPass;
 	}
 	
 	/** получить имя текущей бд */
-	public function getDatabase(){
+	public function getDatabase() {
 		return $this->connDatabase;
 	}
 	
 	/** получить текущую кодировку соединения */
-	public function getEncoding(){
+	public function getEncoding() {
 		return $this->_encoding;
 	}
 	
@@ -245,12 +354,12 @@ abstract class DbAdapter {
 	 * @param array $fieldsValues - массив пар (поле => значение) для вставки
 	 * @return integer последний вставленный id 
 	 */
-	public function insert($table, $fieldsValues){
+	public function insert($table, $fieldsValues) {
 		
 		$fields = array();
 		$values = array();
 		
-		foreach($fieldsValues as $field => $value){
+		foreach($fieldsValues as $field => $value) {
 			$fields[] = $this->quoteFieldName($field);
 			$values[] = $this->qe($value);
 		}
@@ -268,12 +377,12 @@ abstract class DbAdapter {
 	 *        данные для вставки одной строки. Например: array( array(val1, val2), array(val3, val4) )
 	 * @return integer колечество вставленных строк
 	 */
-	public function insertMulti($table, $fields, $valuesArrArr){
+	public function insertMulti($table, $fields, $valuesArrArr) {
 		
 		$valuesArrStr = array();
 		foreach($fields as $index => $field)
             $fields[$index] = $this->quoteFieldName($field);
-		foreach($valuesArrArr as $_rowArr){
+		foreach($valuesArrArr as $_rowArr) {
 			$rowArr = array();
 			foreach($_rowArr as $cell)
 				$rowArr[] = $this->qe($cell);
@@ -281,7 +390,7 @@ abstract class DbAdapter {
 		}
 
 		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES '.implode(',', $valuesArrStr);
-		return $this->getOne($sql);
+		return $this->fetchOne($sql);
 	}
 	
 	/**
@@ -322,14 +431,14 @@ abstract class DbAdapter {
 	 * @param array $conditionFieldsValues - поля, задающие условие обновления
 	 * @return integer количество затронутых строк
 	 */
-	public function updateInsert($table, $fieldsValues, $conditionFieldsValues){
+	public function updateInsert($table, $fieldsValues, $conditionFieldsValues) {
 		
 		$update_arr = array();
 		foreach($fieldsValues as $field => $value)
 			$update_arr[] = $this->quoteFieldName($field).'='.$this->qe($value);
 		
-		if(!is_array($conditionFieldsValues) || !count($conditionFieldsValues)){
-			$this->error('функция updateInsert получила неверное условие conditionFieldsValues');
+		if(!is_array($conditionFieldsValues) || !count($conditionFieldsValues)) {
+			$this->_error('функция updateInsert получила неверное условие conditionFieldsValues');
 			return false;
 		}
 		$conditionArr = array();
@@ -342,9 +451,9 @@ abstract class DbAdapter {
 		$affected = $this->getAffectedNum();
 		
 		// если не было изменено ни одной строки, смотрим внимательно
-		if($affected == 0){
+		if($affected == 0) {
 			// если такая запись присутствует в таблице, то все хорошо
-			if($this->getOne('SELECT COUNT(1) FROM '.$table.' WHERE '.implode(' AND ',$conditionArr)))
+			if($this->fetchOne('SELECT COUNT(1) FROM '.$table.' WHERE '.implode(' AND ',$conditionArr)))
 				return 0;
 			// если же нет, то создаем ее
 			else
@@ -376,45 +485,92 @@ abstract class DbAdapter {
 
 		return $this->getAffectedNum();
 	}
-	
+
 	/**
-	 * TRUNCATE
+	 * @deprecated
+	 * @see $this->fetchOne
+	 */
+	public function getOne($sql, $bind = array(), $default = null) {
+		return $this->fetchOne($sql, $bind, $default);
+	}
+
+	/**
+	 * @deprecated
+	 * @see $this->fetchRow
+	 */
+	public function getRow($sql, $bind = array(), $default = null) {
+		return $this->fetchRow($sql, $bind, $default);
+	}
+
+	/**
+	 * @deprecated
+	 * @see $this->fetchPairs
+	 */
+	public function getPairs($sql, $bind = array(), $default = array()) {
+		return $this->fetchPairs($sql, $bind, $default);
+	}
+
+	/**
+	 * @deprecated
+	 * @see $this->fetchCol
+	 */
+	public function getCol($sql, $bind = array(), $default = array()) {
+		return $this->fetchCol($sql, $bind, $default);
+	}
+
+	/**
+	 * @deprecated
+	 * @see $this->fetchAll
+	 */
+	public function getAll($sql, $bind = array(), $default = array()) {
+		return $this->fetchAll($sql, $bind, $default);
+	}
+
+	/**
+	 * @deprecated
+	 * @see $this->fetchAssoc
+	 */
+	public function getAssoc($sql, $index, $bind = array(), $default = array()) {
+		return $this->fetchAssoc($sql, $index, $bind, $default);
+	}
+
+	/**
 	 * очистка таблицы
 	 * @param string $table - имя таблицы
 	 * @return void
 	 */
-	public function truncate($table){
+	public function truncate($table) {
 		
 		$this->query('TRUNCATE TABLE '.$table);
 	}
 	
 	/** НАЧАТЬ ТРАНЗАКЦИЮ */
-	public function beginTransaction(){
+	public function beginTransaction() {
 		
 		$this->query('BEGIN');
 	}
 	
 	/** ПРИМЕНИТЬ ТРАНЗАКЦИЮ */
-	public function commit(){
+	public function commit() {
 		
 		$this->query('COMMIT');
 	}
 	
 	/** ОТКАТИТЬ ТРАНЗАКЦИЮ */
-	public function rollBack(){
+	public function rollBack() {
 		
 		$this->query('ROLLBACK');
 	}
-	
+
 	/**
 	 * ЗАКЛЮЧЕНИЕ СТРОК В КОВЫЧКИ
 	 * в зависимости от типа данных
 	 * @param mixed $cell - исходная строка
 	 * @return string заключенная в нужный тип ковычек строка
 	 */
-	public function quote($cell){
-		
-		switch(strtolower(gettype($cell))){
+	public function quote($cell) {
+
+		switch(strtolower(gettype($cell))) {
 			case 'boolean':
 				return $cell ? 'TRUE' : 'FALSE';
 			case 'null':
@@ -425,18 +581,18 @@ abstract class DbAdapter {
 				return "'".$cell."'";
 		}
 	}
-	
+
 	/**
 	 * ЭСКЕЙПИРОВАНИЕ И ЗАКЛЮЧЕНИЕ СТРОКИ В КОВЫЧКИ
 	 * замена последовательному вызову функций db::escape и db::quote
 	 * @param mixed $cell - исходная строка
 	 * @return string эскейпированая и заключенная в нужный тип ковычек строка
 	 */
-	public function qe($cell){
-		
+	public function qe($cell) {
+
 		return $this->quote($this->escape($cell));
 	}
-	
+
 	/**
 	 * получить строку, которая будет обработана адаптером без преобразований
 	 * (без эскейпирования и заковычивания)
@@ -444,64 +600,37 @@ abstract class DbAdapter {
 	 * @param string $statement - SQL выражение
 	 * @return DbStatement object
 	 */
-	public function raw($statement){
+	public function raw($statement) {
 		
 		return new DbStatement($statement);
 	}
-	
-	/** 
-	 * СОХРАНИТЬ ЗАПРОС
-	 * @access protected
-	 */
-	protected function _saveQuery($sql){
-		
-		$this->_sqls[] = $sql;
-	}
-	
-	/** 
-	 * СОХРАНИТЬ ВРЕМЯ ПОДКЛЮЧЕНИЯ К БД
-	 * @access protected
-	 */
-	protected function _saveConnectTime($t){
-	
-		$this->_connectTime = $t;
-	}
-	
-	/** 
-	 * СОХРАНИТЬ ВРЕМЯ ИСПОЛНЕНИЯ ЗАПРОСА
-	 * @access protected
-	 */
-	protected function _saveQueryTime($t){
-	
-		$this->_queriesTime[] = $t;
-	}
-	
-	/** ПОЛУЧИТЬ ВРЕМЯ ПОДКЛЮЧЕНИЯ К БД */
-	public function getConnectTime(){
+
+	/** получить время подключения к бд */
+	public function getConnectTime() {
 		
 		return $this->_connectTime;
 	}
 	
-	/** ПОЛУЧИТЬ ЧИСЛО ВЫПОЛНЕННЫХ SQL ЗАПРОСОВ */
-	public function getQueriesNum(){
+	/** получить число выполненных sql запросов */
+	public function getQueriesNum() {
 		
 		return $this->_queriesNum;
 	}
 	
-	/** ПОЛУЧИТЬ ВЫПОЛНЕННЫЕ SQL ЗАПРОСЫ */
-	public function getQueries(){
+	/** получить выполненные sql запросы */
+	public function getQueries() {
 		
 		return $this->_sqls;
 	}
 	
-	/** ПОЛУЧИТЬ ОБЩЕЕ ВРЕМЯ ВЫПОЛНЕНИЯ SQL ЗАПРОСОВ */
-	public function getQueriesTime(){
+	/** получить общее время выполнения sql запросов */
+	public function getQueriesTime() {
 		
 		return array_sum($this->_queriesTime);
 	}
 	
-	/** ПОЛУЧИТЬ ВЫПОЛЕННЫЕ ЗАПРОСЫ В ВИДЕ МАССИВА (ЗАПРОС => ВРЕМЯ) */
-	public function getQueriesWithTime(){
+	/** получить выполенные запросы в виде массива (запрос => время) */
+	public function getQueriesWithTime() {
 		
 		$output = array();
 		foreach($this->_sqls as $index => $sql)
@@ -512,8 +641,8 @@ abstract class DbAdapter {
 		return $output;
 	}
 	
-	/** ПОЛУЧИТЬ ИНФОРМАЦИЮ О ПОСЛЕДНЕМ ЗАПРОСЕ (sql, time) */
-	public function getLastQueryInfo(){
+	/** получить информацию о последнем запросе (sql, time) */
+	public function getLastQueryInfo() {
 		
 		return array(
 			'sql' => end($this->_sqls),
@@ -522,14 +651,15 @@ abstract class DbAdapter {
 	}
 	
 	/**
-	 * ПЕРЕХВАТ ОШИБОК ВЫПОЛНЕНИЯ SQL-ЗАПРОСОВ
+	 * перехват ошибок выполнения sql-запросов
 	 * Дальнейший путь ошибки зависит от установки _errorHandlingMode
 	 * @access protected
+	 * @throws ExceptionDB
 	 * @param string $msg - сообщение, сгенерированное СУБД
 	 * @param string $sql - SQL-запрос, в котором возникла ошибка
 	 * @return void
 	 */
-	protected function error($msg, $sql = ''){
+	protected function _error($msg, $sql = '') {
 		
 		$fullmsg = ""
 			."\n\nError on ".date('Y-m-d H:i:s')."\n"
@@ -556,7 +686,7 @@ abstract class DbAdapter {
 	}
 	
 	/** СОХРАНИТЬ ОШИБКУ */
-	protected function _setError($error){
+	protected function _setError($error) {
 		$this->_error[] = $error;
 	}
 	
@@ -572,24 +702,24 @@ abstract class DbAdapter {
 	}
 	
 	/** ПРОВЕРИТЬ, ЕСТЬ ЛИ ОШИБКИ */
-	public function hasError(){
+	public function hasError() {
 		return !empty($this->_error);
 	}
 	
 	/** ОЧИСТИТЬ НАКОПИВШИЕСЯ ОШИБКИ */
-	public function resetError(){
+	public function resetError() {
 		$this->_error = array();
 	}
 	
 	/** ЗАГРУЗИТЬ ДАМП ДАННЫХ */
-	public function loadDump($fileName){
+	public function loadDump($fileName) {
 	
-		if(!$fileName){
+		if(!$fileName) {
 			$this->_setError('Файл дампа не загружен');
 			return FALSE;
 		}
 		
-		if(!file_exists($fileName)){
+		if(!file_exists($fileName)) {
 			$this->_setError('Файл дампа не найден');
 			return FALSE;
 		}
@@ -598,13 +728,13 @@ abstract class DbAdapter {
 		$numCommands = 0;
 
 		$rs = fopen($fileName, "r");
-		while(!feof($rs)){
+		while(!feof($rs)) {
 		
 			$row = fgets($rs);
 			$row = preg_replace('/;\r\n/', ";\n", $row);
 			$singleQuery .= $row;
 			
-			if(substr($row, -2) == ";\n"){
+			if(substr($row, -2) == ";\n") {
 				$singleQuery = str_replace(array('\r', '\n'), array("\r", "\n"), $singleQuery);
 				$this->query($singleQuery);
 				$singleQuery = '';
@@ -622,15 +752,15 @@ abstract class DbAdapter {
 	 * @output выдает текст sql-дампа
 	 * @return void
 	 */
-	public function makeDump($database = null, $tables = null){}
+	public function makeDump($database = null, $tables = null) {}
 	
 	/**
 	 * ДЕСТРУКОТР
 	 * запись лога выполненных sql-запросов в файл (если требуется)
 	 */
-	public function __destruct(){
+	public function __destruct() {
 		
-		if($this->_keepFileLog){
+		if($this->_keepFileLog) {
 			
 			$logpath = FS_ROOT.'logs/';
 			if (!is_dir($logpath))
@@ -644,6 +774,33 @@ abstract class DbAdapter {
 		}
 	}
 
+	/**
+	 * сохранить запрос
+	 * @access protected
+	 */
+	protected function _saveQuery($sql) {
+
+		$this->_sqls[] = $sql;
+	}
+
+	/**
+	 * сохранить время подключения к бд
+	 * @access protected
+	 */
+	protected function _saveConnectTime($t) {
+
+		$this->_connectTime = $t;
+	}
+
+	/**
+	 * сохранить время исполнения запроса
+	 * @access protected
+	 */
+	protected function _saveQueryTime($t) {
+
+		$this->_queriesTime[] = $t;
+	}
+
 }
 
 /**
@@ -654,17 +811,17 @@ class DbStatement {
 	
 	private $_statement = '';
 	
-	public static function create($statement){
+	public static function create($statement) {
 		
 		return new DbStatement($statement);
 	}
 	
-	public function __construct($statement){
+	public function __construct($statement) {
 		
 		$this->_statement = $statement;
 	}
 	
-	public function __toString(){
+	public function __toString() {
 		
 		return $this->_statement;
 	}

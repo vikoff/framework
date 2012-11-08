@@ -11,7 +11,7 @@ class Alias_Manager {
 	public static function getPath($alias){
 		
 		$db = db::get();
-		return $db->getOne('SELECT path FROM '.Alias_Model::TABLE.' WHERE alias='.$db->qe($alias));
+		return $db->fetchOne('SELECT path FROM '.Alias_Model::TABLE.' WHERE alias='.$db->qe($alias));
 	}
 }
 

@@ -103,7 +103,7 @@ class Alias_Model extends ActiveRecord {
 		$db = db::get();
 		$condition = ' WHERE alias='.$db->qe($alias);
 		$condition .= $this->isNewObj ? '' : 'AND id != '.$this->id;
-		return $db->getOne('SELECT COUNT(1) FROM '.self::TABLE.$condition) ? FALSE : TRUE;
+		return $db->fetchOne('SELECT COUNT(1) FROM '.self::TABLE.$condition) ? FALSE : TRUE;
 	}
 	
 }
@@ -135,7 +135,7 @@ class Alias_Collection extends ARCollection{
 		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array('*', 'FROM '.Alias_Model::TABLE.' ORDER BY '.$sorter->getOrderBy()), 50);
 		
-		$data = db::get()->getAll($paginator->getSql(), array());
+		$data = db::get()->fetchAll($paginator->getSql(), array());
 		
 		foreach($data as &$row)
 			$row = Alias_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
@@ -150,7 +150,7 @@ class Alias_Collection extends ARCollection{
 	/** ПОЛУЧИТЬ СПИСОК ВСЕХ ЭЛЕМЕНТОВ */
 	public function getAll(){
 		
-		$data = db::get()->getAllIndexed('SELECT * FROM '.Alias_Model::TABLE, 'id', array());
+		$data = db::get()->fetchAssoc('SELECT * FROM '.Alias_Model::TABLE, 'id', array());
 		
 		foreach($data as &$row)
 			$row = Alias_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();

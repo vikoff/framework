@@ -16,7 +16,7 @@ foreach ($paths as $p)
 	$pathsQuoted[] = '"'.$p.'"';
 
 $sql = 'SELECT path, alias FROM aliases WHERE path IN('.implode(',', $pathsQuoted).')';
-$paths = array_merge( $paths, db::get()->getColIndexed($sql) );
+$paths = array_merge( $paths, db::get()->fetchPairs($sql) );
 
 return array (
 

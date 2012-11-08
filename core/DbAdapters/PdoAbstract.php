@@ -8,7 +8,6 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 	/** @return PDO */
 	abstract protected function _getPdoInstance();
 
-	/** подключение к базе данных */
 	public function connect(){
 		
 		$start = microtime(1);
@@ -16,35 +15,26 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 			$this->_dbrs = $this->_getPdoInstance();
 			$this->_connected = TRUE;
 		} catch (PDOException $e) {
-			$this->error('Невозможно подключиться к базе данных: '.$e->getMessage());
+			$this->_error('Невозможно подключиться к базе данных: '.$e->getMessage());
 		}
 		$this->_saveConnectTime(microtime(1) - $start);
 	}
 
-	/** установить кодировку соединения */
 	public function setEncoding($encoding){}
 
-	/** получить последний вставленный primary key */
 	public function getLastId(){
 	
 		return $this->_dbrs->lastInsertId();
 	}
 	
-	/** получить количество строк, затронутых последней операцией */
 	public function getAffectedNum(){
 		
 		trigger_error('function is not available in PDO', E_USER_ERROR);
 	}
 
-	/**
-	 * выполнить запрос
-	 * @param string $sql - SQL-запрос
-	 * @param array|string $bind - параметры для SQL запроса
-	 * @return PDOStatement - объект ответа базы данных
-	 */
 	public function query($sql, $bind = array()){
 
-		$bind = (array)$bind;
+		$bind = $bind === null ? array(null) : (array)$bind;
 
 		$sqlForLog = $sql.($bind ? '; BIND ['.implode('; ', $bind).']' : '');
 		$this->_saveQuery($sqlForLog);
@@ -52,147 +42,68 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 		
 		$start = microtime(1);
 
-		$stmt = $this->_dbrs->prepare($sql) or $this->error($this->_dbrs->errorInfo(), $sqlForLog);
+		/** @var $stmt PDOStatement */
+		$stmt = $this->_dbrs->prepare($sql);
+		if (!$stmt) {
+			$this->_error($this->_dbrs->errorInfo(), $sqlForLog);
+			return null;
+		}
 		try {
-			$stmt->execute($bind) or $this->error($stmt->errorInfo(), $sqlForLog);
-		} catch (Exception $e) { $this->error($e->getMessage(), $sql); }
+			$stmt->execute($bind) or $this->_error($stmt->errorInfo(), $sqlForLog);
+		} catch (Exception $e) { $this->_error($e->getMessage(), $sql); }
 
 		$this->_saveQueryTime(microtime(1) - $start);
 		
 		return $stmt;
 	}
 	
-	/**
-	 * GET ONE
-	 * выполнить запрос и вернуть единственное значение (первая строка, первый столбец)
-	 * @param string $sql - SQL-запрос
-	 * @param array|string $bind - параметры для SQL запроса
-	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
-	 * @return mixed|null
-	 */
-	public function getOne($sql, $bind = array(), $default = null){
-
-		$data = $this->query($sql, (array)$bind)->fetchColumn();
-		return $data !== FALSE ? $data : $default;
-	}
-
-	/**
-	 * GET ROW
-	 * выполнить запрос и вернуть единственную строку (первую)
-	 * @param string $sql - SQL-запрос
-	 * @param array|string $bind - параметры для SQL запроса
-	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
-	 * @return mixed|null
-	 */
-	public function getRow($sql, $bind = array(), $default = null){
-
-		$data = $this->query($sql, $bind)->fetch(PDO::FETCH_ASSOC);
-		return $data ? $data : $default;
-	}
-
-	/**
-	 * GET COL
-	 * выполнить запрос и вернуть единственный столбец (первый)
-	 * @param string $sql - SQL-запрос
-	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
-	 * @return array|$default
-	 */
-	public function getCol($sql, $default = array()){
-		
-		$data = $this->query($sql)->fetchAll(PDO::FETCH_COLUMN, 0);
-		return $data ? $data : $default;
-	}
-	
-	/**
-	 * GET COL INDEXED
-	 * возвращает одномерный ассоциативный массив.
-	 * Для каждой пары ключ массива - значение первого столбца, извлекаемого из БД
-	 * значение массива - значение второго столбца, извлекаемого из БД
-	 * @param string $sql
-	 * @param mixed $default
-	 * @return array|$default
-	 */
-	public function getColIndexed($sql, $default = array()){
-		
-		$rs = $this->query($sql);
-		for ($data = array(); $row = $rs->fetch(PDO::FETCH_NUM); $data[ $row[0] ] = $row[1]);
-		
-		return $data ? $data : $default;
-	}
-
-	/**
-	 * GET ALL
-	 * выполнить запрос и вернуть многомерный ассоциативный массив данных
-	 * @param string $sql - SQL-запрос
-	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
-	 * @return array|$default
-	 */
-	public function getAll($sql, $default = array()){
-
-		$data = $this->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-		return $data !== FALSE ? $data : $default;
-	}
-	
-	/**
-	 * GET ALL INDEXED
-	 * выполнить запрос и вернуть многомерный индексированных ассоциативный массив данных
-	 * @param string $sql - SQL-запрос
-	 * @param string $index - имя поля, по которому будет индексироваться массив результатов.
-	 *        Важно проследить, чтобы значение у индекса было уникальным у каждой строки,
-	 *        иначе дублирующиеся строки будут затерты.
-	 * @param mixed $default - значение, возвращаемое если запрос ничего не вернул
-	 * @return array|$default
-	 */
-	public function getAllIndexed($sql, $index, $default = array()){
-		
-		$rs = $this->query($sql);
-		for ($data = array(); $row = $rs->fetch(PDO::FETCH_ASSOC); $data[ $row[$index] ] = $row);
-		
-		return $data ? $data : $default;
-	}
-	
 	public function fetchOne($sql, $bind = array(), $default = null){
-		
+
 		$data = $this->query($sql, $bind)->fetchColumn();
 		return $data !== FALSE ? $data : $default;
 	}
-	
+
+	public function fetchCell($sql, $col, $bind = array(), $default = null){
+
+		$data = $this->query($sql, $bind)->fetchColumn($col);
+		return $data !== FALSE ? $data : $default;
+	}
+
 	public function fetchRow($sql, $bind = array(), $default = null){
-		
+
 		$data = $this->query($sql, $bind)->fetch(PDO::FETCH_ASSOC);
 		return $data ? $data : $default;
 	}
-	
-	public function fetchPairs($sql, $bind = array(), $default = array()){
-		
-		$rs = $this->query($sql, $bind);
-		for ($data = array(); $row = $rs->fetch(PDO::FETCH_NUM); $data[ $row[0] ] = $row[1]);
-		
-		return $data ? $data : $default;
-	}
-	
+
 	public function fetchCol($sql, $bind = array(), $default = array()){
-		
+
 		$data = $this->query($sql, $bind)->fetchAll(PDO::FETCH_COLUMN, 0);
 		return $data ? $data : $default;
 	}
 	
-	public function fetchAssoc($sql, $bind = array(), $key = 'id', $default = array()){
-		
+	public function fetchPairs($sql, $bind = array(), $default = array()){
+
 		$rs = $this->query($sql, $bind);
-		for ($data = array(); $row = $rs->fetch(PDO::FETCH_ASSOC); $data[ $row[$key] ] = $row);
-		
+		for ($data = array(); $row = $rs->fetch(PDO::FETCH_NUM); $data[ $row[0] ] = $row[1]);
+
 		return $data ? $data : $default;
 	}
-	
+
 	public function fetchAll($sql, $bind = array(), $default = array()){
-		
+
 		$data = $this->query($sql, $bind)->fetchAll(PDO::FETCH_ASSOC);
 		return $data !== FALSE ? $data : $default;
 	}
 	
+	public function fetchAssoc($sql, $index, $bind = array(), $default = array()){
+
+		$rs = $this->query($sql, $bind);
+		for ($data = array(); $row = $rs->fetch(PDO::FETCH_ASSOC); $data[ $row[$index] ] = $row);
+
+		return $data ? $data : $default;
+	}
+
 	/**
-	 * INSERT
 	 * вставка данных в таблицу
 	 * @param string $table - имя таблицы
 	 * @param array $fieldsValues - массив пар (поле => значение) для вставки
@@ -221,18 +132,21 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 
     public function insertMulti($table, $fields, $valuesArrArr){
 
-        $valuesArrStr = array();
+        $rows = array();
+		$values = array();
         foreach($fields as $index => $field)
             $fields[$index] = $this->quoteFieldName($field);
         foreach($valuesArrArr as $_rowArr){
             $rowArr = array();
-            foreach($_rowArr as $cell)
-                $rowArr[] = $this->qe($cell);
-            $valuesArrStr[] = '('.implode(',', $rowArr).')';
+            foreach($_rowArr as $cell) {
+                $rowArr[] = '?';
+				$values[] = $cell;
+			}
+            $rows[] = '('.implode(',', $rowArr).')';
         }
 
-        $sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES '.implode(',', $valuesArrStr);
-        return $this->getOne($sql);
+        $sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES '.implode(',', $rows);
+        return $this->fetchOne($sql, $values);
     }
 
     /**
@@ -241,9 +155,10 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 	 * @param string $table - имя таблицы
 	 * @param array $fieldsValues - массив пар (поле => значение) для обновления
 	 * @param string $where - SQL строка условия (без слова WHERE). Не должно быть пустой строкой.
+	 * @param mixed $bind - параметры для SQL запроса
 	 * @return integer количество затронутых строк
 	 */
-	public function update($table, $fieldsValues, $where) {
+	public function update($table, $fieldsValues, $where, $bind = array()) {
 		
 		$update_arr = array();
 		$bind_arr = array();
@@ -255,6 +170,8 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 				$bind_arr[] = $value;
 			}
 		}
+
+		$bind_arr = array_merge($bind_arr, (array)$bind);
 	
 		if(!strlen($where))
 			trigger_error('Функции update не передано условие', E_USER_ERROR);
@@ -268,36 +185,25 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 	 * DELETE
 	 * удаление записей из таблицы
 	 * @param string $table - имя таблицы
-	 * @param array $fieldsValues - массив пар (поле => значение) для обновления
 	 * @param string $where - SQL строка условия (без слова WHERE). Не должно быть пустой строкой.
+	 * @param mixed $bind - параметры для SQL запроса
 	 * @return integer количество затронутых строк
 	 */
-	public function delete($table, $where) {
+	public function delete($table, $where, $bind = array()) {
 	
 		if(!strlen($where))
 			trigger_error('Функции delete не передано условие. Необходимо использовать truncate', E_USER_ERROR);
 		
 		$sql = 'DELETE FROM '.$table.' WHERE '.$where;
-		$rs = $this->query($sql);
+		$rs = $this->query($sql, $bind);
 
 		return $rs->rowCount();
 	}
-	
+
 	/**
-	 * TRUNCATE
-	 * очистка таблицы
-	 * @param string $table - имя таблицы
-	 * @return void
-	 */
-	public function truncate($table){
-		
-		$this->query('DELETE FROM '.$table);
-	}
-	
-	/**
-	 * ЭСКЕЙПИРОВАНИЕ И ЗАКЛЮЧЕНИЕ СТРОКИ В КОВЫЧКИ
+	 * эскейпирование и заключение строки в ковычки
 	 * замена последовательному вызову функций db::escape и db::quote
-	 * @param variant $cell - исходная строка
+	 * @param mixed $cell - исходная строка
 	 * @return string эскейпированая и заключенная в нужный тип ковычек строка
 	 */
 	public function qe($cell){
@@ -305,12 +211,6 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 		return $this->quote($cell);
 	}
 	
-	/**
-	 * ЭКРАНИРОВАНИЕ ДАННЫХ
-	 * выполняется с учетом типа данных для предотвращения SQL-инъекций
-	 * @param mixed строка для экранирования
-	 * @param mixed - безопасная строка
-	 */
 	public function escape($str){
 		
 		return is_string($str)
@@ -319,10 +219,10 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 	}
 
 	/**
-	 * ЗАКЛЮЧЕНИЕ СТРОК В КОВЫЧКИ И ЭКРАНИРОВАНИЕ
+	 * заключение строк в ковычки и экранирование
 	 * в зависимости от типа данных
 	 * @override DbAdapter method
-	 * @param variant $cell - исходная строка
+	 * @param mixed $cell - исходная строка
 	 * @return string заключенная в нужный тип ковычек строка
 	 */
 	public function quote($cell){
@@ -338,50 +238,10 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 				return $cell;
 		}
 	}
-	
-	/**
-	 * DESCRIBE
-	 * получить массив, описывающий структуру таблицы
-	 * @param string $table - имя таблицы
-	 * @return array - структура таблицы
-	 */
-	public function describe($table){
+
+	protected function _error($msg, $sql = ''){
 		
-		return $this->getAll('PRAGMA table_info('.$table.')');
-	}
-	
-	/**
-	 * ПОЛУЧИТЬ СПИСОК ТАБЛИЦ
-	 * в текущей базе данных
-	 * @return array - массив-список таблиц
-	 */
-	public function showTables(){
-	
-		return $this->fetchCol('SELECT name FROM sqlite_master WHERE type = "table"');
-	}
-	
-	/**
-	 * ПОЛУЧИТЬ СПИСОК БД
-	 * @return array - массив-список баз данных
-	 */
-	public function showDatabases(){
-	
-		return array($this->connDatabase);
-	}
-	
-	/**
-	 * ПОКАЗАТЬ СТРОКУ CREATE TABLE
-	 * @param string $table - имя таблицы
-	 * @return string - строка CREATE TABLE
-	 */
-	public function showCreateTable($table){
-	
-		return $this->getOne('SELECT sql FROM sqlite_master WHERE type = "table" AND name= "'.$table.'"');
-	}
-	
-	protected function error($msg, $sql = ''){
-		
-		parent::error(is_array($msg) ? implode('; ', $msg) : $msg, $sql);
+		parent::_error(is_array($msg) ? implode('; ', $msg) : $msg, $sql);
 	}
 	
 	/**
@@ -443,7 +303,7 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 			echo $createtable[$table].';'.$lf;
 			echo $lf;
 			
-			$numRows = $this->getOne('SELECT COUNT(1) FROM '.$table);
+			$numRows = $this->fetchOne('SELECT COUNT(1) FROM '.$table);
 			
 			if($numRows){
 				
@@ -453,7 +313,7 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 					
 				for($i = 0; $i < $numIterations; $i++){
 				
-					$rows = db::get()->getAll('SELECT * FROM '.$table.' LIMIT '.($i * $rowsPerIteration).', '.$rowsPerIteration, array());
+					$rows = db::get()->fetchAll('SELECT * FROM '.$table.' LIMIT '.($i * $rowsPerIteration).', '.$rowsPerIteration, array());
 				
 					echo $cmnt.$lf;
 					echo $cmnt.' TABLE '.$table.' DUMP'.$lf;
@@ -488,4 +348,3 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 
 }
 
-?>

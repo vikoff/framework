@@ -157,7 +157,7 @@ class TestItem_Collection extends ARCollection{
 		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array('*', 'FROM '.TestItem_Model::TABLE.' ORDER BY '.$sorter->getOrderBy()), 50);
 		
-		$data = db::get()->getAll($paginator->getSql(), array());
+		$data = db::get()->fetchAll($paginator->getSql(), array());
 		
 		foreach($data as &$row)
 			$row = TestItem_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
@@ -172,7 +172,7 @@ class TestItem_Collection extends ARCollection{
 	/** ПОЛУЧИТЬ СПИСОК ВСЕХ ЭЛЕМЕНТОВ */
 	public function getAll(){
 		
-		$data = db::get()->getAllIndexed('SELECT * FROM '.TestItem_Model::TABLE, 'id', array());
+		$data = db::get()->fetchAssoc('SELECT * FROM '.TestItem_Model::TABLE, 'id', array());
 		
 		foreach($data as &$row)
 			$row = TestItem_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();

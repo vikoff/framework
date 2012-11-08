@@ -25,7 +25,7 @@ class User_Acl {
 	private function _loadUserPermissions(){
 		
 		$db = db::get();
-		$_data = $db->getAll('SELECT module, resource FROM '.self::TABLE.' WHERE role_id='.CurUser::roleId());
+		$_data = $db->fetchAll('SELECT module, resource FROM '.self::TABLE.' WHERE role_id='.CurUser::roleId());
 		
 		foreach($_data as $row)
 			$this->_userPermissions[ $row['module'] ][ $row['resource'] ] = 1;
@@ -68,7 +68,7 @@ class User_Acl {
 	public function getAllAccessRules(){
 		
 		$rules = array();
-		foreach(db::get()->getAll('SELECT * FROM '.self::TABLE) as $rule){
+		foreach(db::get()->fetchAll('SELECT * FROM '.self::TABLE) as $rule){
 			if (!isset($rules[ $rule['module'] ]))
 				$rules[ $rule['module'] ] = array();
 			if (!isset($rules[ $rule['module'] ][ $rule['resource'] ]))
@@ -104,7 +104,7 @@ class User_Acl {
 	public function copyRules($fromRoleId, $toRoleId){
 		
 		$db = db::get();
-		$db->getOne('
+		$db->fetchOne('
 			INSERT INTO '.self::TABLE.'
 			SELECT '.$db->qe($toRoleId).' AS role_id, module, resource FROM '.self::TABLE.' WHERE role_id='.(int)$fromRoleId.'
 		');

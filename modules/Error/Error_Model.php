@@ -116,7 +116,7 @@ class Error_Model{
 	// ЗАГРУЗКА ОШИБКИ - МЕТОД САМОСТОЯТЛЬНО ИЗВЛЕКАЕТ ДАННЫЕ ИЗ БД (ТОЧКА ВХОДА В КЛАСС)
 	public static function load($id){
 		
-		$data = db::get()->getRow('SELECT * FROM '.self::$_config['dbTableName'].' WHERE id='.(int)$id, FALSE);
+		$data = db::get()->fetchRow('SELECT * FROM '.self::$_config['dbTableName'].' WHERE id='.(int)$id, FALSE);
 		
 		if(!$data)
 			throw new Exception('Запись не найдена');
@@ -341,7 +341,7 @@ class Error_Model{
 		$fields['lastdate'] = time();
 		$db = db::get();
 		
-		if($lastid = $db->getOne('SELECT id FROM '.self::$_config['dbTableName'].' WHERE hash='.$db->qe($fields['hash']).' LIMIT 1', 0)){
+		if($lastid = $db->fetchOne('SELECT id FROM '.self::$_config['dbTableName'].' WHERE hash='.$db->qe($fields['hash']).' LIMIT 1', 0)){
 			$db->update(self::$_config['dbTableName'],
 				array('lastdate' => $fields['lastdate'], 'occur_num' => $db->raw('occur_num+1')),
 				'id='.$lastid);
@@ -424,7 +424,7 @@ class Error_Collection extends ARCollection {
 	public function getPaginated(){
 		
 		$paginator = new Paginator('sql', array('*', 'FROM '.Error_Model::getConfig('dbTableName').' ORDER BY id DESC'), '~50');
-		$data = db::get()->getAll($paginator->getSql(), array());
+		$data = db::get()->fetchAll($paginator->getSql(), array());
 		
 		foreach($data as &$row)
 			$row = Error_Model::forceLoad($row['id'], $row)->printHTML($return = TRUE);

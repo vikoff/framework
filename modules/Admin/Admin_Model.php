@@ -15,7 +15,7 @@ class Admin_Model {
 			$sql = trim($sql);
 			if(!empty($sql)){
 				$sql = str_replace(array('\r', '\n'), array("\r", "\n"), $sql);
-				$result = $db->getAll($sql);
+				$result = $db->fetchAll($sql);
 				$results[] = array_merge($db->getLastQueryInfo(), array('result' => $result, 'numrows' => count($result)));
 			}
 		}
@@ -43,7 +43,7 @@ class Admin_Model {
 		return array(
 			'sortableLinks' => $sorter->getSortableLinks(),
 			'structure' => $structure,
-			'rows' => $db->getAll($paginator->getSql()),
+			'rows' => $db->fetchAll($paginator->getSql()),
 			'pagination' => $paginator->getButtons(),
 		);
 	}

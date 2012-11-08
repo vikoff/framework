@@ -205,14 +205,14 @@ class User_Model extends ActiveRecord {
 		if (!empty($excludeId))
 			$sql .= ' AND id != '.(int)$excludeId;
 		
-		return $db->getOne($sql);
+		return $db->fetchOne($sql);
 	}
 	
 	/** ЗАНЯТ ЛИ ЛОГИН */
 	public static function isLoginInUse($login){
 		
 		$db = db::get();
-		return $db->getOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE login='.$db->qe($login));
+		return $db->fetchOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE login='.$db->qe($login));
 	}
 	
 	/** ТЕКСТОВОЕ ЗНАЧЕНИЕ ПАРАМЕТРА "ПОЛ ПОЛЬЗОВАТЕЛЯ" */
@@ -274,7 +274,7 @@ class User_Collection extends ARCollection {
 		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
 		$paginator = new Paginator('sql', array('*', 'FROM '.User_Model::TABLE.' ORDER BY '.$sorter->getOrderBy()), 50);
 		
-		$data = db::get()->getAll($paginator->getSql(), array());
+		$data = db::get()->fetchAll($paginator->getSql(), array());
 		
 		foreach($data as &$row)
 			$row = User_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
@@ -289,7 +289,7 @@ class User_Collection extends ARCollection {
 	public function getAll(){
 		
 		$where = $this->_getSqlFilter();
-		$data = db::get()->getAllIndexed('SELECT * FROM '.User_Model::TABLE.' '.$where, 'id', array());
+		$data = db::get()->fetchAssoc('SELECT * FROM '.User_Model::TABLE.' '.$where, 'id', array());
 		
 		foreach($data as &$row)
 			$row = User_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();

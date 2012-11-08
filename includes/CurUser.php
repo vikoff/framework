@@ -119,7 +119,7 @@ class CurUser extends User_Model {
 		$login = $db->qe($login);
 		$pass = $db->quote(sha1($pass));
 		
-		if($ans = $db->getRow('SELECT id, '.self::LOGIN_FIELD.', password, role_id FROM '.self::TABLE.' WHERE '.self::LOGIN_FIELD.'='.$login.' AND password='.$pass, FALSE)){
+		if($ans = $db->fetchRow('SELECT id, '.self::LOGIN_FIELD.', password, role_id FROM '.self::TABLE.' WHERE '.self::LOGIN_FIELD.'='.$login.' AND password='.$pass, FALSE)){
 		
 			// сохранить данные в сессию
 			$this->setLoggedAuthData($ans['id'], $ans['role_id']);
@@ -143,7 +143,7 @@ class CurUser extends User_Model {
 		$uid = (int)$_COOKIE[$this->_authPrefix.'uid'];
 		$db = db::get();
 		
-		$ans = $db->getRow('SELECT id, '.self::LOGIN_FIELD.', password, role_id FROM '.self::TABLE.' WHERE id='.$db->qe($uid), 0);
+		$ans = $db->fetchRow('SELECT id, '.self::LOGIN_FIELD.', password, role_id FROM '.self::TABLE.' WHERE id='.$db->qe($uid), 0);
 		if(!$ans)
 			return false;
 

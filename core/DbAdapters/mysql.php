@@ -7,7 +7,7 @@ class DbAdapter_mysql extends DbAdapter{
 		
 		$start = microtime(1);
 		
-		$this->_dbrs = mysql_connect($this->connHost, $this->connUser, $this->connPass, $new_link = TRUE) or $this->error('Невозможно подключиться к серверу MySQL');
+		$this->_dbrs = mysql_connect($this->connHost, $this->connUser, $this->connPass, $new_link = TRUE) or $this->_error('Невозможно подключиться к серверу MySQL');
 		$this->selectDb($this->connDatabase);
 		
 		$this->_saveConnectTime(microtime(1) - $start);
@@ -31,7 +31,7 @@ class DbAdapter_mysql extends DbAdapter{
 	public function selectDb($db){
 		
 		$this->connDatabase = $db;
-		mysql_select_db($this->connDatabase, $this->_dbrs)or $this->error('Невозможно выбрать базу данных');
+		mysql_select_db($this->connDatabase, $this->_dbrs)or $this->_error('Невозможно выбрать базу данных');
 	}
 	
 	/** ПОЛУЧИТЬ ПОСЛЕДНИЙ ВСТАВЛЕННЫЙ PRIMARY KEY */
@@ -80,7 +80,7 @@ class DbAdapter_mysql extends DbAdapter{
 		$this->_queriesNum++;
 		
 		$start = microtime(1);
-		$rs = mysql_query($sql, $this->_dbrs) or $this->error(mysql_error($this->_dbrs), $sql);
+		$rs = mysql_query($sql, $this->_dbrs) or $this->_error(mysql_error($this->_dbrs), $sql);
 		$this->_saveQueryTime(microtime(1) - $start);
 		
 		return $rs;
@@ -93,7 +93,7 @@ class DbAdapter_mysql extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return mixed|$default_value
 	 */
-	public function getOne($query, $default_value = null){
+	public function fetchOne($query, $bind = array(), $default_value = null){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && mysql_num_rows($rs))
@@ -153,7 +153,7 @@ class DbAdapter_mysql extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getCol($query, $default_value = array()){
+	public function fetchCol($query, $bind = array(), $default_value = array()){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && mysql_num_rows($rs))
@@ -173,7 +173,7 @@ class DbAdapter_mysql extends DbAdapter{
 	 * @param mixed $default_value
 	 * @return array|$default_value
 	 */
-	public function getColIndexed($query, $default_value = array()){
+	public function fetchPairs($query, $bind = array(), $default_value = array()){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && mysql_num_rows($rs))
@@ -191,7 +191,7 @@ class DbAdapter_mysql extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getRow($query, $default_value = array()){
+	public function fetchRow($query, $bind = array(), $default_value = array()){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && mysql_num_rows($rs))
@@ -231,7 +231,7 @@ class DbAdapter_mysql extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getAll($query, $default_value = array()){
+	public function fetchAll($query, $bind = array(), $default_value = array()){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && mysql_num_rows($rs))
@@ -252,7 +252,7 @@ class DbAdapter_mysql extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getAllIndexed($query, $index, $default_value = 0){
+	public function fetchAssoc($query, $index, $default_value = 0){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && mysql_num_rows($rs))
@@ -293,7 +293,7 @@ class DbAdapter_mysql extends DbAdapter{
 	 */
 	public function describe($table){
 		
-		$data = $this->getAll('DESCRIBE '.$table);
+		$data = $this->fetchAll('DESCRIBE '.$table);
 		foreach ($data as & $row) {
 			$row['name'] = $row['Field'];
 			$row['type'] = $row['Type'];
@@ -310,7 +310,7 @@ class DbAdapter_mysql extends DbAdapter{
 	 */
 	public function showTables(){
 	
-		return $this->getCol('SHOW TABLES');
+		return $this->fetchCol('SHOW TABLES');
 	}
 	
 	/**
@@ -319,7 +319,7 @@ class DbAdapter_mysql extends DbAdapter{
 	 */
 	public function showDatabases(){
 	
-		return $this->getCol('SHOW DATABASES');
+		return $this->fetchCol('SHOW DATABASES');
 	}
 	
 	/**
@@ -392,7 +392,7 @@ class DbAdapter_mysql extends DbAdapter{
 				
 			echo $lf;
 			
-			$numRows = $this->getOne('SELECT COUNT(1) FROM '.$table);
+			$numRows = $this->fetchOne('SELECT COUNT(1) FROM '.$table);
 			
 			if($numRows){
 				
@@ -402,12 +402,12 @@ class DbAdapter_mysql extends DbAdapter{
 				
 				// извлечение названий полей
 				$fields = array();
-				foreach($this->getAll('DESCRIBE '.$table, array()) as $f)
+				foreach($this->fetchAll('DESCRIBE '.$table, array()) as $f)
 					$fields[] = $this->quoteFieldName($f['Field']);
 					
 				for($i = 0; $i < $numIterations; $i++){
 				
-					$rows = db::get()->getAll('SELECT * FROM '.$table.' LIMIT '.($i * $rowsPerIteration).', '.$rowsPerIteration, array());
+					$rows = db::get()->fetchAll('SELECT * FROM '.$table.' LIMIT '.($i * $rowsPerIteration).', '.$rowsPerIteration, array());
 					foreach($rows as $rowIndex => $row){
 						foreach($row as &$cell){
 							if(is_string($cell)){

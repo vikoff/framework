@@ -8,7 +8,7 @@ class DbAdapter_postgres extends DbAdapter{
 		$start = microtime(1);
 		
 		$connString = 'host='.$this->connHost.' port='.$this->connPort.' user='.$this->connUser.' password='.$this->connPass.' dbname='.$this->connDatabase;
-		$this->_dbrs = pg_connect($connString) or $this->error('Невозможно подключиться к серверу PgSQL');
+		$this->_dbrs = pg_connect($connString) or $this->_error('Невозможно подключиться к серверу PgSQL');
 		
 		$this->_saveConnectTime(microtime(1) - $start);
 		
@@ -33,7 +33,7 @@ class DbAdapter_postgres extends DbAdapter{
 		if(is_null($tablename) || is_null($fieldname))
 			trigger_error('Имя таблицы и поля обязательны для заполнения', E_USER_ERROR);
 			
-		return $this->getOne('SELECT last_value FROM '.$tablename.'_'.$fieldname.'_seq');
+		return $this->fetchOne('SELECT last_value FROM '.$tablename.'_'.$fieldname.'_seq');
 	}
 	
 	/** ПОЛУЧИТЬ КОЛИЧЕСТВО СТРОК, ЗАТРОНУТЫХ ПОСЛЕДНЕЙ ОПЕРАЦИЕЙ */
@@ -59,7 +59,7 @@ class DbAdapter_postgres extends DbAdapter{
 		$sql = 'INSERT INTO '.$table.' SET '.$insert_str.(!is_null($autoIncrement) ? 'RETURNING '.$autoIncrementField : '');
 		
 		if(!is_null($autoIncrement)){
-			return $this->getOne($sql);
+			return $this->fetchOne($sql);
 		}else{
 			$this->query($sql);
 			return null;
@@ -74,7 +74,7 @@ class DbAdapter_postgres extends DbAdapter{
 	public function query($sql){
 		
 		$this->saveQuery($sql);
-		$rs = @pg_query($this->_dbrs, $sql) or $this->error(pg_last_error($this->_dbrs), $sql);
+		$rs = @pg_query($this->_dbrs, $sql) or $this->_error(pg_last_error($this->_dbrs), $sql);
 		return $rs;
 
 	}
@@ -95,7 +95,7 @@ class DbAdapter_postgres extends DbAdapter{
 			$sql = implode('', $sqlArr);
 		}
 		$this->saveQuery($sql);
-		$rs = @pg_query_params($this->_dbrs, $sql, $params) or $this->error(pg_last_error($this->_dbrs), $sql);
+		$rs = @pg_query_params($this->_dbrs, $sql, $params) or $this->_error(pg_last_error($this->_dbrs), $sql);
 		return $rs;
 
 	}
@@ -114,7 +114,7 @@ class DbAdapter_postgres extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return mixed|$default_value
 	 */
-	public function getOne($query, $default_value = null){
+	public function fetchOne($query, $default_value = null){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && pg_num_rows($rs))
@@ -178,7 +178,7 @@ class DbAdapter_postgres extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getCol($query, $default_value = array()){
+	public function fetchCol($query, $default_value = array()){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && pg_num_rows($rs))
@@ -201,7 +201,7 @@ class DbAdapter_postgres extends DbAdapter{
 	 * @param mixed $default_value
 	 * @return array
 	 */
-	public function getColIndexed($query, $default_value = array()){
+	public function fetchPairs($query, $default_value = array()){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && pg_num_rows($rs))
@@ -220,7 +220,7 @@ class DbAdapter_postgres extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getRow($query, $default_value = array()){
+	public function fetchRow($query, $default_value = array()){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && pg_num_rows($rs))
@@ -261,7 +261,7 @@ class DbAdapter_postgres extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getAll($query, $default_value = array()){
+	public function fetchAll($query, $default_value = array()){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && pg_num_rows($rs))
@@ -283,7 +283,7 @@ class DbAdapter_postgres extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getAllIndexed($query, $index, $default_value = 0){
+	public function fetchAssoc($query, $index, $default_value = 0){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs) && pg_num_rows($rs))
@@ -395,7 +395,7 @@ class DbAdapter_postgres extends DbAdapter{
 	 */
 	public function showTables(){
 	
-		return $this->getCol("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+		return $this->fetchCol("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
 	}
 	
 	/**
@@ -415,7 +415,7 @@ class DbAdapter_postgres extends DbAdapter{
 	 */
 	public function describe($table){
 		
-		return $this->getAll('DESCRIBE '.$table);
+		return $this->fetchAll('DESCRIBE '.$table);
 	}
 	
 	/**
@@ -488,7 +488,7 @@ class DbAdapter_postgres extends DbAdapter{
 				
 			echo $lf;
 			
-			$numRows = $this->getOne('SELECT COUNT(*) FROM '.$table);
+			$numRows = $this->fetchOne('SELECT COUNT(*) FROM '.$table);
 			
 			if($numRows){
 				
@@ -498,12 +498,12 @@ class DbAdapter_postgres extends DbAdapter{
 				
 				// извлечение названий полей
 				$fields = array();
-				foreach($this->getAll('DESCRIBE '.$table, array()) as $f)
+				foreach($this->fetchAll('DESCRIBE '.$table, array()) as $f)
 					$fields[] = $this->quoteFieldName($f['Field']);
 					
 				for($i = 0; $i < $numIterations; $i++){
 				
-					$rows = db::get()->getAll('SELECT * FROM '.$table.' LIMIT '.($i * $rowsPerIteration).', '.$rowsPerIteration, array());
+					$rows = db::get()->fetchAll('SELECT * FROM '.$table.' LIMIT '.($i * $rowsPerIteration).', '.$rowsPerIteration, array());
 					foreach($rows as $rowIndex => $row){
 						foreach($row as &$cell){
 							if(is_string($cell)){

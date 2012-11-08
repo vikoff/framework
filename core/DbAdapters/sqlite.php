@@ -7,7 +7,7 @@ class DbAdapter_sqlite extends DbAdapter{
 		
 		$start = microtime(1);
 		
-		$this->_dbrs = sqlite_open($this->connDatabase)or $this->error('Невозможно подключиться к базе данных');
+		$this->_dbrs = sqlite_open($this->connDatabase)or $this->_error('Невозможно подключиться к базе данных');
 		$this->_connected = TRUE;
 		
 		$this->_saveConnectTime(microtime(1) - $start);
@@ -45,7 +45,7 @@ class DbAdapter_sqlite extends DbAdapter{
 		$this->_queriesNum++;
 		
 		$start = microtime(1);
-		$rs = sqlite_query($this->_dbrs, $sql) or $this->error(sqlite_error_string(sqlite_last_error($this->_dbrs)), $sql);
+		$rs = sqlite_query($this->_dbrs, $sql) or $this->_error(sqlite_error_string(sqlite_last_error($this->_dbrs)), $sql);
 		$this->_saveQueryTime(microtime(1) - $start);
 		
 		return $rs;
@@ -58,7 +58,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return mixed|$default_value
 	 */
-	public function getOne($query, $default_value = 0){
+	public function fetchOne($query, $default_value = 0){
 		
 		$rs = $this->query($query);
 		$data = sqlite_fetch_single($rs);
@@ -119,7 +119,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getCol($query, $default_value = array()){
+	public function fetchCol($query, $default_value = array()){
 		
 		$rs = $this->query($query);
 		for($data = array(); $row = sqlite_fetch_single($rs); $data[] = $row);
@@ -138,7 +138,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 * @param mixed $default_value
 	 * @return array|$default_value
 	 */
-	public function getColIndexed($query, $default_value = 0){
+	public function fetchPairs($query, $default_value = 0){
 		
 		$rs = $this->query($query);
 		if(is_resource($rs))
@@ -156,7 +156,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getRow($query, $default_value = 0){
+	public function fetchRow($query, $default_value = 0){
 		
 		$rs = $this->query($query);
 		$data = sqlite_fetch_array($rs, SQLITE_ASSOC);
@@ -194,7 +194,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getAll($query, $default_value = array()){
+	public function fetchAll($query, $default_value = array()){
 
 		$rs = $this->query($query);
 		$data = sqlite_fetch_all($rs, SQLITE_ASSOC);
@@ -212,7 +212,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 * @param mixed $default_value - значение, возвращаемое если запрос ничего не вернул
 	 * @return array|$default_value
 	 */
-	public function getAllIndexed($query, $index, $default_value = 0){
+	public function fetchAssoc($query, $index, $default_value = 0){
 		
 		$rs = $this->query($query);
 		$data = array();
@@ -283,7 +283,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 */
 	public function describe($table){
 		
-		return $this->getAll('PRAGMA table_info('.$table.')');
+		return $this->fetchAll('PRAGMA table_info('.$table.')');
 	}
 	
 	/**
@@ -293,7 +293,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 */
 	public function showTables(){
 	
-		return $this->getCol('SELECT name FROM sqlite_master WHERE type = "table"');
+		return $this->fetchCol('SELECT name FROM sqlite_master WHERE type = "table"');
 	}
 	
 	/**
@@ -312,7 +312,7 @@ class DbAdapter_sqlite extends DbAdapter{
 	 */
 	public function showCreateTable($table){
 	
-		return $this->getOne('SELECT sql FROM sqlite_master WHERE type = "table" AND name= "'.$table.'"');
+		return $this->fetchOne('SELECT sql FROM sqlite_master WHERE type = "table" AND name= "'.$table.'"');
 	}
 	
 	/**
@@ -374,7 +374,7 @@ class DbAdapter_sqlite extends DbAdapter{
 			echo $createtable[$table].';'.$lf;
 			echo $lf;
 			
-			$numRows = $this->getOne('SELECT COUNT(1) FROM '.$table);
+			$numRows = $this->fetchOne('SELECT COUNT(1) FROM '.$table);
 			
 			if($numRows){
 				
@@ -384,7 +384,7 @@ class DbAdapter_sqlite extends DbAdapter{
 					
 				for($i = 0; $i < $numIterations; $i++){
 				
-					$rows = db::get()->getAll('SELECT * FROM '.$table.' LIMIT '.($i * $rowsPerIteration).', '.$rowsPerIteration, array());
+					$rows = db::get()->fetchAll('SELECT * FROM '.$table.' LIMIT '.($i * $rowsPerIteration).', '.$rowsPerIteration, array());
 				
 					echo $cmnt.$lf;
 					echo $cmnt.' TABLE '.$table.' DUMP'.$lf;

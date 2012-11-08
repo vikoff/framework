@@ -6,11 +6,35 @@ class DbAdapter_PdoSqlite extends DbAdapter_PdoAbstract {
 		return new PDO("sqlite:{$this->connDatabase}");
 	}
 
-	/** выбрать базу данных */
 	public function selectDb($db){}
 
     public function quoteFieldName($field){
         return '"'.$field.'"';
     }
+
+	public function truncate($table){
+
+		$this->query('DELETE FROM '.$table);
+	}
+
+	public function describe($table){
+
+		return $this->fetchAll('PRAGMA table_info('.$table.')');
+	}
+
+	public function showTables(){
+
+		return $this->fetchCol('SELECT name FROM sqlite_master WHERE type = "table"');
+	}
+
+	public function showDatabases(){
+
+		return array($this->connDatabase);
+	}
+
+	public function showCreateTable($table){
+
+		return $this->fetchOne('SELECT sql FROM sqlite_master WHERE type = "table" AND name= "'.$table.'"');
+	}
 
 }

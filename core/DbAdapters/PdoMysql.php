@@ -26,4 +26,24 @@ class DbAdapter_PdoMysql extends DbAdapter_PdoAbstract {
         return "`$field`";
     }
 
+	public function describe($table){
+
+		return $this->fetchAll('DESCRIBE '.$table);
+	}
+
+	public function showTables(){
+
+		return $this->fetchCol('SHOW TABLES');
+	}
+
+	public function showDatabases(){
+
+		return $this->fetchCol('SHOW DATABASES');
+	}
+
+	public function showCreateTable($table){
+
+		return $this->fetchCell("SHOW CREATE TABLE `$table`", 1);
+	}
+
 }
