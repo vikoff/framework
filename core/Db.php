@@ -104,6 +104,9 @@ abstract class DbAdapter {
 	const ERROR_STORE    = 3;
 	const ERROR_CALLBACK = 4;
 
+	/** флаг, используется ли pdo адаптер */
+	protected $_isPdo = FALSE;
+
 	/** флаг, что соединение установлено */
 	protected $_connected = FALSE;
 	
@@ -244,7 +247,7 @@ abstract class DbAdapter {
 	 * экранирование данных
 	 * выполняется с учетом типа данных для предотвращения SQL-инъекций
 	 * @param mixed строка для экранирования
-	 * @param mixed - безопасная строка
+	 * @return mixed - безопасная строка
 	 */
 	abstract public function escape($str);
 	
@@ -356,17 +359,23 @@ abstract class DbAdapter {
 	 * @return integer последний вставленный id 
 	 */
 	public function insert($table, $fieldsValues) {
-		
+
 		$fields = array();
 		$values = array();
-		
-		foreach($fieldsValues as $field => $value) {
+		$valuePhs = array();
+
+		foreach($fieldsValues as $field => $value){
 			$fields[] = $this->quoteFieldName($field);
-			$values[] = $this->qe($value);
+			if (is_object($value)) {
+				$valuePhs[] = $value;
+			} else {
+				$values[] = $value;
+				$valuePhs[] = '?';
+			}
 		}
-		
-		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES ('.implode(',', $values).')';
-		$this->query($sql);
+
+		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES ('.implode(',', $valuePhs).')';
+		$this->query($sql, $values);
 		return $this->getLastId();
 	}
 
@@ -379,39 +388,51 @@ abstract class DbAdapter {
 	 * @return integer колечество вставленных строк
 	 */
 	public function insertMulti($table, $fields, $valuesRows) {
-		
-		$valuesArrStr = array();
+
+		$rows = array();
+		$values = array();
 		foreach($fields as $index => $field)
-            $fields[$index] = $this->quoteFieldName($field);
-		foreach($valuesRows as $_rowArr) {
+			$fields[$index] = $this->quoteFieldName($field);
+		foreach($valuesRows as $_rowArr){
 			$rowArr = array();
-			foreach($_rowArr as $cell)
-				$rowArr[] = $this->qe($cell);
-			$valuesArrStr[] = '('.implode(',', $rowArr).')';
+			foreach($_rowArr as $cell) {
+				$rowArr[] = '?';
+				$values[] = $cell;
+			}
+			$rows[] = '('.implode(',', $rowArr).')';
 		}
 
-		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES '.implode(',', $valuesArrStr);
-		return $this->fetchOne($sql);
+		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES '.implode(',', $rows);
+		return $this->fetchOne($sql, $values);
 	}
 	
 	/**
-	 * UPDATE
 	 * обновление записей в таблице
 	 * @param string $table - имя таблицы
 	 * @param array $fieldsValues - массив пар (поле => значение) для обновления
-	 * @param string $conditions - SQL строка условия (без слова WHERE). Не должно быть пустой строкой.
+	 * @param string $where - SQL строка условия (без слова WHERE). Не должно быть пустой строкой.
 	 * @param mixed $bind - параметры для SQL запроса
 	 * @return integer количество затронутых строк
 	 */
-	public function update($table, $fieldsValues, $conditions, $bind = array()) {
-		
-		$updateArr = array();
-		foreach($fieldsValues as $field => $value)
-			$updateArr[] = $this->quoteFieldName($field).'='.$this->qe($value);
+	public function update($table, $fieldsValues, $where, $bind = array()) {
 
-		$sql = 'UPDATE '.$table.' SET '. implode(', ',$updateArr).' WHERE '.$conditions;
-		$this->query($sql, $bind);
-		return $this->getAffectedNum();
+		$update_arr = array();
+		$bind_arr = array();
+		foreach($fieldsValues as $field => $value) {
+			if (is_object($value)) {
+				$update_arr[] = $this->quoteFieldName($field).'='.$value;
+			} else {
+				$update_arr[] = $this->quoteFieldName($field).'=?';
+				$bind_arr[] = $value;
+			}
+		}
+
+		$bind = $bind === null ? array(null) : (array)$bind;
+		$bind_arr = array_merge($bind_arr, $bind);
+
+		$sql = 'UPDATE '.$table.' SET '.implode(',',$update_arr).' WHERE '.$where;
+		$rs = $this->query($sql, $bind_arr);
+		return $this->_isPdo ? $rs->rowCount() : $this->getAffectedNum();
 	}
 
 	/**
@@ -674,12 +695,12 @@ abstract class DbAdapter {
 		}
 	}
 	
-	/** СОХРАНИТЬ ОШИБКУ */
+	/** сохранить ошибку */
 	protected function _setError($error) {
 		$this->_error[] = $error;
 	}
 	
-	/** ПОЛУЧИТЬ ВСЕ ОШИБКИ */
+	/** получить все ошибки */
 	public function getError($clear = false) {
 
 		$separator = PHP_SAPI == 'cli' ? "\n" : '<br />';
@@ -690,17 +711,17 @@ abstract class DbAdapter {
 		return $output;
 	}
 	
-	/** ПРОВЕРИТЬ, ЕСТЬ ЛИ ОШИБКИ */
+	/** проверить, есть ли ошибки */
 	public function hasError() {
 		return !empty($this->_error);
 	}
 	
-	/** ОЧИСТИТЬ НАКОПИВШИЕСЯ ОШИБКИ */
+	/** очистить накопившиеся ошибки */
 	public function resetError() {
 		$this->_error = array();
 	}
 	
-	/** ЗАГРУЗИТЬ ДАМП ДАННЫХ */
+	/** загрузить дамп данных */
 	public function loadDump($fileName) {
 	
 		if(!$fileName) {
@@ -735,7 +756,7 @@ abstract class DbAdapter {
 	}
 	
 	/**
-	 * СОЗДАТЬ ДАМП БАЗЫ ДАННЫХ
+	 * создать дамп базы данных
 	 * @param string|null $database - база данных (или дефолтная, если null)
 	 * @param array|null $tables - список таблиц (или все, если null)
 	 * @output выдает текст sql-дампа
@@ -744,7 +765,7 @@ abstract class DbAdapter {
 	public function makeDump($database = null, $tables = null) {}
 	
 	/**
-	 * ДЕСТРУКОТР
+	 * деструкотр
 	 * запись лога выполненных sql-запросов в файл (если требуется)
 	 */
 	public function __destruct() {

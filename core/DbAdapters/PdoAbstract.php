@@ -5,6 +5,8 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 	/** @var PDO */
 	protected $_dbrs = null;
 
+	protected $_isPdo = TRUE;
+
 	/** @return PDO */
 	abstract protected function _getPdoInstance();
 
@@ -102,52 +104,6 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 
 		return $data ? $data : $default;
 	}
-
-	/**
-	 * вставка данных в таблицу
-	 * @param string $table - имя таблицы
-	 * @param array $fieldsValues - массив пар (поле => значение) для вставки
-	 * @return integer последний вставленный id 
-	 */
-	public function insert($table, $fieldsValues){
-		
-		$fields = array();
-		$values = array();
-		$valuePhs = array();
-		
-		foreach($fieldsValues as $field => $value){
-			$fields[] = $this->quoteFieldName($field);
-			if (is_object($value)) {
-				$valuePhs[] = $value;
-			} else {
-				$values[] = $value;
-				$valuePhs[] = '?';
-			}
-		}
-		
-		$sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES ('.implode(',', $valuePhs).')';
-		$this->query($sql, $values);
-		return $this->getLastId();
-	}
-
-    public function insertMulti($table, $fields, $valuesRows){
-
-        $rows = array();
-		$values = array();
-        foreach($fields as $index => $field)
-            $fields[$index] = $this->quoteFieldName($field);
-        foreach($valuesRows as $_rowArr){
-            $rowArr = array();
-            foreach($_rowArr as $cell) {
-                $rowArr[] = '?';
-				$values[] = $cell;
-			}
-            $rows[] = '('.implode(',', $rowArr).')';
-        }
-
-        $sql = 'INSERT INTO '.$table.' ('.implode(',', $fields).') VALUES '.implode(',', $rows);
-        return $this->fetchOne($sql, $values);
-    }
 
     /**
 	 * UPDATE
