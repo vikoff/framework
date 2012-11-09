@@ -399,23 +399,17 @@ abstract class DbAdapter {
 	 * @param string $table - имя таблицы
 	 * @param array $fieldsValues - массив пар (поле => значение) для обновления
 	 * @param string $conditions - SQL строка условия (без слова WHERE). Не должно быть пустой строкой.
+	 * @param mixed $bind - параметры для SQL запроса
 	 * @return integer количество затронутых строк
 	 */
-	public function update($table, $fieldsValues, $conditions) {
+	public function update($table, $fieldsValues, $conditions, $bind = array()) {
 		
-		$update_arr = array();
+		$updateArr = array();
 		foreach($fieldsValues as $field => $value)
-			$update_arr[] = $this->quoteFieldName($field).'='.$this->qe($value);
-		$update_str = implode(',',$update_arr);
-		
-		$conditions = trim(str_replace('WHERE', '', $conditions));
-		$conditions = strlen($conditions) ? ' WHERE '.$conditions : '';
-	
-		if(!strlen($conditions))
-			trigger_error('Функции update не передано условие', E_USER_ERROR);
-		
-		$sql = 'UPDATE '.$table.' SET '.$update_str.$conditions;
-		$this->query($sql);
+			$updateArr[] = $this->quoteFieldName($field).'='.$this->qe($value);
+
+		$sql = 'UPDATE '.$table.' SET '. implode(', ',$updateArr).' WHERE '.$conditions;
+		$this->query($sql, $bind);
 		return $this->getAffectedNum();
 	}
 
@@ -466,22 +460,16 @@ abstract class DbAdapter {
 	}
 	
 	/**
-	 * DELETE
 	 * удаление записей из таблицы
 	 * @param string $table - имя таблицы
 	 * @param string $conditions - SQL строка условия (без слова WHERE). Не должно быть пустой строкой.
+	 * @param mixed $bind - параметры для SQL запроса
 	 * @return integer количество затронутых строк
 	 */
-	public function delete($table, $conditions) {
-		
-		$conditions = trim(str_replace('WHERE', '', $conditions));
-		$conditions = strlen($conditions) ? ' WHERE '.$conditions : '';
-	
-		if(!strlen($conditions))
-			trigger_error('Функции delete не передано условие. Необходимо использовать truncate', E_USER_ERROR);
-		
-		$sql = 'DELETE FROM '.$table.$conditions;
-		$this->query($sql);
+	public function delete($table, $conditions, $bind = array()) {
+
+		$sql = 'DELETE FROM '.$table.' WHERE '.$conditions;
+		$this->query($sql, $bind);
 
 		return $this->getAffectedNum();
 	}

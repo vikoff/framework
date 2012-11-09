@@ -135,8 +135,9 @@ abstract class DbAdapterTestAbstract extends PHPUnit_Framework_TestCase {
 		$db = self::$_db;
 
 		$dataSet = array('field' => 'new \\\row ?!#$%^&*() \'with\' "spec" \symbols/', 'num' => 100500, 'select' => true);
-		$db->insert(self::$_table, $dataSet);
+		$insertId = $db->insert(self::$_table, $dataSet);
 
+		$this->assertEquals(7, $insertId);
 		$this->assertEquals(7, $db->fetchOne('SELECT COUNT(1) FROM '.self::$_table));
 
 		$fetchedRow = $db->fetchRow(
@@ -149,73 +150,133 @@ abstract class DbAdapterTestAbstract extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testInsertMulti() {
-
 		$db = self::$_db;
+
+		$fields = array('field', 'num', 'select');
+		$dataSet = array(
+			array('spec !@#$%^&*()\'\\" symbols', -100500, true),
+			array('', 0, 0),
+			array(null, null, null),
+		);
+		$db->insertMulti(self::$_table, $fields, $dataSet);
+
+		$this->assertEquals(9, $db->fetchOne('SELECT COUNT(1) FROM '.self::$_table));
+
+		$fetchedData = $db->fetchAll(
+			'SELECT '.$db->quoteFieldName('field').', '.$db->quoteFieldName('num').', '.$db->quoteFieldName('select').'
+			 FROM '.self::$_table.' WHERE id>?', 6);
+
+		foreach ($fetchedData as $index => $row)
+			$this->assertEquals($dataSet[$index], array_values($row));
 	}
 
 	public function testUpdate() {
-
 		$db = self::$_db;
+		$dataSet = array('field' => 'new \\\row ?!#$%^&*() \'with\' "spec" \symbols/', 'num' => null, 'select' => true);
+
+		$numAffected1 = $db->update(self::$_table, $dataSet, 'id=?', 1);
+		$numAffected2 = $db->update(self::$_table, $dataSet, 'id=?', 10);
+
+		$this->assertEquals(1, $numAffected1);
+		$this->assertEquals(0, $numAffected2);
+
+		$fetchedRow = $db->fetchRow(
+			'SELECT '.$db->quoteFieldName('field').', '.$db->quoteFieldName('num').', '.$db->quoteFieldName('select').'
+			 FROM '.self::$_table.' WHERE id=?', 1);
+		$this->assertEquals($dataSet, $fetchedRow);
 	}
 
 	public function testDelete() {
-
 		$db = self::$_db;
+
+		$numAffected1 = $db->delete(self::$_table, 'id=?', 5);
+		$numAffected2 = $db->delete(self::$_table, $db->quoteFieldName('field').'=?', "'");
+		$numAffected3 = $db->delete(self::$_table, $db->quoteFieldName('field').'=?', 100500);
+
+		$this->assertEquals(1, $numAffected1);
+		$this->assertEquals(1, $numAffected2);
+		$this->assertEquals(0, $numAffected3);
+
+		$fetchedIds = $db->fetchCol('SELECT id FROM '.self::$_table.' ORDER BY id');
+		$this->assertEquals(array(1,2,3,6), $fetchedIds);
 	}
 
 	public function testTruncate() {
-
 		$db = self::$_db;
+
+		$db->truncate(self::$_table);
+
+		$this->assertEquals(0, $db->fetchOne('SELECT COUNT(1) FROM '.self::$_table));
+
+		$db->insert(self::$_table, array('field' => 'new row'));
+		$this->assertEquals(1, $db->fetchOne('SELECT MAX(id) FROM '.self::$_table));
 	}
 
 	public function testGetLastId () {
-
 		$db = self::$_db;
+
+		$db->insert(self::$_table, array('field' => 'new row'));
+		$this->assertEquals(7, $db->getLastId());
 	}
 
 	public function testDescribe() {
-
 		$db = self::$_db;
+
+		$describe = $db->describe(self::$_table);
+
+		$this->assertInternalType('array', $describe);
+		$this->assertCount(5, $describe);
 	}
 
 	public function testShowTables() {
-
 		$db = self::$_db;
+
+		$tables = $db->showTables();
+		$this->assertEquals(array(self::$_table), $tables);
 	}
 
 	public function testIsConnected() {
-
 		$db = self::$_db;
+
+		$this->assertTrue($db->isConnected());
 	}
 
 	public function testGetConnectTime() {
-
 		$db = self::$_db;
+
+		$this->assertInternalType('float', $db->getConnectTime());
 	}
 
 	public function testGetQueriesNum() {
-
 		$db = self::$_db;
+
+		$this->assertInternalType('int', $db->getQueriesNum());
 	}
 
 	public function testGetQueries() {
-
 		$db = self::$_db;
+
+		$this->assertInternalType('array', $db->getQueries());
 	}
 
 	public function testGetQueriesTime() {
-
 		$db = self::$_db;
+
+		$this->assertInternalType('float', $db->getQueriesTime());
 	}
 
 	public function testGetQueriesWithTime() {
-
 		$db = self::$_db;
+
+		$this->assertInternalType('array', $db->getQueriesWithTime());
 	}
 
 	public function testGetLastQueryInfo() {
-
 		$db = self::$_db;
+
+		$info = $db->getLastQueryInfo();
+		$this->assertArrayHasKey('sql', $info);
+		$this->assertArrayHasKey('time', $info);
 	}
 
 }

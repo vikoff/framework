@@ -42,20 +42,4 @@ class PdoMysqlTest extends DbAdapterTestAbstract {
 		parent::tearDownAfterClass();
 	}
 
-	public function setUp() {
-
-		parent::setUp();
-	}
-
-	public function tearDown() {
-
-	}
-
-	// TEST METHODS //
-
-	public function testSelectDb() {
-
-		self::$_db->selectDb(self::$_dbName);
-	}
-
 }
