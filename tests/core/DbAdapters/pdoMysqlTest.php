@@ -8,9 +8,10 @@ class PdoMysqlTest extends DbAdapterTestAbstract {
 
 		self::$_dbName = 'vikoff_tests';
 		self::$_table = 'test1';
+		self::$adapter = 'PdoMysql';
 
 		db::create(array(
-			'adapter' => 'PdoMysql',
+			'adapter' => self::$adapter,
 			'host' => 'localhost',
 			'user' => 'root',
 			'pass' => '',
@@ -36,6 +37,7 @@ class PdoMysqlTest extends DbAdapterTestAbstract {
 
 		parent::setUpBeforeClass();
 	}
+
 	public static function tearDownAfterClass() {
 
 		self::$_db->query("DROP TABLE ".self::$_table);

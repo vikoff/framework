@@ -373,16 +373,16 @@ abstract class DbAdapter {
 	 * вставка в таблицу нескольких строк за раз
 	 * @param string $table - имя таблицы
 	 * @param array $fields - массив-список полей таблиц. Например: array('field1', 'field2')
-	 * @param array $valuesArrArr - список списков, каждый из которых содержит в себе
+	 * @param array $valuesRows - список списков, каждый из которых содержит в себе
 	 *        данные для вставки одной строки. Например: array( array(val1, val2), array(val3, val4) )
 	 * @return integer колечество вставленных строк
 	 */
-	public function insertMulti($table, $fields, $valuesArrArr) {
+	public function insertMulti($table, $fields, $valuesRows) {
 		
 		$valuesArrStr = array();
 		foreach($fields as $index => $field)
             $fields[$index] = $this->quoteFieldName($field);
-		foreach($valuesArrArr as $_rowArr) {
+		foreach($valuesRows as $_rowArr) {
 			$rowArr = array();
 			foreach($_rowArr as $cell)
 				$rowArr[] = $this->qe($cell);

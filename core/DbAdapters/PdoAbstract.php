@@ -130,13 +130,13 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 		return $this->getLastId();
 	}
 
-    public function insertMulti($table, $fields, $valuesArrArr){
+    public function insertMulti($table, $fields, $valuesRows){
 
         $rows = array();
 		$values = array();
         foreach($fields as $index => $field)
             $fields[$index] = $this->quoteFieldName($field);
-        foreach($valuesArrArr as $_rowArr){
+        foreach($valuesRows as $_rowArr){
             $rowArr = array();
             foreach($_rowArr as $cell) {
                 $rowArr[] = '?';
@@ -229,7 +229,7 @@ abstract class DbAdapter_PdoAbstract extends DbAdapter {
 		
 		switch(strtolower(gettype($cell))){
 			case 'boolean':
-				return $cell ? '1' : '0';
+				return $cell ? '1' : "''";
 			case 'null':
 				return 'NULL';
 			case 'string':

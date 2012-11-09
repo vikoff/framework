@@ -2,40 +2,39 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/setup.php');
 
-class PdoMysqlTest extends DbAdapterTestAbstract {
+class PdoSqliteTest extends DbAdapterTestAbstract {
 
 	public static function setUpBeforeClass() {
 
-		self::$_dbName = 'vikoff_tests';
+		self::$_dbName = FS_ROOT.'vikoff_tests';
 		self::$_table = 'test1';
+		self::$adapter = 'PdoSqlite';
 
 		db::create(array(
-			'adapter' => 'PdoMysql',
+			'adapter' => self::$adapter,
 			'host' => 'localhost',
 			'user' => 'root',
 			'pass' => '',
+//			'database' => self::$_dbName,
 			'database' => '',
 			'keepFileLog' => 0,
-		), 'pdo_mysql');
+		), 'pdo_sqlite');
 
-		self::$_db = db::get('pdo_mysql');
-
-		self::$_db->query("DROP DATABASE IF EXISTS ".self::$_dbName);
-		self::$_db->query("CREATE DATABASE ".self::$_dbName);
-		self::$_db->query("USE ".self::$_dbName);
+		self::$_db = db::get('pdo_sqlite');
 
 		$db = self::$_db;
-		$db->query("CREATE TABLE `".self::$_table."` (
-			`id`            INT(10) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-			`field`        VARCHAR(100),
-			`num`			INT,
-			`select`		BOOLEAN,
-			`date`          TIMESTAMP DEFAULT NOW()
-		) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-		");
+		$db->query('DROP TABLE IF EXISTS '.self::$_table);
+		$db->query('CREATE TABLE '.self::$_table.' (
+			"id"           INTEGER PRIMARY KEY,
+			"field"        VARCHAR(100),
+			"num"          INTEGER,
+			"select"       BOOLEAN,
+			"date"         DATETIME DEFAULT CURRENT_TIMESTAMP
+		)');
 
 		parent::setUpBeforeClass();
 	}
+
 	public static function tearDownAfterClass() {
 
 		self::$_db->query("DROP TABLE ".self::$_table);

@@ -12,6 +12,12 @@ class DbAdapter_PdoSqlite extends DbAdapter_PdoAbstract {
         return '"'.$field.'"';
     }
 
+	public function insertMulti($table, $fields, $valuesRows){
+
+		foreach ($valuesRows as $row)
+			$this->insert($table, array_combine($fields, $row));
+	}
+
 	public function truncate($table){
 
 		$this->query('DELETE FROM '.$table);
