@@ -45,7 +45,8 @@ class db {
 			: 'mysql';
 
 		// создание экземпляра класса db
-		$adapterClass = 'DbAdapter_'.$adapter;
+		$adapterClass = 'DbAdapter_'.ucfirst($adapter);
+
 		/** @var DbAdapter $db */
 		$db = new $adapterClass($connParams['host'], $connParams['user'], $connParams['pass'], $connParams['database']);
 		
