@@ -38,17 +38,12 @@ class ImageMaster {
 	
 	private $_isFileExists = FALSE;
 	
-	private $_isCorrectFormat = FALSE;
-	
 	private $_reducedImgFullName = null;
 	
 	private $_exifData = null;
 	
 	private $_completedImages = 0;
-	private $_failedImages = 0;
-	
-	private $_error = array();
-	
+
 	/**
 	 * Конфигурация класса
 	 * @var array
@@ -97,20 +92,24 @@ class ImageMaster {
 			? self::$_config
 			: self::$_config[$key];
 	}
-	
+
+	/**
+	 * @param string $fullName - полный путь к изображению
+	 * @param string $prettyName - реальное имя (для проверки валидности расширения)
+	 * @return ImageMaster
+	 */
 	public static function load($fullName, $prettyName = ''){
 		
 		$instance = new ImageMaster($fullName, $prettyName);
 		return $instance;
 	}
 	
-	// КОНСТРУКТОР
 	private function __construct($fullName, $prettyName = ''){
 		
 		$this->setFullName($fullName, $prettyName);
 	}
 	
-	// ЗАДАТЬ ПОЛНОЕ ИМЯ ИЗОБРАЖЕНИЯ И ПРОВЕРИТЬ НАЛИЧИЕ ФАЙЛА
+	 /** задать полное имя изображения и проверить наличие файла */
 	public function setFullName($fullName, $prettyName = ''){
 		
 		$this->_fullName = $fullName;
@@ -883,11 +882,11 @@ class ImageMaster {
 	public function checkDir($dir){
 		
 		if(!is_dir($dir))
-			if(!@mkdir($dir, 0777, TRUE))
-				trigger_error('Невозможно создать целевую папку', E_USER_ERROR);
+			if(!is_writable(dirname($dir)) || !@mkdir($dir, 0777, TRUE))
+				throw new Exception('Невозможно создать целевую папку');
 		
 		if(!is_writable($dir))
-			trigger_error('Невозможно произвести запись в целевую папку "'.$dir.'" (права: '.substr(sprintf('%o', fileperms($dir)), -4).').', E_USER_ERROR);
+			throw new Exception('Невозможно произвести запись в целевую папку "'.$dir.'" (права: '.substr(sprintf('%o', fileperms($dir)), -4).').');
 		
 		return $this;
 	}
@@ -985,5 +984,3 @@ class ImageMaster {
 		}
 	}
 }
-
-?>

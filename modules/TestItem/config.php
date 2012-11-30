@@ -2,12 +2,12 @@
 
 return array(
 	'name' => 'test-item',
-	'title' => 'Тестовые сущности',
+	'title' => 'Тестовые объекты',
 	'controller' => 'TestItem_Controller',
 	'adminController' => 'TestItem_AdminController',
 	'resources' => array(
 		'view' => 'Просмотр',
-		'edit' => 'Редактирование',
+		'admin_edit' => 'Редактирование',
 	),
 );
 

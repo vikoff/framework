@@ -57,16 +57,28 @@ return array (
       'root' => 'Root-привилегии (установка ограничений, запрет удаления)',
     ),
   ),
+  'test-group' => 
+  array (
+    'name' => 'test-group',
+    'title' => 'Тестовые группы',
+    'controller' => 'TestGroup_Controller',
+    'adminController' => 'TestGroup_AdminController',
+    'resources' => 
+    array (
+      'view' => 'Просмотр',
+      'admin_edit' => 'Редактирование',
+    ),
+  ),
   'test-item' => 
   array (
     'name' => 'test-item',
-    'title' => 'Тестовые сущности',
+    'title' => 'Тестовые объекты',
     'controller' => 'TestItem_Controller',
     'adminController' => 'TestItem_AdminController',
     'resources' => 
     array (
       'view' => 'Просмотр',
-      'edit' => 'Редактирование',
+      'admin_edit' => 'Редактирование',
     ),
   ),
   'user' => 

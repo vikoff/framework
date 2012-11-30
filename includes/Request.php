@@ -9,7 +9,7 @@ class Request {
 	private $_controller = null;
 	private $_params = null;
 	
-	// ТОЧКА ВХОДА В КЛАСС
+	/** @return Request */
 	public static function get(){
 		
 		if(is_null(self::$_instance))
@@ -124,5 +124,3 @@ class Request {
 	}
 	
 }
-
-?>

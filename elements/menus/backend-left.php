@@ -14,6 +14,16 @@ switch($topMenuHref){
 				'href' => $topMenuHref.'/page',
 				'active' => $r->getParts(2) == 'page',
 			),
+			array(
+				'title' => 'Тестовые группы',
+				'href' => $topMenuHref.'/test-group',
+				'active' => $r->getParts(2) == 'test-group',
+			),
+			array(
+				'title' => 'Тестовые объекты',
+				'href' => $topMenuHref.'/test-item',
+				'active' => $r->getParts(2) == 'test-item',
+			),
 		);
 		break;
 	

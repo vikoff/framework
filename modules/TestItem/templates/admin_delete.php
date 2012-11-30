@@ -6,11 +6,11 @@
 		Хотите удалить запись #<?= $this->instanceId; ?>		
 
 		id: <?= $this->id; ?>, 
-		Категория: <?= $this->category_id; ?>, 
-		Имя: <?= $this->item_name; ?>, 
-		Описание: <?= $this->item_text; ?>, 
-		Публикация: <?= $this->published; ?>, 
-		Дата: <?= $this->date; ?>, 
+		Группа: <?= $this->group_id; ?>, 
+		Название: <?= $this->name; ?>, 
+		Изображение: <?= $this->img; ?>, 
+		Описание: <?= $this->description; ?>, 
+		Дата создания: <?= $this->date; ?>, 
 		
 		безвозвратно?
 

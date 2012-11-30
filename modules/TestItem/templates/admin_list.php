@@ -3,27 +3,28 @@
 	<a href="<?= href('admin/content/test-item/new'); ?>">Добавить запись</a>
 </div>
 
-<?= $this->pagination; ?>
-
 <? if($this->collection): ?>
+
+	<?= $this->pagination; ?>
+
 	<table class="grid wide tr-highlight">
 	<tr>
 		<th><?= $this->sorters['id']; ?></th>
-		<th><?= $this->sorters['category_id']; ?></th>
-		<th><?= $this->sorters['item_name']; ?></th>
-		<th><?= $this->sorters['item_text']; ?></th>
-		<th><?= $this->sorters['published']; ?></th>
+		<th><?= $this->sorters['group_id']; ?></th>
+		<th><?= $this->sorters['name']; ?></th>
+		<th><?= $this->sorters['img']; ?></th>
+		<th><?= $this->sorters['description']; ?></th>
 		<th><?= $this->sorters['date']; ?></th>
 		<th>Опции</th>
 	</tr>
 	<? foreach($this->collection as $item): ?>	
 	<tr>
 		<td><?= $item['id']; ?></td>
-		<td><?= $item['category_id']; ?></td>
-		<td><?= $item['item_name']; ?></td>
-		<td><?= $item['item_text']; ?></td>
-		<td><?= $item['published']; ?></td>
-		<td><?= $item['date']; ?></td>
+		<td><?= $item['group_id']; ?></td>
+		<td><?= $item['name']; ?></td>
+		<td><?= $item['img']; ?></td>
+		<td><?= $item['description']; ?></td>
+		<td><?= $item['date_str']; ?></td>
 			
 		<td class="center" style="width: 90px;">
 			<div class="tr-hover-visible options">
@@ -35,8 +36,11 @@
 	</tr>
 	<? endforeach; ?>	
 	</table>
-<? else: ?>
-	<p>Сохраненных записей пока нет.</p>
-<? endif; ?>
 
-<?= $this->pagination; ?>
+	<?= $this->pagination; ?>	
+	
+<? else: ?>
+
+	<p>Сохраненных записей пока нет.</p>
+	
+<? endif; ?>

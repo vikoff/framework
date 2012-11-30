@@ -3,25 +3,34 @@
 
 <h2><?= $this->pageTitle; ?></h2>
 
-<form id="edit-form" action="" method="post">
+<form id="edit-form" action="" method="post" enctype="multipart/form-data">
 	<?= FORMCODE; ?>	
 	<input type="hidden" name="id" value="<?= $this->instanceId; ?>" />
 
 	<div class="paragraph">
-		<label class="title">Категория</label>
-		<?= Html_Form::select(array('name' => 'category_id'), array('' => 'Выберите...', '1' => '1', '2' => '2'), $this->category_id); ?>
+		<label class="title">Группа</label>
+		<?= Html_Form::select(array('name' => 'group_id'), array(0 => 'Выберите...') + $this->testGroups, $this->group_id); ?>
 	</div>
 	<div class="paragraph">
-		<label class="title">Имя</label>
-		<?= Html_Form::inputText(array('name' => 'item_name', 'value' => $this->item_name)); ?>
+		<label class="title">Название</label>
+		<?= Html_Form::inputText(array('name' => 'name', 'value' => $this->name)); ?>
+	</div>
+	<div class="paragraph">
+		<label class="title">Изображение</label>
+		<?php if ($this->thumb_src) { ?>
+			<div style="margin-bottom: 5px;">
+				<img src="<?= $this->thumb_src; ?>" align="middle" />
+				<form action="" class="inline" onsubmit="return confirm('Уверены?');">
+					<?= FORMCODE; ?>
+					<input class="button-small" type="submit" name="action[admin/test-item/delete-img]" value="удалить" />
+				</form>
+			</div>
+		<?php } ?>
+		<?= Html_Form::input(array('type' => 'file', 'name' => 'img')); ?>
 	</div>
 	<div class="paragraph">
 		<label class="title">Описание</label>
-		<?= Html_Form::textarea(array('name' => 'item_text', 'value' => $this->item_text)); ?>
-	</div>
-	<div class="paragraph">
-		<label class="title">Публикация</label>
-		<label><?= Html_Form::checkbox(array('name' => 'published', 'value' => '1', 'checked' => $this->published)); ?></label>
+		<?= Html_Form::textarea(array('name' => 'description', 'value' => $this->description)); ?>
 	</div>
 
 	<div class="paragraph" id="submit-box">

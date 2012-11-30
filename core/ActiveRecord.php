@@ -124,15 +124,14 @@ class ActiveRecord {
 	 * ПРИНУДИТЕЛЬНАЯ ЗАГРУЗКА
 	 * Загружает внешние данные в объект, заставляя его думать, что данные получены из БД.
 	 * То есть если будет вызван метод save, то никаких изменений в БД не попадет.
+	 * @throws Exception404
 	 * @param array $data - массив данных для загрузки
-	 * @return void
 	 */
 	protected function _forceLoadData($data) {
 		
 		$this->_dbFieldValues = $data;
 		
 		if(!$this->id || !is_array($this->_dbFieldValues) || !count($this->_dbFieldValues)){
-			var_dump($this->_dbFieldValues);
 			throw new Exception404($this->getConst('NOT_FOUND_MESSAGE'));
 		}
 			
@@ -281,7 +280,7 @@ class ActiveRecord {
 	/** ПОДГОТОВКА ДАННЫХ К СОХРАНЕНИЮ */
 	public function save($data, $saveMode = self::SAVE_DEFAULT){
 		
-		if($this->preValidation($data, $saveMode) === FALSE)
+		if($this->preValidation($data, $saveMode) === FALSE || $this->hasError())
 			return FALSE;
 		
 		$validator = $this->getValidator($saveMode);

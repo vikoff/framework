@@ -3,7 +3,7 @@
 class TestItem_Model extends ActiveRecord {
 	
 	/** имя модуля */
-	const MODULE = 'testItem';
+	const MODULE = 'test-item';
 	
 	/** таблица БД */
 	const TABLE = 'test_items';
@@ -14,73 +14,68 @@ class TestItem_Model extends ActiveRecord {
 	
 	const NOT_FOUND_MESSAGE = 'Страница не найдена';
 
+	const IMG_PATH = 'images/content/test_items/';
+
 	
-	/** ТОЧКА ВХОДА В КЛАСС (СОЗДАНИЕ НОВОГО ОБЪЕКТА) */
+	/** точка входа в класс (создание нового объекта) */
 	public static function create(){
 			
 		return new TestItem_Model(0, self::INIT_NEW);
 	}
 	
-	/** ТОЧКА ВХОДА В КЛАСС (ЗАГРУЗКА СУЩЕСТВУЮЩЕГО ОБЪЕКТА) */
+	/** точка входа в класс (загрузка существующего объекта) */
 	public static function load($id){
 		
 		return new TestItem_Model($id, self::INIT_EXISTS);
 	}
 	
-	/** ТОЧКА ВХОДА В КЛАСС (ЗАГРУЗКА СУЩЕСТВУЮЩЕГО ОБЪЕКТА) */
+	/** точка входа в класс (загрузка существующего объекта) */
 	public static function forceLoad($id, $fieldvalues){
 		
 		return new TestItem_Model($id, self::INIT_EXISTS_FORCE, $fieldvalues);
 	}
 	
-	/** ПОЛУЧИТЬ ИМЯ КЛАССА */
+	/** получить имя класса */
 	public function getClass(){
 		return __CLASS__;
 	}
 	
 	/**
-	 * ПРОВЕРКА ВОЗМОЖНОСТИ ДОСТУПА К ОБЪЕКТУ
-	 * Вызывается автоматически при загрузке существующего объекта
-	 * В случае запрета доступа генерирует нужное исключение
-	 */
-	protected function _accessCheck(){}
-	
-	/**
-	 * ДОЗАГРУЗКА ДАННЫХ
+	 * дозагрузка данных
 	 * выполняется после основной загрузки данных из БД
 	 * и только для существующих объектов
 	 * @param array &$data - данные полученные основным запросом
 	 * @return void
 	 */
-	protected function afterLoad(&$data){}
+	protected function _afterLoad(&$data){}
 	
-	/** ПОДГОТОВКА ДАННЫХ К ОТОБРАЖЕНИЮ */
+	/** подготовка данных к отображению */
 	public function beforeDisplay($data){
-	
-		// $data['modif_date'] = YDate::loadTimestamp($data['modif_date'])->getStrDateShortTime();
-		// $data['create_date'] = YDate::loadTimestamp($data['create_date'])->getStrDateShortTime();
+
+		$data['date_str'] = YDate::loadTimestamp($data['date'])->getStrDateShortTime();
+		$data['img_src'] = $data['img'] ? WWW_ROOT . self::IMG_PATH . $data['img'] : null;
+		$data['thumb_src'] = $data['img'] ? WWW_ROOT . self::IMG_PATH . 'thumb_'.$data['img'] : null;
 		return $data;
 	}
 	
-	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР ВАЛИДАТОРА */
-	public function getValidator($mode = self::SAVE_CREATE){
+	/** получить экземпляр валидатора */
+	public function getValidator($mode = self::SAVE_CREATE) {
 		
 		$rules = array(
-			'category_id' => array('settype' => 'int'),
-			'item_name' => array('strip_tags' => TRUE, 'length' => array('max' => 255)),
-			'item_text' => array('strip_tags' => TRUE, 'length' => array('max' => 65535)),
-			'published' => array('strip_tags' => TRUE, 'length' => array('max' => 1))
+			'group_id' => array('settype' => 'int', 'required' => TRUE),
+			'name' => array('strip_tags' => TRUE, 'length' => array('max' => 255), 'required' => TRUE),
+			'description' => array('strip_tags' => TRUE, 'length' => array('max' => 65535))
 		);
 		
 		$fields = array();
 		switch($mode) {
 			
 			case self::SAVE_CREATE:
-				$fields = array('category_id', 'item_name', 'item_text', 'published');
+				$fields = array('group_id', 'name', 'description');
 				break;
 			
 			case self::SAVE_EDIT:
-				$fields = array('category_id', 'item_name', 'item_text', 'published');
+				$fields = array('group_id', 'name', 'description');
 				break;
 			
 			default: trigger_error('Неверный ключ валидатора', E_USER_ERROR);
@@ -94,41 +89,104 @@ class TestItem_Model extends ActiveRecord {
 		
 		$validator->setFieldTitles(array(
 			'id' => 'id',
-			'category_id' => 'Категория',
-			'item_name' => 'Имя',
-			'item_text' => 'Описание',
-			'published' => 'Публикация',
-			'date' => 'Дата',
+			'group_id' => 'Группа',
+			'name' => 'Название',
+			'img' => 'Изображение',
+			'description' => 'Описание',
+			'date' => 'Дата создания',
 		));
 		
 		return $validator;
 	}
 		
-	/** ПРЕ-ВАЛИДАЦИЯ ДАННЫХ */
-	public function preValidation(&$data){}
-	
-	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
-	public function postValidation(&$data){
-		
-		// $data['author'] = CurUser::id();
-		// $data['modif_date'] = time();
-		// if($this->isNewObj)
-			// $data['create_date'] = time();
+	/** пре-валидация данных */
+	public function preValidation(&$data, $saveMode = self::SAVE_DEFAULT){
+
+		$this->checkImage();
 	}
 	
-	/** ДЕЙСТВИЕ ПОСЛЕ СОХРАНЕНИЯ */
+	/** пост-валидация данных */
+	public function postValidation(&$data, $saveMode = self::SAVE_DEFAULT){
+
+		$this->saveImage();
+		$data['date'] = time();
+	}
+	
+	/** действие после сохранения */
 	public function afterSave($data){
 		
 	}
 	
-	/** ПОДГОТОВКА К УДАЛЕНИЮ ОБЪЕКТА */
+	/** подготовка к удалению объекта */
 	public function beforeDestroy(){
 	
 	}
-	
+
+	/** проверка изображения */
+	public function checkImage() {
+
+		$this->additData['image'] = null;
+
+		// если изображения нет
+		if (empty($_FILES['img']['name'])) {
+			if ($this->isNewObj)
+				$this->setError('Изображение не загружено');
+			return;
+		}
+
+		$path = FS_ROOT.self::IMG_PATH;
+
+		try {
+			// создание экземпляра картинки и выполнение проверок
+			$this->additData['image'] = ImageMaster::load($_FILES['img']['tmp_name'], $_FILES['img']['name'])
+				->checkImageFormat($withExt = TRUE)
+				->checkDir($path);
+
+			// если новая картинка загружена, а объект существующий и была старая картинка
+			// то старую надо удалить
+			if ($this->isExistsObj && $this->img) {
+				Tools::unlink($path.$this->img);
+				Tools::unlink($path.'thumb_'.$this->img);
+			}
+		}
+		catch (Exception $e) {
+			$this->setError($e->getMessage());
+		}
+	}
+
+	 /** сохранение изображения */
+	public function saveImage() {
+
+		if (!empty($this->additData['image'])) {
+			try {
+				$path = FS_ROOT.self::IMG_PATH;
+				$copies = array(
+					array(138, 98, 'thumb_', ImageMaster::T_CENTER),
+					array(640, 480, '', ImageMaster::T_PROPORT),
+				);
+				$resultImg = $this->additData['image']
+					->checkDir($path)
+					->resize($path.$this->id, $copies);
+
+				$this->setField('img', $resultImg)->_save();
+			}
+			catch(Exception $e){trigger_error($e->getMessage(), E_USER_ERROR);}
+		}
+	}
+
+	public function deleteImg() {
+
+		$path = FS_ROOT.self::IMG_PATH;
+		if ($this->img) {
+			Tools::unlink($path.$this->img);
+			Tools::unlink($path.'thumb_'.$this->img);
+			$this->setField('img', null);
+			$this->_save();
+		}
+	}
 }
 
-class TestItem_Collection extends ARCollection{
+class TestItem_Collection extends ARCollection {
 	
 	/**
 	 * поля, по которым возможна сортировка коллекции
@@ -137,25 +195,33 @@ class TestItem_Collection extends ARCollection{
 	 */
 	protected $_sortableFieldsTitles = array(
 		'id' => 'id',
-		'category_id' => 'Категория',
-		'item_name' => 'Имя',
-		'item_text' => 'Описание',
-		'published' => 'Публикация',
-		'date' => 'Дата',
+		'group_id' => 'Группа',
+		'name' => 'Название',
+		'img' => 'Изображение',
+		'description' => 'Описание',
+		'date' => 'Дата создания',
 	);
 	
 	
-	/** ТОЧКА ВХОДА В КЛАСС */
-	public static function load(){
+	/** точка входа в класс */
+	public static function load($filters = array(), $options = array()){
 			
-		return new TestItem_Collection();
+		return new TestItem_Collection($filters, $options);
+	}
+	
+	/** конструктор */
+	public function __construct($filters = array(), $options = array()){
+		
+		$this->_filters = $filters;
+		$this->_options = $options;
 	}
 
-	/** ПОЛУЧИТЬ СПИСОК С ПОСТРАНИЧНОЙ РАЗБИВКОЙ */
+	/** получить список с постраничной разбивкой */
 	public function getPaginated(){
 		
+		$where = $this->_getSqlFilter();
 		$sorter = new Sorter('id', 'DESC', $this->_sortableFieldsTitles);
-		$paginator = new Paginator('sql', array('*', 'FROM '.TestItem_Model::TABLE.' ORDER BY '.$sorter->getOrderBy()), 50);
+		$paginator = new Paginator('sql', array('*', 'FROM '.TestItem_Model::TABLE.' '.$where.' ORDER BY '.$sorter->getOrderBy()), 50);
 		
 		$data = db::get()->fetchAll($paginator->getSql(), array());
 		
@@ -169,10 +235,11 @@ class TestItem_Collection extends ARCollection{
 		return $data;
 	}
 	
-	/** ПОЛУЧИТЬ СПИСОК ВСЕХ ЭЛЕМЕНТОВ */
+	/** получить список всех элементов */
 	public function getAll(){
 		
-		$data = db::get()->fetchAssoc('SELECT * FROM '.TestItem_Model::TABLE, 'id', array());
+		$where = $this->_getSqlFilter();
+		$data = db::get()->fetchAssoc('SELECT * FROM '.TestItem_Model::TABLE.' '.$where, 'id', array());
 		
 		foreach($data as &$row)
 			$row = TestItem_Model::forceLoad($row['id'], $row)->getAllFieldsPrepared();
@@ -181,5 +248,3 @@ class TestItem_Collection extends ARCollection{
 	}
 	
 }
-
-?>

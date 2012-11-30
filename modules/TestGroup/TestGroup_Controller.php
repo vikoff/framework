@@ -1,15 +1,15 @@
 <?php
 
-class TestItem_Controller extends Controller {
+class TestGroup_Controller extends Controller {
 	
 	/** имя модуля */
-	const MODULE = 'test-item';
+	const MODULE = 'test-group';
 	
 	/** элемент, отображаемый во view по умолчанию */
 	const DEFAULT_VIEW = 1;
 	
 	/** путь к шаблонам (относительно FS_ROOT) */
-	const TPL_PATH = 'modules/TestItem/templates/';
+	const TPL_PATH = 'modules/TestGroup/templates/';
 	
 	/** метод, отображаемый по умолачанию */
 	protected $_displayIndex = 'list';
@@ -40,7 +40,7 @@ class TestItem_Controller extends Controller {
 	/** DISPLAY LIST */
 	public function display_list(){
 		
-		$collection = new TestItem_Collection(array('published' => TRUE));
+		$collection = new TestGroup_Collection();
 		$variables = array(
 			'collection' => $collection->getPaginated(),
 			'pagination' => $collection->getPagination(),
@@ -58,10 +58,7 @@ class TestItem_Controller extends Controller {
 	public function display_view($instanceId = null){
 		
 		$instanceId = (int)$instanceId;
-		$instance = TestItem_Model::load($instanceId);
-		
-		if (!$instance->published)
-			throw new Exception404(TestItem_Model::NOT_FOUND_MESSAGE);
+		$instance = TestGroup_Model::load($instanceId);
 		
 		$variables = $instance->getAllFieldsPrepared();
 		FrontendLayout::get()
