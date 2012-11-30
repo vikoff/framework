@@ -6,7 +6,7 @@
  * 		const: CFG_SITE_NAME, FS_ROOT, WWW_ROOT, AJAX_MODE
  * 
  */
-class Layout{
+class Layout {
 	
 	
 	protected $_layoutName = 'default';
@@ -378,5 +378,3 @@ class Layout{
 	}
 
 }
-
-?>

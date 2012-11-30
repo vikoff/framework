@@ -42,7 +42,7 @@ class Sorter{
 	
 	
 	/**
-	 * КОНСТРУКТОР
+	 * конструктор
 	 * @param string $sortField - поле для сортировки по умолчанию (например 'id')
 	 * @param string $sortDirection - направление сортировки по умолчанию (например 'ASC')
 	 * @param array $sortFieldsTitles - массив допустимых полей для сортировки
@@ -52,12 +52,7 @@ class Sorter{
 	public function __construct($sortField, $sortDirection, $sortFieldsTitles){
 		
 		$this->_sortingField = $sortField;
-		
-		// TODO! заменить в вызовах класса первый параметр с 's.id' на 'id'
-		if (($pos = strpos($this->_sortingField, '.')) !== FALSE)
-			$this->_sortingField = substr($this->_sortingField, $pos + 1);
-		// END TODO
-		
+
 		$this->_sortingDirection = strtolower($sortDirection);
 		$this->_sortingFieldsTitles = $sortFieldsTitles;
 		
@@ -65,7 +60,7 @@ class Sorter{
 	}
 	
 	/**
-	 * PARSE QUERY STRING
+	 * parse query string
 	 * Получение поля и направления сортировки из Query String
 	 * назначает поля $this->_sortingDirection, $this->_sortingField.
 	 * @return void;
@@ -169,5 +164,3 @@ class Sorter{
 	}
 	
 }
-
-?>

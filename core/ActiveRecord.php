@@ -42,7 +42,7 @@ class ActiveRecord {
 	 * @throws Exception404 - если объект не найден
 	 * @throws Exception403 - если доступ к объекту запрещен
 	 * @param int $id - id записи в БД
-	 * @param const $initType - тип инициализации
+	 * @param int $initType - тип инициализации
 	 * @param array $data - данные для принудительной загрузки (forceLoad)
 	 */
 	public function __construct($id = 0, $initType = self::INIT_ANY, $data = array()){
@@ -109,7 +109,7 @@ class ActiveRecord {
 		
 	}  
 	
-	/** ЗАГРУЗКА ДАННЫХ ИЗ БД */
+	/** загрузка данных из бд */
 	protected function _loadData(){
 		
 		$this->_dbFieldValues = $this->dbGetRow();
@@ -121,7 +121,7 @@ class ActiveRecord {
 	}
 	
 	/**
-	 * ПРИНУДИТЕЛЬНАЯ ЗАГРУЗКА
+	 * принудительная загрузка
 	 * Загружает внешние данные в объект, заставляя его думать, что данные получены из БД.
 	 * То есть если будет вызван метод save, то никаких изменений в БД не попадет.
 	 * @throws Exception404
@@ -139,7 +139,7 @@ class ActiveRecord {
 	}
 	
 	/**
-	 * ДЕСЕРИАЛИЗАЦИЯ ДАННЫХ
+	 * десериализация данных
 	 * загрузка сериализованных полей в объект так,
 	 * как будто каждое из них хранится в отдельной колонке БД.
 	 * выполняется при загрузке существующих объектов
@@ -157,7 +157,7 @@ class ActiveRecord {
 	}
 	
 	/**
-	 * СЕРИАЛИЗАЦИЯ ДАННЫХ
+	 * сериализация данных
 	 * выполняется перед сохранением любого объекта
 	 */
 	protected function _serialize(){
@@ -175,7 +175,7 @@ class ActiveRecord {
 	}
 	
 	/**
-	 * ИНИЦИАЛИЗАЦИЯ ДАННЫХ
+	 * инициализация данных
 	 * выполняется при любом типе создания существующего объекта
 	 * для новых объектов не выполняется
 	 * @param array &$data - загруженные в класс данные
@@ -183,7 +183,7 @@ class ActiveRecord {
 	protected function _init(&$data){}
 	
 	/**
-	 * ДОЗАГРУЗКА ДАННЫХ
+	 * дозагрузка данных
 	 * выполняется после основной загрузки данных из БД
 	 * и только для существующих объектов
 	 * @param array &$data - данные полученные основным запросом
@@ -192,7 +192,7 @@ class ActiveRecord {
 	protected function _afterLoad(&$data){}
 	
 	/**
-	 * ДОЗАГРУЗКА ДАННЫХ ПОСЛЕ ПРИНУДИТЕЛЬНОЙ ЗАГРУЗКИ
+	 * дозагрузка данных после принудительной загрузки
 	 * выполняется после основной загрузки данных
 	 * и только для существующих объектов
 	 * @param array &$data - данные, уже переданные в объект
@@ -200,7 +200,7 @@ class ActiveRecord {
 	 */
 	protected function _afterForceLoad(&$data){}
 	
-	/** ПОЛУЧИТЬ ЗНАЧЕНИЕ ПОЛЯ */
+	/** получить значение поля */
 	public function getField($key){
 		
 		if(array_key_exists($key, $this->_dbFieldValues))
@@ -212,7 +212,7 @@ class ActiveRecord {
 			trigger_error('Невозможно вызвать метод self::getField() для нового объекта', E_USER_ERROR);
 	}
 	
-	/** ПОЛУЧИТЬ МАССИВ ЗНАЧЕНИЙ ВСЕХ ПОЛЕЙ */
+	/** получить массив значений всех полей */
 	public function getAllFields(){
 		
 		if($this->isNewObj)
@@ -221,7 +221,7 @@ class ActiveRecord {
 		return $this->_dbFieldValues;
 	}
 	
-	/** ПОЛУЧИТЬ ЗНАЧЕНИЕ ПОЛЯ, ПОДГОТОВЛЕННОЕ ДЛЯ ОТОБРАЖЕНИЯ */
+	/** получить значение поля, подготовленное для отображения */
 	public function getFieldPrepared($key){
 		
 		if(!$this->_hasPreparedFieldsValues){
@@ -238,7 +238,7 @@ class ActiveRecord {
 			trigger_error('Невозможно вызвать метод self::getFieldPrepared() для нового объекта', E_USER_ERROR);
 	}
 	
-	/** ПОЛУЧИТЬ МАССИВ ЗНАЧЕНИЙ ВСЕХ ПОЛЕЙ, ПОДГОТОВЛЕННЫХ ДЛЯ ОТОБРАЖЕНИЯ */
+	/** получить массив значений всех полей, подготовленных для отображения */
 	public function getAllFieldsPrepared(){
 		
 		if($this->isNewObj)
@@ -252,7 +252,7 @@ class ActiveRecord {
 		return $this->_fieldValuesForDisplay;
 	}
 
-	/** УСТАНОВИТЬ ЗНАЧЕНИЕ ПОЛЯ */
+	/** установить значение поля */
 	public function setField($field, $value){
 		
 		// выполнить, если значение не было задано, или же изменилось
@@ -265,7 +265,7 @@ class ActiveRecord {
 		return $this;
 	}
 	
-	/** УСТАНОВИТЬ ЗНАЧЕНИЕ ПОЛЕЙ */
+	/** установить значение полей */
 	public function setFields($fields){
 	
 		foreach($fields as $field => $value){
@@ -277,7 +277,7 @@ class ActiveRecord {
 		return $this;
 	}
 	
-	/** ПОДГОТОВКА ДАННЫХ К СОХРАНЕНИЮ */
+	/** подготовка данных к сохранению */
 	public function save($data, $saveMode = self::SAVE_DEFAULT){
 		
 		if($this->preValidation($data, $saveMode) === FALSE || $this->hasError())
@@ -302,7 +302,7 @@ class ActiveRecord {
 		return $this->id;
 	}
 	
-	/** СОХРАНЕНИЕ ОБЪЕКТА */
+	/** сохранение объекта */
 	protected function _save(){
 	
 		$fields = array();
@@ -336,25 +336,25 @@ class ActiveRecord {
 		}
 	}
 	
-	/** ПРЕ-ВАЛИДАЦИЯ ДАННЫХ */
+	/** пре-валидация данных */
 	public function preValidation(&$data){}
 	
-	/** ПОСТ-ВАЛИДАЦИЯ ДАННЫХ */
+	/** пост-валидация данных */
 	public function postValidation(&$data){}
 	
-	/** ДЕЙСТВИЕ ПОСЛЕ СОХРАНЕНИЯ */
+	/** действие после сохранения */
 	public function afterSave($data){}
 	
-	/** ПОДГОТОВКА ДАННЫХ К ОТОБРАЖЕНИЮ */
+	/** подготовка данных к отображению */
 	public function beforeDisplay($data){
 		
 		return $data;
 	}
 	
-	/** ПОДГОТОВКА К УДАЛЕНИЮ ОБЪЕКТА */
+	/** подготовка к удалению объекта */
 	public function beforeDestroy(){}
 	
-	/** УДАЛЕНИЕ ОБЪЕКТА */
+	/** удаление объекта */
 	public function destroy(){
 
 		if($this->isNewObj)
@@ -377,7 +377,7 @@ class ActiveRecord {
 		return count($this->_errors);
 	}
 	
-	/** ПОЛУЧИТЬ КОНСТАНТУ ИЗ КЛАССА-ПОТОМКА */
+	/** получить константу из класса-потомка */
 	public function getConst($name){
 		
 		return constant($this->getClass().'::'.$name);
@@ -412,7 +412,7 @@ class ActiveRecord {
 }
 
 
-class ARCollection{
+class ARCollection {
 	
 	protected $_filters = array();
 	protected $_options = array();
@@ -441,24 +441,22 @@ class ARCollection{
 		return !empty($whereArr) ? ' WHERE '.implode(' AND ', $whereArr) : '';
 	}
 	
-	// ПОЛУЧИТЬ SORTABLE LINKS
+	 /** получить sortable links */
 	public function getSortableLinks(){
 	
 		return $this->_sortableLinks;
 	}
 	
-	// ПОЛУЧИТЬ КНОПКИ ПЕРЕКЛЮЧЕНИЯ СТРАНИЦ
+	 /** получить кнопки переключения страниц */
 	public function getPagination(){
 	
 		return $this->_pagination;
 	}
 	
-	// ПОЛУЧИТЬ LINK ТЭГИ
+	 /** получить link тэги */
 	public function getLinkTags(){
 	
 		return $this->_linkTags;
 	}
 	
 }
-
-?>

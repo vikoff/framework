@@ -17,6 +17,7 @@ class Messenger {
 	
 	/**
 	 * точка входа в класс
+	 * @param string $ns - namespace
 	 * @return Messenger
 	 */
 	public static function get($ns = 'default'){
@@ -107,5 +108,3 @@ class Messenger {
 	}
 	
 }
-
-?>

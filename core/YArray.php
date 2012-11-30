@@ -27,13 +27,13 @@ class YArray{
 		return $arr;
 	}
 	
-	public static function settype($arr, $type){
+	public static function settype(&$arr, $type){
 		
 		if(!is_array($arr))
 			return;
 		foreach($arr as &$v)
 			if(is_array($v))
-				self::settype($v);			
+				self::settype($v, $type);
 			else
 				settype($v, $type);
 	}
@@ -99,7 +99,7 @@ class YArray{
 	}
 	
 	// ПОЛУЧИТЬ ПРЕДЫДУЩИЙ КЛЮЧ В МАССИВЕ
-	public static function get_prev_index($cur_index, $arr){
+	public static function getPrevIndex($cur_index, $arr){
 		
 		if(!count($arr))
 			return 0;
@@ -116,7 +116,7 @@ class YArray{
 			$prev_index = $index;
 		}
 		if($desired_index === FALSE)
-			$desired_index = self::get_last_key($arr);
+			$desired_index = self::getLastKey($arr);
 		return $desired_index;
 	}
 	
@@ -133,64 +133,4 @@ class YArray{
 			
 		return is_array($output) ? $output : array();
 	}
-	
-	/**
-	 * КОНВЕРТИРОВАНИЕ МАССИВОВ
-	 * $input - одномерный ассоциативный массив входных данных;
-	 * $convert_rules - одномерный ассоциативный массив ключи которого - имена изменяемых полей, а значения - тип преобразования.
-	**/
-	public static function convert($input, $convert_rules){
-
-		if(is_array($input) && is_array($convert_rules)){
-			foreach($convert_rules as $field => $operation){
-				switch($operation){
-					case 'unserialize': $input[$field] = self::unserialize($input[$field]); break;
-					case 'timestamp2date': $input[$field] = YDate::timestamp2date($input[$field]); break;
-					default: Error::fatal_error('Неверный тип преобразования: '.$operation);
-				}
-			}
-		}
-		/* $input - строка; $convert_rules - строка: тип преобразования */
-		elseif(is_string($input) && is_string($convert_rules)){
-			switch($convert_rules){
-				case 'unserialize': $input = self::unserialize($input); break;
-				case 'timestamp2date': $input = YDate::timestamp2date($input);	break;
-				default: Error::fatal_error('Неверный тип преобразования: '.$convert_rules);
-			}
-		}else{
-			Error::fatal_error('Неверные типы параметров: '.gettype($input).', '.gettype($convert_rules));
-		}
-		return $input;
-	}
-	
-	// ПРЕОБРАЗОВАНИЕ СТРОКИ В АССОЦИАТИВНЫЙ МАССИВ
-	public static function string2hash($string, $separator = ','){
-		
-		$string = (string)$string;
-		if(!strlen($string))
-			return array();
-		
-		$output = array();
-		foreach(array_unique(explode($separator, $string)) as $item){
-		
-			$item = trim($item);
-			if(!strlen($item))
-				continue;
-				
-			if(strpos($item, '=')){
-			
-				$pair = explode('=', $item);
-				if(!strlen($pair[0]))
-					continue;
-					
-				$output[trim($pair[0])] = trim($pair[1]);
-				
-			}else{
-				$output[$item] = 1;
-			}
-		}
-		return $output;
-	}
 }
-
-?>

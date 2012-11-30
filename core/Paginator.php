@@ -11,7 +11,7 @@
  *		App::getHrefReplaced()
  */
 
-class Paginator{
+class Paginator {
 	
 	
 	///////////////////////////
@@ -322,5 +322,3 @@ class Paginator{
 	}
 	
 }
-
-?>

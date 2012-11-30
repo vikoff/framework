@@ -342,36 +342,7 @@ class YDate{
 			$output .= '<option value="'.$i.'"'.($i == $selected ? ' selected="selected"' : '').'>'.$i.'</option>'."\n";
 		return $output;
 	}
-	
-	
-	/**
-	 * ПРОВЕРКА СТРОКОВОГО ЗНАЧЕНИЯ МЕСЯЦА
-	 * функция пытается перевести строковое значение месяца в числовое
-	 * @param string $date - строка, в которой будет искаться месяц
-	 * @return string - строка, в которой тестовое значение месяца заменено на числовое
-	 */
-	private function _checkStringMonth($date){
-		
-		if(preg_match('/([АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюя]+)/', $date, $matches)){
-			$monthNum = 1;
-			$monthStr = strtolower($matches[1]);
-			$tmp1 = array_flip(self::$_monthsShort);
-			$tmp2 = array_flip(self::$_monthsGenFull);
-			$tmp3 = array_flip(self::$_monthsNomFull);
-			if(isset($tmp1[$monthStr]))
-				$monthNum = $tmp1[$monthStr];
-			elseif(isset($tmp2[$monthStr]))
-				$monthNum = $tmp2[$monthStr];
-			elseif(isset($tmp3[$monthStr]))
-				$monthNum = $tmp3[$monthStr];
-			$date = str_replace($monthStr, $monthNum, $date);
-		}
-		return $date;
-	}
-	
-	
-	
-	
+
 	// ПОЛУЧИТЬ НАЗВАНИЕ МЕСЯЦА ПО ИНДЕКСУ
 	public static function getMonthName($index){
 		
@@ -553,5 +524,3 @@ class YDate{
 	
 	
 }
-
-?>

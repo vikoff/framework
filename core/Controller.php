@@ -96,7 +96,7 @@ abstract class Controller {
 		
 	}
 	
-	/** ВЫПОЛНЕНИЕ ОТОБРАЖЕНИЯ */
+	/** выполнение отображения */
 	public function display($params){
 		
 		$method = array_shift($params);
@@ -133,11 +133,11 @@ abstract class Controller {
 	}
 	
 	/**
-	 * ВЫПОЛНЕНИЕ ДЕЙСТВИЯ
+	 * выполнение действия
 	 * @exception Exception - ловит стандартные исключения
 	 * @exception Exception403 - ловит исключения 403
 	 * @exception Exception404 - ловит исключения 404
-	 * @param string $method - идентификатор метода
+	 * @param array $params - имя метода и параметры
 	 * @param string $redirectUrl - url, куда надо сделать редирект после успешного выполнения
 	 * @return void
 	 */
@@ -189,7 +189,7 @@ abstract class Controller {
 		return TRUE;
 	}
 	
-	/** ВЫПОЛНЕНИЕ AJAX */
+	/** выполнение ajax */
 	public function ajax($params){
 		
 		$method = array_shift($params);
@@ -221,7 +221,7 @@ abstract class Controller {
 		return TRUE;
 	}
 	
-	/** ПОЛУЧИТЬ ИМЯ МЕТОДА ОТОБРАЖЕНИЯ ПО ИДЕНТИФИКАТОРУ */
+	/** получить имя метода отображения по идентификатору */
 	public function getDisplayMethodName($method){
 	
 		// преобразует строку вида 'any-Method-name' в 'any_method_name'
@@ -229,7 +229,7 @@ abstract class Controller {
 		return $method;
 	}
 	
-	/** ПОЛУЧИТЬ ИМЯ МЕТОДА ДЕЙСТВИЯ ПО ИДЕНТИФИКАТОРУ */
+	/** получить имя метода действия по идентификатору */
 	public function getActionMethodName($method){
 	
 		// преобразует строку вида 'any-Method-name' в 'any_method_name'
@@ -237,7 +237,7 @@ abstract class Controller {
 		return $method;
 	}
 	
-	/** ПОЛУЧИТЬ ИМЯ AJAX МЕТОДА ПО ИДЕНТИФИКАТОРУ */
+	/** получить имя ajax метода по идентификатору */
 	public function getAjaxMethodName($method){
 	
 		// преобразует строку вида 'any-Method-name' в 'any_method_name'
@@ -245,7 +245,7 @@ abstract class Controller {
 		return $method;
 	}
 	
-	/** ПОЛУЧИТЬ ЭКЗЕМЛЯР КОНТРОЛЛЕРА ДЛЯ ПРОКСИРОВАНИЯ */
+	/** получить экземляр контроллера для проксирования */
 	public function getProxyControllerInstance($proxy){
 		
 		$app = App::get();
@@ -255,7 +255,7 @@ abstract class Controller {
 			: new $proxy($this->_config);
 	}
 	
-	// ЗАДАТЬ URL ДЛЯ РЕДИРЕКТА после выполнения действия (action)
+	// задать url для редиректа после выполнения действия (action)
 	public function setRedirectUrl($url){
 	
 		$this->_redirectUrl = $url;
@@ -341,5 +341,3 @@ abstract class Controller {
 		exit();
 	}
 }
-
-?>

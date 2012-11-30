@@ -140,8 +140,6 @@ class Validator {
 	 * наличие ошибок в исходных данных можно проверить методом $this->hasError()
 	 * получить сообщения об ошибках (если они есть) можно методом $this->getError()
 	 * @param array $inputData - данные для валидации в виде одномерного ассоциативного массива
-	 * @param null|array $additValidationRules - дополнительные правила валидации
-	 *        вида array('field' => array('rule1' => 'params', 'rule2' => 'params') )
 	 * @return array - валидные данные
 	 */
 	public function validate($inputData){
@@ -152,7 +150,7 @@ class Validator {
 		// проверка наличия исходных данных
 		if (!is_array($inputData)) {
 			$this->setError($this->getErrorText('', 'emptyDataSet'));
-			return;
+			return array();
 		}
 		
 		// инициализация массива валидных данных (содержит разрешенные и назначенные поля)
@@ -238,20 +236,16 @@ class Validator {
 				
 				// RULE REQUIRED
 				if($rule == 'required'){
-				
 					$elmRulesArr[] = 'required: true';
 					$elmMessagesArr[] = 'required: "'.$this->getErrorText($field, 'required').'"';
 				}
 				// RULE EMAIL
 				elseif($rule == 'email'){
-				
 					$elmRulesArr[] = 'email: true';
 					$elmMessagesArr[] = 'email: "'.$this->getErrorText($field, 'email').'"';
 				}
 				// RULE LENGTH
 				elseif($rule == 'length'){
-					
-					$isset = FALSE;
 					if(isset($params['min'])){
 						$elmRulesArr[] = 'minlength: '.(int)$params['min'];
 						$elmMessagesArr[] = 'minlength: "'.$this->getErrorText($field, 'length', $params).'"';
@@ -263,13 +257,11 @@ class Validator {
 				}
 				// RULE COMPARE
 				elseif($rule == 'compare'){
-				
 					$elmRulesArr[] = 'equalTo: "input[name=\''.$params.'\']"';
 					$elmMessagesArr[] = 'equalTo: "'.$this->getErrorText($field, 'compare', $params).'"';
 				}
 				// RULE SETTYPE
 				elseif($rule == 'settype'){
-					
 					if($params == 'int'){
 						$elmRulesArr[] = 'digits: true';
 						$elmMessagesArr[] = 'digits: "'.$this->getErrorText($field, 'int_type').'"';
@@ -352,7 +344,8 @@ class Validator {
 	
 	/**
 	 * ПРАВИЛО FUNCTION
-	 * @param $callback - функция, которая должна произвести валидацию, и вернуть 0 в случае успеха,
+	 * @param string $field - имя поля
+	 * @param callable $callback - функция, которая должна произвести валидацию, и вернуть 0 в случае успеха,
 	 *                    или текстовое сообщение, в случае ошибки. В параметры функции передаются
 	 *                    переменные: ($fieldValue, $fieldName)
 	 */
@@ -647,5 +640,3 @@ class Validator {
 	}
 	
 }
-
-?>
