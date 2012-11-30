@@ -1,7 +1,7 @@
 <?php
 
 return array(
-	'name' => 'testItem',
+	'name' => 'test-item',
 	'title' => 'Тестовые сущности',
 	'controller' => 'TestItem_Controller',
 	'adminController' => 'TestItem_AdminController',

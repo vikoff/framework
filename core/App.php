@@ -22,8 +22,7 @@ class App {
 	public static $adminMode = FALSE;
 	
 	private static $_instance = null;
-	private static $_smartyInstance = null;
-	
+
 	private $_requestModuleName = null;
 	private $_requestModuleParams = array();
 	
@@ -34,7 +33,7 @@ class App {
 	private $_modulesConfig = array();
 
 	
-	/** ПОЛУЧИТЬ ЭКЗЕМПЛЯР КЛАССА */
+	/** @return App */
 	public static function get(){
 		
 		if(is_null(self::$_instance))
@@ -43,7 +42,7 @@ class App {
 		return self::$_instance;
 	}
 	
-	/** КОНСТРУКТОР */
+	/** конструктор */
 	private function __construct(){
 		
 		// извлечение параметров запроса
@@ -57,13 +56,13 @@ class App {
 		$this->_adminMode = $this->_requestModuleName == 'admin';
 	}
 	
-	/** ПРОВЕРИТЬ, ВКЛЮЧЕН ЛИ РЕЖИМ АДМИНИСТРАТОРА */
+	/** проверить, включен ли режим администратора */
 	public function isAdminMode(){
 		
 		return $this->_adminMode;
 	}
 	
-	/** ЗАПУСК ПРИЛОЖЕНИЯ */
+	/** запуск приложения */
 	public function run(){
 		
 		$this->_checkAction();
@@ -74,7 +73,7 @@ class App {
 		$this->error404('Страница '.Request::get()->getString().' не найдена');
 	}
 	
-	/** ЗАПУСК ПРИЛОЖЕНИЯ В AJAX-РЕЖИМЕ */
+	/** запуск приложения в ajax-режиме */
 	public function ajax(){
 		
 		if($this->_checkAction())
@@ -90,28 +89,41 @@ class App {
 	}
 	
 	/**
-	 * ПОЛУЧЕНИЕ РЕАЛЬНОГО ИМЕНИ МОДУЛЯ 
-	 * преобразование строки "user-statistics" в "userStatistics"
+	 * получение реального имени модуля
 	 */
 	public function prepareModuleName($module){
-		
-		$module = str_replace(' ', '', ucwords(str_replace('-', ' ', strtolower($module))));
-		return strtolower(substr($module, 0, 1)).substr($module, 1);
+
+		return mb_strtolower($module, 'utf-8');
 	}
 	
-	/** ПРОВЕРКА, СУЩЕСТВУЕТ ЛИ УКАЗАННЫЙ МОДУЛЬ */
+	/**
+	 * проверка, существует ли указанный модуль
+	 * @param string $module - имя модуля
+	 * @return bool найден ли модуль или нет
+	 */
 	public function issetModule($module){
 		
 		return isset($this->_modulesConfig[$module]);
 	}
 	
-	/** ПРОВЕРКА, СУЩЕСТВУЕТ ЛИ УКАЗАННЫЙ МОДУЛЬ и есть ли у него контроллер */
+	/**
+	 * проверка, существует ли указанный модуль
+	 * и есть ли у него контроллер
+	 * @param string $module - имя модуля
+	 * @param bool $adminMode - frontend/backend контроллер
+	 * @return bool - найден ли нужный контроллер модуля или нет
+	 */
 	public function isModule($module, $adminMode = FALSE){
 		
 		return isset($this->_modulesConfig[$module][$adminMode ? 'adminController' : 'controller']);
 	}
 	
-	/** ПОЛУЧЕНИЕ ЭКЗЕМПЛЯРА КОНТРОЛЛЕРА МОДУЛЯ */
+	/**
+	 * получение экземпляра контроллера модуля
+	 * @param string $module - имя модуля
+	 * @param bool $adminMode - получить frontend/backend контроллер
+	 * @return Controller
+	 */
 	public function getModule($module, $adminMode = FALSE){
 		
 		$key = $adminMode ? 'adminController' : 'controller';
@@ -119,7 +131,8 @@ class App {
 			$this->error404('Модуль "'.$module.'" не найден');
 			exit;
 		}
-		return new $this->_modulesConfig[$module][$key]( $this->_modulesConfig[$module] );
+		$controllerClass = $this->_modulesConfig[$module][$key];
+		return new $controllerClass( $this->_modulesConfig[$module] );
 	}
 	
 	/** ПОЛУЧЕНИЕ МАССИВА КОНФИГУРАЦИИ ВСЕХ МОДУЛЕЙ */
@@ -178,9 +191,10 @@ class App {
 		$this->_preventDisplay = (bool)$prevent;
 	}
 	
+
 	#### ВЫПОЛНЕНИЕ РЕДИРЕКТОВ ####
-	
-	
+
+
 	// REDIRECT
 	public static function redirect($uri){
 		
@@ -267,12 +281,12 @@ class App {
 	
 	
 	#### HREF ####
-	
+
+
 	/**
-	 * HREF
 	 * Генерация валидного абсолютного URL адреса
 	 * @param string $href - строка вида 'contoller/method/addit?param1=val1&param2=val2
-	 * return string абсолютный URL
+	 * @return string абсолютный URL
 	 */
 	public static function href($href){
 	
@@ -311,19 +325,9 @@ class App {
 	}
 
 	#### ПРОЧЕЕ ####
-	
-	public function setControllerErrCode($code){
-		
-		$this->_controllerErrCode = $code;
-	}
-	
-	public function getControllerErrCode(){
-		
-		return $this->_controllerErrCode;
-	}
-	
+
 	// ERROR 403
-	public static function error403($msg = ''){
+	public function error403($msg = ''){
 		
 		if(AJAX_MODE){
 			header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden'); // 'HTTP/1.1 403 Forbidden'
@@ -349,4 +353,3 @@ class App {
 	}
 	
 }
-?>

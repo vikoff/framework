@@ -8,7 +8,7 @@ class Config {
 	private $_envMode = null;
 	
 	
-	/** ИНИЦИАЛИЗАЦИЯ ЭКЗЕМПЛЯРА КЛАССА */
+	/** инициализация экземпляра класса */
 	public static function init(){
 		
 		if(!is_null(self::$_instance))
@@ -18,7 +18,10 @@ class Config {
 		self::$_instance->loadFiles();
 	}
 	
-	/** ПОЛУЧЕНИЕ ЭКЗЕМПЛЯРА КЛАССА */
+	/**
+	 * получение экземпляра класса
+	 * @return Config
+	 */
 	public static function get(){
 		
 		return self::$_instance;

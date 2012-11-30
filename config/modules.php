@@ -57,9 +57,9 @@ return array (
       'root' => 'Root-привилегии (установка ограничений, запрет удаления)',
     ),
   ),
-  'testItem' => 
+  'test-item' => 
   array (
-    'name' => 'testItem',
+    'name' => 'test-item',
     'title' => 'Тестовые сущности',
     'controller' => 'TestItem_Controller',
     'adminController' => 'TestItem_AdminController',
@@ -84,9 +84,9 @@ return array (
       'edit' => 'Редактирование данных других пользователей',
     ),
   ),
-  'userStatistics' => 
+  'user-statistics' => 
   array (
-    'name' => 'userStatistics',
+    'name' => 'user-statistics',
     'title' => 'Статистика посещений',
     'controller' => 'UserStatistics_Controller',
     'adminController' => 'UserStatistics_AdminController',

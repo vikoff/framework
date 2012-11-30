@@ -1,7 +1,7 @@
 <?
 
 return array(
-	'name' => 'userStatistics',
+	'name' => 'user-statistics',
 	'title' => 'Статистика посещений',
 	'controller' => 'UserStatistics_Controller',
 	'adminController' => 'UserStatistics_AdminController',

@@ -112,11 +112,41 @@ CREATE TABLE `aliases` (
   INDEX (`alias`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
--- some comments
+-- TEST TABLES --
+
+/*
+ * test_groups
+ * @test
+ * таблица зависит от:
+ * от таблицы зависят: test_items
+ */
+DROP TABLE IF EXISTS `test_groups`;
+CREATE TABLE `test_groups` (
+	`id` 			INT(10) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`name`          VARCHAR(255),
+	`date`			INT(10) UNSIGNED
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+/*
+ * test_items
+ * @test
+ * таблица зависит от: test_groups
+ * от таблицы зависят: 
+ */
+DROP TABLE IF EXISTS `test_items`;
+CREATE TABLE `test_items` (
+	`id` 			INT(10) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`group_id`      INT,
+	`name`          VARCHAR(255),
+	`img`           VARCHAR(16),
+	`description`   TEXT,
+	`date`			INT(10) UNSIGNED
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 /*
  * ____
- * таблица зависит от: 
- * от таблицы зависят: 
+ * таблица зависит от:
+ * от таблицы зависят:
  */
 DROP TABLE IF EXISTS `___`;
 CREATE TABLE `___` (
