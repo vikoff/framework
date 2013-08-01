@@ -38,6 +38,9 @@ UserStatistics_Model::enable();
 
 ########## РАЗНОЕ ##########
 
+// ключ для идентификации приложения
+define('CFG_APP_KEY', 'H5wg2A');
+
 // использовать красивые url
 define('CFG_USE_SEF', 0);
 
@@ -46,13 +49,3 @@ define('CHECK_FORM_DUPLICATION', 1);
 
 // производить ли редирект на дефолтные display методы
 define('CFG_REDIRECT_DEFAULT_DISPLAY', 0);
-
-
-########## SMARTY ##########
-
-// удаление лишних пробельных символов из html
-define('CFG_SMARTY_TRIMWHITESPACES', 0);
-
-// использовать ли кэширование шаблонов смарти
-define('CFG_USE_SMARTY_CACHING', 0);
-

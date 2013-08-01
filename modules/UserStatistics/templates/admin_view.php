@@ -23,14 +23,14 @@
 	<td><?= $this->has_js ? $this->browser_name.' '.$this->browser_version : '-'; ?></td>
 	<td><?= $this->has_js ? '<span class="green">✔</span>' : '<span class="red">✘</span>'; ?></td>
 	<td><?= $this->has_js ? $this->screen_width.'x'.$this->screen_height : '-'; ?></td>
-</td>
+</tr>
 </tbody>
 </table>
 
 <h3>Посещенные страницы (всего <?= $this->num_pages; ?>)</h3>
 <table class="grid tr-highlight user-stat-pages" style=" margin: 1em 0;">
-<colgroup span="2" />
-<colgroup span="2" align="center" />
+<colgroup span="2"></colgroup>
+<colgroup span="2" align="center"></colgroup>
 <tr>
 	<th>Дата</th>
 	<th>URL</th>
@@ -48,7 +48,7 @@
 				<?= $p['first_date']; ?>
 			<? endif; ?>
 		</td>
-		<td><?= $p['url'].($p['num_requests'] > 1 ? ' <sup>('.$p['num_requests'].')</sup>' : ''); ?></td>
+		<td><?= $p['url'].($p['num_requests'] > 1 ? ' <span class="grey">('.$p['num_requests'].')</span>' : ''); ?></td>
 		<?= $p['is_ajax'] ? '<td class="active">+</td>' : '<td>-</td>'; ?>
 		<?= $p['is_post'] ? '<td class="active">+</td>' : '<td>-</td>'; ?>
 		<td><?= $p['is_post'] ? $p['post_action'] : ''; ?></td>

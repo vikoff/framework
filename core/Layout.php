@@ -55,7 +55,7 @@ class Layout {
 		$this->_htmlTitle = $title;
 		return $this;
 	}
-	
+
 	public function prependTitle($title, $separator = ' » '){
 		
 		$this->_htmlTitle = strlen($this->_htmlTitle)
@@ -92,7 +92,7 @@ class Layout {
 		$this->_manualBreadcrumbs[] = array($href, $title);
 		return $this;
 	}
-	
+
 	public function href($url){
 	
 	return WWW_ROOT.(CFG_USE_SEF
@@ -230,16 +230,6 @@ class Layout {
 				->setContentPhpFile($this->_layoutDir.'error.php', array('message' => $message))
 				->render();
 		}
-		exit();
-	
-		$variables = array(
-			'message' => $message,
-		);
-		$this
-			->setTitle('Ошибка')
-			->setContentPhpFile($this->_layoutDir.'error.php', $variables)
-			->render();
-		exit();
 	}
 	
 	/** RENDER ERROR 403 PAGE */

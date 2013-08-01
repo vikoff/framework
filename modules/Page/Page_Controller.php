@@ -5,7 +5,7 @@ class Page_Controller extends Controller{
 	/** имя модуля */
 	const MODULE = 'page';
 	
-	const DEFAULT_VIEW = 'main';
+	const DEFAULT_PAGE = 'main';
 	
 	/** путь к шаблонам (относительно FS_ROOT) */
 	const TPL_PATH = 'modules/Page/templates/';
@@ -48,7 +48,7 @@ class Page_Controller extends Controller{
 	public function display_view($pageAlias = null){
 		
 		if (empty($pageAlias))
-			$pageAlias = self::DEFAULT_VIEW;
+			$pageAlias = self::DEFAULT_PAGE;
 		
 		$variables = Page_Model::LoadByAlias($pageAlias)->GetAllFieldsPrepared();
 		FrontendLayout::get()

@@ -18,8 +18,10 @@ require_once('setup.php');
 
 
 if ($argc == 1) {
-	exit("USAGE: php ".basename(__FILE__)." path/to/structure.sql 'comma-separated tables to recreate (drop, create)'\n");
+	exit("USAGE: php ".basename(__FILE__)." path/to/structure.sql [ --recreate table1,table2 ] [ --drop table1, table2 ]'\n");
 }
+
+$args = Cmd::parseArgs(array('recreate' => '-r --recreate', 'drop' => '-d --drop'));
 
 function convert($sql){
 	
@@ -44,13 +46,14 @@ function convert($sql){
 	$sql = preg_replace('/\)[^)]*$/', ')', $sql);
 	$sql = preg_replace('/int\(\d+\)/i', 'INTEGER', $sql);
 	$sql = preg_replace('/NOT NULL\s+PRIMARY KEY/i', 'PRIMARY KEY', $sql);
+	$sql = preg_replace('/NOW\(\)/i', 'CURRENT_TIMESTAMP', $sql);
 	$sql = preg_replace('/\)\s*ENGINE[^;]*;/i', ');', $sql);
 	return $sql;
 }
 
-
 $sqlFile = $argv[1];
-$tablesToRecreate = isset($argv[2]) ? explode(',', $argv[2]) : array();
+$argRecreate = $args['recreate'] ? explode(',', $args['recreate']) : array();
+$argDrop = $args['drop'] ? explode(',', $args['drop']) : array();
 
 if (!file_exists($sqlFile))
 	exit("ERROR: file $sqlFile not found\n");
@@ -75,37 +78,70 @@ foreach ($sqlsArrRaw as $sql) {
 
 $db = db::get();
 $existTables = $db->showTables();
+$tablesToCreate = array();
+$tablesToRecreate = array();
+$tablesToDrop = array();
+$counters = array('skipped' => 0, 'created' => 0, 'drop-created' => 0, 'dropped' => 0);
 
-echo "EXISTING TABLES:\n\t".implode("\n\t", $existTables)."\n";
-echo "TABLES TO CREATE:\n";
-foreach ($newTables as $t) echo "\t{$t['name']}\n";
+foreach ($newTables as $table) {
+	if (in_array($table['name'], $existTables)) {
+		if (in_array($table['name'], $argRecreate)) {
+			$tablesToRecreate[] = $table;
+		} else {
+			$counters['skipped']++;
+		}
+	} else {
+		$tablesToCreate[] = $table;
+	}
+}
+
+foreach ($argDrop as $i => $table)
+	if (in_array($table, $existTables))
+		$tablesToDrop[] = $table;
+
+echo "EXISTING TABLES:\n\t".implode("\n\t", $existTables)."\n\n";
+if ($tablesToCreate) {
+	echo "TABLES TO CREATE:\n";
+	foreach ($tablesToCreate as $t) echo "\t{$t['name']}\n";
+	echo "\n";
+}
+if ($tablesToRecreate) {
+	echo "TABLES TO RECREATE:\n";
+	foreach ($tablesToRecreate as $t) echo "\t{$t['name']}\n";
+	echo "\n";
+}
+if ($tablesToDrop) {
+	echo "TABLES TO DROP:\n";
+	foreach ($tablesToDrop as $t) echo "\t$t\n";
+	echo "\n";
+}
 
 echo "\nContinue? [Y/n]: ";
 $ans = mb_strtolower(trim(fread(STDIN, 1)));
 if ($ans !== 'y' && $ans !== '')
 	exit("Aborted\n");
 
-$counters = array('skipped' => 0, 'created' => 0, 'drop-created' => 0);
+foreach ($tablesToCreate as $table) {
+	$db->query(convert($table['sql']));
+	echo "table {$table['name']} created\n";
+	$counters['created']++;
+}
 
-foreach ($newTables as $table) {
-	if (in_array($table['name'], $existTables)) {
-		if (in_array($table['name'], $tablesToRecreate)) {
-			$db->query('DROP TABLE '.$table['name']);
-			$db->query(convert($table['sql']));
-			echo "table {$table['name']} drop, create\n";
-			$counters['drop-created']++;
-		} else {
-			echo "table {$table['name']} already exists, skip\n";
-			$counters['skipped']++;
-		}
-	} else {
-		$db->query(convert($table['sql']));
-		echo "table {$table['name']} created\n";
-		$counters['created']++;
-	}
+foreach ($tablesToRecreate as $table) {
+	$db->query('DROP TABLE '.$table['name']);
+	$db->query(convert($table['sql']));
+	echo "table {$table['name']} recreated\n";
+	$counters['drop-created']++;
+}
+
+foreach ($tablesToDrop as $table) {
+	$db->query('DROP TABLE '.$table);
+	echo "table $table dropped\n";
+	$counters['dropped']++;
 }
 
 echo "\nTOTAL\n"
 	."\t{$counters['created']} tables created\n"
 	."\t{$counters['skipped']} tables skipped\n"
-	."\t{$counters['drop-created']} tables dropped and created\n";
+	."\t{$counters['drop-created']} tables recreated (dropped and created)\n"
+	."\t{$counters['dropped']} tables dropped\n";

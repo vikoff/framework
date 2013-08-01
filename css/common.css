@@ -68,8 +68,9 @@ a:hover{
 .green{
 	color: green;
 }
-.grey{
-	color: #999999;
+.grey,
+a.grey{
+	color: #999999 !important;
 }
 .small{
 	font-size: 11px;

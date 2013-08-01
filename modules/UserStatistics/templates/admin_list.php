@@ -1,3 +1,8 @@
+<?php
+
+$statSessId = UserStatistics_Model::get()->getSessData('session-id');
+?>
+
 <p>
 	<div style="float: right;">
 		<a class="button" href="<?= $this->href('admin/manage/user-statistics/delete'); ?>">Очистить статистику</a>
@@ -61,6 +66,9 @@ table.statistics>tbody:nth-child(even) tr.urls{
 table.statistics>tbody:nth-child(odd) tr.urls{
 	/* background-color: #FAFAFA; */
 }
+table.statistics tbody.own td{
+	background: #CFD;
+}
 </style>
 
 <?= Html_Form::openTag(array('class' => 'paragraph', 'action' => 'admin/manage/user-statistics')); ?>
@@ -70,7 +78,7 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 	<? endif; ?>
 	
 	<table class="small-grid" style="margin: 5px 0 1em; text-align: center;">
-		<legend style="font-weight: bold;">Фильтр</legend>
+		<caption style="font-weight: bold; text-align: left;">Фильтр</caption>
 		<tr>
 			<td>Пользователи:</td>
 			<td>IP адреса:</td>
@@ -118,9 +126,12 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 	</thead>
 	
 	<? foreach ($this->collection as $item): ?>
-	<tbody>
+		<?php
+		$isOwn = $item['id'] == $statSessId;
+		?>
+	<tbody <?= $isOwn ? 'class="own"' : ''; ?>>
 	<tr class="info" style="">
-		<td></td>
+		<td><?= $isOwn ? '<b>Это вы</b>' : ''; ?></td>
 		<td style="text-align: right;">
 			<? if ($item['pages_info']): ?>
 				всего: <?= $item['num_pages']; ?>
@@ -144,24 +155,28 @@ table.statistics>tbody:nth-child(odd) tr.urls{
 			<a href="<?= href('admin/manage/user-statistics/view/'.$item['id']); ?>">Подробней</a>
 		</td>
 	</tr>
-	<? if ($item['referer']): ?>
-	<tr class="urls" style="">
-		<td></td>
-		<td class="grey" style="text-align: right;">Referer</td>
-		<td colspan="4" class="grey"><?= $item['referer']; ?></td>
-	</tr>
-	<? endif; ?>
-	<tr class="urls" style="">
-		<td class="grey"><?= $item['pages_info']['first_page_time']; ?></td>
-		<td class="grey" style="text-align: right;">Первая</td>
-		<td colspan="4">
-			<? if (strlen($item['pages_info']['first_page']) > 80): ?>
-				<?= implode('<wbr>', str_split($item['pages_info']['first_page'], 80)); ?>
-			<? else: ?>
-				<?= $item['pages_info']['first_page']; ?>
-			<? endif; ?>
-		</td>
-	</tr>
+	<? if ($item['referer']) { ?>
+		<tr class="urls" style="">
+			<td></td>
+			<td class="grey" style="text-align: right;">Referer</td>
+			<td colspan="4">
+				<a href="<?= $item['referer']; ?>" class="grey"><?= Tools::truncate($item['referer'], 50); ?></a>
+			</td>
+		</tr>
+	<? } ?>
+	<?php if ($item['num_pages'] > 1) { ?>
+		<tr class="urls" style="">
+			<td class="grey"><?= $item['pages_info']['first_page_time']; ?></td>
+			<td class="grey" style="text-align: right;">Первая</td>
+			<td colspan="4">
+				<? if (strlen($item['pages_info']['first_page']) > 80): ?>
+					<?= implode('<wbr>', str_split($item['pages_info']['first_page'], 80)); ?>
+				<? else: ?>
+					<?= $item['pages_info']['first_page']; ?>
+				<? endif; ?>
+			</td>
+		</tr>
+	<?php } ?>
 	<tr class="urls" style="">
 		<td><?= $item['pages_info']['last_page_time']; ?></td>
 		<td class="grey" style="text-align: right;">Последняя</td>

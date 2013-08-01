@@ -130,9 +130,14 @@ class Page_Model extends ActiveRecord{
 	
 	/** ПРОВЕРКА ПСЕВДОНИМА */
 	private function _checkAlias($data){
-	
+
+		$db = db::get();
+
 		// проверка псевдонима на уникальность (если задан)
-		if(strlen($data['alias']) && db::get()->fetchOne('SELECT COUNT(1) FROM '.self::TABLE.' WHERE alias='.db::get()->qe($data['alias']).' '.($this->isExistsObj ? ' AND id!='.$this->id : ''), 0)){
+		if(strlen($data['alias'])
+			&& $db->fetchOne('SELECT COUNT(1) FROM '.self::TABLE.'
+				WHERE alias=? '.($this->isExistsObj ? ' AND id!='.$this->id : ''), array($data['alias'])))
+		{
 			$this->setError('Запись с таким псевдонимом уже существует');
 			return FALSE;
 		}

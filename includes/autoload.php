@@ -28,6 +28,7 @@ function _vikoffAutoload($className){
 		'Exception403'          => 'core/Exception.php',
 		'Exception404'          => 'core/Exception.php',
 		'HtmlForm'              => 'core/HtmlForm.php',
+		'Cmd'                   => 'core/Cmd.php',
 		
 		'Config'                => 'includes/Config.php',
 		'CurUser'               => 'includes/CurUser.php',

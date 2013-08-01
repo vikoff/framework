@@ -15,8 +15,9 @@ class UserStatistics_Model {
 	
 	private static $_enabled = FALSE;
 	
-	private static $_instance = null;
-	
+	private static $_instance;
+
+	private $_sessKey;
 	
 	/** ВКЛЮЧИТЬ СБОР СТАТИСТИКИ */
 	public static function enable(){
@@ -42,7 +43,9 @@ class UserStatistics_Model {
 		
 		if(!self::$_enabled)
 			return;
-			
+
+		$this->_sessKey = CFG_APP_KEY.'-user-statistics';
+
 		if(!$this->_isSessionInited())
 			$this->_initSession();
 	}
@@ -64,12 +67,12 @@ class UserStatistics_Model {
 	// ПРОВЕРКА, ИНИЦИАЛИЗИРОВАНА ЛИ СЕССИЯ
 	private function _isSessionInited(){
 		
-		return !empty($_SESSION['vik-off-user-statistics']);
+		return !empty($_SESSION[$this->_sessKey]);
 	}
 	
 	// ИНИЦИАЛИЗАЦИЯ СЕССИИ
 	private function _initSession(){
-		$_SESSION['vik-off-user-statistics'] = array(
+		$_SESSION[$this->_sessKey] = array(
 			'session-id' => 0,
 			'last-url' => '',
 			'is-client-stat-saved' => FALSE,
@@ -77,7 +80,7 @@ class UserStatistics_Model {
 	}
 	
 	public function reset(){
-		$_SESSION['vik-off-user-statistics'] = null;
+		$_SESSION[$this->_sessKey] = null;
 	}
 	
 	// СОХРАНЕНИЕ ПЕРВИЧНОЙ СТАТИСТИКИ
@@ -93,7 +96,7 @@ class UserStatistics_Model {
 		$db = db::get();
 		
 		// создание сессии
-		if(!$_SESSION['vik-off-user-statistics']['session-id']){
+		if(!$_SESSION[$this->_sessKey]['session-id']){
 		
 			$sid = $db->insert(self::TABLE, array(
 				'user_ip' 		 => getVar($_SERVER['REMOTE_ADDR']),
@@ -101,7 +104,7 @@ class UserStatistics_Model {
 				'referer' 		 => getVar($_SERVER['HTTP_REFERER']),
 				'date'			 => time(),
 			));
-			$_SESSION['vik-off-user-statistics']['session-id'] = $sid;
+			$_SESSION[$this->_sessKey]['session-id'] = $sid;
 			
 		}
 		
@@ -110,19 +113,19 @@ class UserStatistics_Model {
 			: null;
 		
 		// инкремент запроса страницы (если запрошена та же страница)
-		if($requestUrl === $_SESSION['vik-off-user-statistics']['last-url'] && empty($_POST)
-		   && !empty($_SESSION['vik-off-user-statistics']['last-page-id']))
+		if($requestUrl === $_SESSION[$this->_sessKey]['last-url'] && empty($_POST)
+		   && !empty($_SESSION[$this->_sessKey]['last-page-id']))
 		{
 			$db->update('user_stat_pages', array(
 				'num_requests' => $db->raw('num_requests + 1'),
 				'last_date' => time(),
-			), 'id='.$_SESSION['vik-off-user-statistics']['last-page-id']);
+			), 'id='.$_SESSION[$this->_sessKey]['last-page-id']);
 		}
 		// сохранение запрошенной страницы
 		else {
 
 			$pid = $db->insert('user_stat_pages', array(
-				'session_id'  => $_SESSION['vik-off-user-statistics']['session-id'],
+				'session_id'  => $_SESSION[$this->_sessKey]['session-id'],
 				'url'         => $requestUrl,
 				'is_ajax'     => AJAX_MODE ? TRUE : FALSE,
 				'is_post'     => !empty($_POST),
@@ -134,8 +137,8 @@ class UserStatistics_Model {
 			));
 		
 			// сохраняем запрашиваемый URL
-			$_SESSION['vik-off-user-statistics']['last-url'] = $requestUrl;
-			$_SESSION['vik-off-user-statistics']['last-page-id'] = $pid;
+			$_SESSION[$this->_sessKey]['last-url'] = $requestUrl;
+			$_SESSION[$this->_sessKey]['last-page-id'] = $pid;
 		}
 	}
 	
@@ -146,7 +149,7 @@ class UserStatistics_Model {
 		if(!self::$_enabled)
 			return FALSE;
 	
-		return empty($_SESSION['vik-off-user-statistics']['is-client-stat-saved']);
+		return empty($_SESSION[$this->_sessKey]['is-client-stat-saved']);
 	}
 	
 	// ПОЛУЧИТЬ HTML ДЛЯ СОХРАНЕНИЯ КЛИЕНТСКОЙ СТАТИСТИКИ
@@ -188,7 +191,7 @@ class UserStatistics_Model {
 			'screen_width' => $sW,
 			'screen_height' => $sH,
 		));
-		$_SESSION['vik-off-user-statistics']['is-client-stat-saved'] = TRUE;
+		$_SESSION[$this->_sessKey]['is-client-stat-saved'] = TRUE;
 	}
 	
 	// СОХРАНЕНИЕ АВТОРИЗАЦИОННОЙ СТАТИСТИКИ
@@ -206,15 +209,15 @@ class UserStatistics_Model {
 	// СОХРАНЕНИЕ ДАННЫХ В БД
 	private function _dbSave($fieldvalues){
 		
-		if(!$_SESSION['vik-off-user-statistics']['session-id']){
+		if(!$_SESSION[$this->_sessKey]['session-id']){
 			
 			$fieldvalues['user_ip'] 		= getVar($_SERVER['REMOTE_ADDR']);
 			$fieldvalues['user_agent_raw'] 	= getVar($_SERVER['HTTP_USER_AGENT']);
 			$fieldvalues['referer'] 		= getVar($_SERVER['HTTP_REFERER']);
 			$fieldvalues['date'] 			= time();
-			$_SESSION['vik-off-user-statistics']['session-id'] = db::get()->insert(self::TABLE, $fieldvalues);
+			$_SESSION[$this->_sessKey]['session-id'] = db::get()->insert(self::TABLE, $fieldvalues);
 		}else{
-			db::get()->update(self::TABLE, $fieldvalues, 'id='.$_SESSION['vik-off-user-statistics']['session-id']);
+			db::get()->update(self::TABLE, $fieldvalues, 'id='.$_SESSION[$this->_sessKey]['session-id']);
 		}
 	}
 	
@@ -269,7 +272,15 @@ class UserStatistics_Model {
 		$minDate = time() - $expireTime;
 		db::get()->delete(self::TABLE, 'date < '.$minDate);
 	}
-	
+
+	public function getSessData($key = null)
+	{
+		return $key
+			? (isset($_SESSION[$this->_sessKey][$key])
+				? $_SESSION[$this->_sessKey][$key]
+				: null)
+			: $_SESSION[$this->_sessKey];
+	}
 }
 
 
