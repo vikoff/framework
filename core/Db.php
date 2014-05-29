@@ -55,7 +55,10 @@ class db {
 		
 		if(!empty($connParams['keepFileLog']))
 			$db->keepFileLog($connParams['keepFileLog']);
-		
+
+		if(isset($connParams['profiling']))
+			$db->setProfiling($connParams['profiling']);
+
 		// создаем подключение с указанным идентификатором
 		if(empty(self::$_instances[$connIdentifier]))
 			self::$_instances[$connIdentifier] = & $db;
@@ -148,6 +151,8 @@ abstract class DbAdapter {
 	
 	/** кодировка соединения */
 	protected $_encoding = null;
+
+	protected $_profiling = false;
 
 
 	/** подключение к базе данных */
@@ -324,6 +329,10 @@ abstract class DbAdapter {
 	public function keepFileLog($boolEnable) {
 		
 		$this->_keepFileLog = $boolEnable;
+	}
+
+	public function setProfiling($boolEnable) {
+		$this->_profiling = (bool)$boolEnable;
 	}
 	
 	/** получить хост бд */
